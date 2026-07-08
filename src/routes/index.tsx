@@ -1,24 +1,42 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Navbar } from "@/components/Navbar";
+import { Hero } from "@/components/Hero";
+import { Stats } from "@/components/Stats";
+import { Features } from "@/components/Features";
+import { CTA } from "@/components/CTA";
+import { Footer } from "@/components/Footer";
+import { Starfield } from "@/components/Starfield";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "ware — Discord's premier all-in-one app" },
+      {
+        name: "description",
+        content:
+          "ware is the leading Discord bot for management and engagement — boost perks, vanity rewards, social feeds, roles, and moderation in one polished toolkit.",
+      },
+      { property: "og:title", content: "ware — Discord's premier all-in-one app" },
+      {
+        property: "og:description",
+        content:
+          "The leading Discord bot for management and engagement. Boost perks, vanity rewards, social feeds, roles, and moderation.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="relative min-h-screen overflow-hidden">
+      <Starfield />
+      <Navbar />
+      <Hero />
+      <Stats />
+      <Features />
+      <CTA />
+      <Footer />
     </div>
   );
 }
