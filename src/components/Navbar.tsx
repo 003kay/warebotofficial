@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
-import { INVITE_URL } from "@/lib/links";
+import { INVITE_URL, SUPPORT_URL } from "@/lib/links";
 
 const links: { label: string; to: string }[] = [
   { label: "Commands", to: "/docs/commands" },
