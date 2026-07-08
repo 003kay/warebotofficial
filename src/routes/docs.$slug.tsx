@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { DocsLayout } from "@/components/docs/DocsLayout";
-import { commandCategories } from "@/lib/commands";
+import { commandCategories, type CommandDef } from "@/lib/commands";
 import type { ReactNode } from "react";
 
 type DocPage = {
@@ -10,20 +10,35 @@ type DocPage = {
   toc?: { id: string; label: string }[];
 };
 
-function CommandGrid({ commands }: { commands: string[] }) {
+function CommandList({ commands }: { commands: CommandDef[] }) {
   return (
-    <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-      {commands.map((cmd) => (
-        <code
-          key={cmd}
-          className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 font-mono text-xs text-foreground"
+    <div className="mt-6 space-y-4">
+      {commands.map((c) => (
+        <div
+          key={c.name}
+          className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
         >
-          {cmd}
-        </code>
+          <div className="flex flex-wrap items-baseline gap-2">
+            <code className="rounded-md bg-white/10 px-2 py-0.5 font-mono text-sm text-foreground">
+              ,{c.name}
+            </code>
+            <span className="font-mono text-xs text-muted-foreground">
+              {c.usage}
+            </span>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">{c.description}</p>
+          <div className="mt-2 text-xs text-muted-foreground">
+            Example:{" "}
+            <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-foreground">
+              {c.example}
+            </code>
+          </div>
+        </div>
       ))}
     </div>
   );
 }
+
 
 const staticPages: Record<string, DocPage> = {
   "donator-perks": {
@@ -123,7 +138,7 @@ const staticPages: Record<string, DocPage> = {
               {c.name}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">{c.description}</p>
-            <CommandGrid commands={c.commands} />
+            <CommandList commands={c.commands} />
           </section>
         ))}
       </div>
@@ -144,7 +159,7 @@ function buildPage(slug: string): DocPage | undefined {
       body: (
         <div>
           <p className="text-muted-foreground">{cat.description}</p>
-          <CommandGrid commands={cat.commands} />
+          <CommandList commands={cat.commands} />
         </div>
       ),
     };

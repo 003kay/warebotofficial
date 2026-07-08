@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
-import { INVITE_URL } from "@/lib/links";
+import { INVITE_URL, SUPPORT_URL } from "@/lib/links";
 
 const links: { label: string; to: string }[] = [
   { label: "Commands", to: "/docs/commands" },
@@ -18,13 +18,6 @@ export function Navbar() {
           className="h-9 w-9 rounded-full object-cover ring-1 ring-white/10"
         />
         <span className="text-2xl font-bold leading-none tracking-tight">ware</span>
-        <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-muted-foreground">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-          </span>
-          online
-        </span>
       </Link>
 
       <nav className="pill-surface hidden items-center gap-1 rounded-full px-2 py-1.5 text-sm md:flex">

@@ -11,9 +11,9 @@ export function Hero() {
         </h1>
 
         <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
-          Meet the leading bot for management and engagement. Built to elevate
-          your community's experience, streamline server operations, and unlock
-          premium tools for every necessity.
+          One bot, every module your server actually uses — protection,
+          economy, voice tools, custom embeds, and AI, wired together with a
+          clean prefix system and a dashboard you'll actually open.
         </p>
 
         <div className="mt-10 flex flex-wrap gap-3">
