@@ -76,7 +76,9 @@ export function DocsLayout({
           </div>
 
           <a
-            href="https://discord.gg"
+            href="https://discord.gg/penthouses"
+            target="_blank"
+            rel="noreferrer"
             className="hidden rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground md:inline-block"
           >
             Support Server
