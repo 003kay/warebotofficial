@@ -35,7 +35,7 @@ function Index() {
       <Hero />
       <Stats />
       <Features />
-      <CTA />
+      
       <Footer />
     </div>
   );
