@@ -138,7 +138,7 @@ const staticPages: Record<string, DocPage> = {
               {c.name}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">{c.description}</p>
-            <CommandGrid commands={c.commands} />
+            <CommandList commands={c.commands} />
           </section>
         ))}
       </div>
@@ -159,7 +159,7 @@ function buildPage(slug: string): DocPage | undefined {
       body: (
         <div>
           <p className="text-muted-foreground">{cat.description}</p>
-          <CommandGrid commands={cat.commands} />
+          <CommandList commands={cat.commands} />
         </div>
       ),
     };
