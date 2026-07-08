@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
+import { INVITE_URL } from "@/lib/links";
 
 const links = [
-  { label: "Commands", to: "/commands" },
+  { label: "Commands", to: "/docs" },
   { label: "Status", to: "/status" },
   { label: "Docs", to: "/docs" },
   { label: "FAQ", to: "/faq" },
@@ -33,7 +34,9 @@ export function Navbar() {
       </nav>
 
       <a
-        href="#"
+        href={INVITE_URL}
+        target="_blank"
+        rel="noreferrer"
         className="flex items-center gap-2 rounded-full bg-discord px-4 py-2 text-sm font-medium text-discord-foreground transition-transform hover:scale-[1.02]"
       >
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
