@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Search, Menu } from "lucide-react";
 import { useState } from "react";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
+import { commandCategories } from "@/lib/commands";
 
 export interface DocSection {
   title: string;
@@ -15,6 +16,7 @@ export const docSections: DocSection[] = [
     items: [
       { label: "Introduction", slug: "introduction" },
       { label: "Donator Perks", slug: "donator-perks" },
+      { label: "FAQ", slug: "faq" },
     ],
   },
   {
@@ -30,10 +32,10 @@ export const docSections: DocSection[] = [
     title: "Commands",
     items: [
       { label: "All Commands", slug: "commands" },
-      { label: "Moderation", slug: "commands-moderation" },
-      { label: "Roles", slug: "commands-roles" },
-      { label: "Utility", slug: "commands-utility" },
-      { label: "Fun", slug: "commands-fun" },
+      ...commandCategories.map((c) => ({
+        label: c.name,
+        slug: `commands-${c.slug}`,
+      })),
     ],
   },
 ];

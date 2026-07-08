@@ -3,7 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Stats } from "@/components/Stats";
 import { Features } from "@/components/Features";
-import { CTA } from "@/components/CTA";
+
 import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
 
@@ -35,7 +35,7 @@ function Index() {
       <Hero />
       <Stats />
       <Features />
-      <CTA />
+      
       <Footer />
     </div>
   );

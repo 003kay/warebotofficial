@@ -1,4 +1,4 @@
-import { Crown, ShieldCheck, Instagram, Users, MessageSquare, Zap } from "lucide-react";
+import { Crown, ShieldCheck, Users, MessageSquare, Zap } from "lucide-react";
 
 const features = [
   {
@@ -10,11 +10,6 @@ const features = [
     icon: ShieldCheck,
     title: "Moderation",
     body: "Powerful anti-nuke, anti-raid, and logging systems keep your community safe around the clock.",
-  },
-  {
-    icon: Instagram,
-    title: "Social feeds",
-    body: "Pipe Instagram, TikTok, YouTube and Twitch posts straight into your channels in real time.",
   },
   {
     icon: Users,
@@ -33,6 +28,7 @@ const features = [
   },
 ] as const;
 
+
 export function Features() {
   return (
     <section className="relative z-10 mx-auto max-w-7xl px-6 pb-32 md:px-10">
@@ -40,10 +36,8 @@ export function Features() {
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           / features
         </p>
-        <h2 className="mt-3 font-display text-4xl tracking-tight md:text-5xl">
-          <span className="text-gradient-hero">Every tool your server </span>
-          <span className="text-gradient-accent italic">actually</span>
-          <span className="text-gradient-hero"> needs.</span>
+        <h2 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
+          Every tool your server actually needs.
         </h2>
       </div>
 
@@ -56,7 +50,7 @@ export function Features() {
             <div className="mb-5 grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-foreground">
               <f.icon className="h-5 w-5" />
             </div>
-            <h3 className="font-display text-2xl tracking-tight">{f.title}</h3>
+            <h3 className="text-xl font-semibold tracking-tight">{f.title}</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {f.body}
             </p>

@@ -2,12 +2,11 @@ import { Link } from "@tanstack/react-router";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
 import { INVITE_URL } from "@/lib/links";
 
-const links = [
-  { label: "Commands", to: "/docs" },
-  { label: "Status", to: "/status" },
+const links: { label: string; to: string }[] = [
+  { label: "Commands", to: "/docs/commands" },
   { label: "Docs", to: "/docs" },
-  { label: "FAQ", to: "/faq" },
-] as const;
+  { label: "FAQ", to: "/docs/faq" },
+];
 
 export function Navbar() {
   return (
@@ -18,18 +17,25 @@ export function Navbar() {
           alt="ware"
           className="h-9 w-9 rounded-full object-cover ring-1 ring-white/10"
         />
-        <span className="font-display text-2xl leading-none tracking-tight">ware</span>
+        <span className="text-2xl font-bold leading-none tracking-tight">ware</span>
+        <span className="ml-2 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-muted-foreground">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          </span>
+          online
+        </span>
       </Link>
 
       <nav className="pill-surface hidden items-center gap-1 rounded-full px-2 py-1.5 text-sm md:flex">
         {links.map((l) => (
-          <a
+          <Link
             key={l.label}
-            href="#"
+            to={l.to}
             className="rounded-full px-4 py-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
           >
             {l.label}
-          </a>
+          </Link>
         ))}
       </nav>
 
