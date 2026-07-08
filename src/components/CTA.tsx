@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import { INVITE_URL } from "@/lib/links";
 
 export function CTA() {
   return (
@@ -23,14 +24,16 @@ export function CTA() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <a
-            href="#"
+            href={INVITE_URL}
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
           >
             <Sparkles className="h-4 w-4" />
             Invite to Discord
           </a>
           <a
-            href="#"
+            href="/docs"
             className="rounded-full border border-white/10 px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-white/5"
           >
             Read the docs
