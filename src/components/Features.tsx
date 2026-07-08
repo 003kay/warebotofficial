@@ -1,4 +1,4 @@
-import { Crown, ShieldCheck, Instagram, Users, MessageSquare, Zap } from "lucide-react";
+import { Crown, ShieldCheck, Users, MessageSquare, Zap } from "lucide-react";
 
 const features = [
   {
@@ -10,11 +10,6 @@ const features = [
     icon: ShieldCheck,
     title: "Moderation",
     body: "Powerful anti-nuke, anti-raid, and logging systems keep your community safe around the clock.",
-  },
-  {
-    icon: Instagram,
-    title: "Social feeds",
-    body: "Pipe Instagram, TikTok, YouTube and Twitch posts straight into your channels in real time.",
   },
   {
     icon: Users,
@@ -32,6 +27,7 @@ const features = [
     body: "AFK, reminders, tickets, giveaways, starboard — every essential in one clean toolkit.",
   },
 ] as const;
+
 
 export function Features() {
   return (
