@@ -1,4 +1,4 @@
-import { Sparkles, ArrowRight, Crown, Instagram, Users, ShieldCheck } from "lucide-react";
+import { Sparkles, ArrowRight, Crown, Users, ShieldCheck } from "lucide-react";
 import { FeaturePill } from "./FeaturePill";
 import { INVITE_URL } from "@/lib/links";
 
@@ -6,13 +6,8 @@ export function Hero() {
   return (
     <section className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 pb-24 pt-16 md:grid-cols-2 md:px-10 md:pb-32 md:pt-24">
       <div>
-        <h1 className="font-display text-5xl leading-[1.02] tracking-tight md:text-7xl">
-          <span className="text-gradient-accent">ware</span>{" "}
-          <span className="text-gradient-hero">is Discord's</span>
-          <br />
-          <span className="text-gradient-hero">premier </span>
-          <span className="text-gradient-accent italic">all-in-one</span>
-          <span className="text-gradient-hero"> app</span>
+        <h1 className="text-5xl font-bold leading-[1.05] tracking-tight text-foreground md:text-7xl">
+          Ware is Discord's all in one app
         </h1>
 
         <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -51,11 +46,6 @@ export function Hero() {
           icon={<ShieldCheck className="h-3 w-3" />}
           label="vanity rewards"
           className="absolute right-2 top-24 animate-float-slower"
-        />
-        <FeaturePill
-          icon={<Instagram className="h-3 w-3" />}
-          label="social media"
-          className="absolute right-10 top-56 animate-float-slow"
         />
         <FeaturePill
           icon={<Users className="h-3 w-3" />}
