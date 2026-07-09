@@ -3,7 +3,11 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Starfield } from "@/components/Starfield";
-import { getTicketPanel, saveTicketPanel } from "@/lib/dashboard.functions";
+import {
+  getTicketPanel,
+  saveTicketPanel,
+  publishTicketPanel,
+} from "@/lib/dashboard.functions";
 
 export const Route = createFileRoute("/dashboard/$guildId/tickets")({
   head: () => ({ meta: [{ title: "Tickets — ware dashboard" }] }),
@@ -18,7 +22,7 @@ export const Route = createFileRoute("/dashboard/$guildId/tickets")({
   errorComponent: ({ error }) => (
     <div className="p-10 text-center text-muted-foreground">
       {error.message === "You don't manage this server"
-        ? "You don't have access to configure this server."
+        ? "You don't have Manage Server permission for this guild."
         : `Error: ${error.message}`}
     </div>
   ),
@@ -58,25 +62,64 @@ function TicketsPage() {
     button_emoji: p?.button_emoji ?? DEFAULTS.button_emoji,
     button_style: p?.button_style ?? DEFAULTS.button_style,
     welcome_message: p?.welcome_message ?? DEFAULTS.welcome_message,
+    channel_id: p?.channel_id ?? "",
+    category_id: p?.category_id ?? "",
+    support_role_ids: (p?.support_role_ids as string[] | null) ?? [],
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publishResult, setPublishResult] = useState<string | null>(null);
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
     setSaved(false);
+    setPublishResult(null);
   };
 
   async function onSave() {
     setSaving(true);
     try {
-      await saveTicketPanel({ data: { guildId, ...form } });
+      await saveTicketPanel({
+        data: {
+          guildId,
+          ...form,
+          channel_id: form.channel_id || null,
+          category_id: form.category_id || null,
+        },
+      });
       setSaved(true);
       router.invalidate();
     } catch (e) {
       alert((e as Error).message);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function onPublish() {
+    if (!form.channel_id) {
+      alert("Choose a channel first, then save.");
+      return;
+    }
+    setPublishing(true);
+    setPublishResult(null);
+    try {
+      await saveTicketPanel({
+        data: {
+          guildId,
+          ...form,
+          channel_id: form.channel_id || null,
+          category_id: form.category_id || null,
+        },
+      });
+      const res = await publishTicketPanel({ data: { guildId } });
+      setPublishResult(`Panel posted to Discord (message ${res.messageId}).`);
+      router.invalidate();
+    } catch (e) {
+      alert((e as Error).message);
+    } finally {
+      setPublishing(false);
     }
   }
 
@@ -103,15 +146,107 @@ function TicketsPage() {
           </div>
         </div>
 
+        {!data.botInGuild && (
+          <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+            The Ware bot isn't in this server yet, so channels and roles can't be listed.{" "}
+            <a
+              href={`https://discord.com/oauth2/authorize?client_id=1519976058923778058&permissions=8&scope=bot+applications.commands&guild_id=${guildId}`}
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Invite Ware to this server
+            </a>{" "}
+            and refresh.
+          </div>
+        )}
+
         <div className="grid gap-8 lg:grid-cols-[1fr,420px]">
           {/* Left: form */}
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Ticket Panel</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Customize the embed and button members see to open a ticket.
+                Customize the panel embed, the button, and where tickets get created.
               </p>
             </div>
+
+            <Section title="Where">
+              <Field label="Panel channel" hint="The channel where the panel embed is posted.">
+                <select
+                  value={form.channel_id}
+                  onChange={(e) => set("channel_id", e.target.value)}
+                  className="input"
+                  disabled={!data.botInGuild}
+                >
+                  <option value="">— Select a channel —</option>
+                  {data.textChannels.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      #{c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field
+                label="Ticket category"
+                hint="New tickets are created as channels under this category."
+              >
+                <select
+                  value={form.category_id}
+                  onChange={(e) => set("category_id", e.target.value)}
+                  className="input"
+                  disabled={!data.botInGuild}
+                >
+                  <option value="">— None (top-level) —</option>
+                  {data.categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field
+                label="Support roles"
+                hint="Members with these roles can see and reply in every ticket."
+              >
+                <div className="flex flex-wrap gap-2">
+                  {data.roles.length === 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      {data.botInGuild ? "No roles found." : "Invite the bot to load roles."}
+                    </span>
+                  )}
+                  {data.roles.map((r) => {
+                    const active = form.support_role_ids.includes(r.id);
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() =>
+                          set(
+                            "support_role_ids",
+                            active
+                              ? form.support_role_ids.filter((x) => x !== r.id)
+                              : [...form.support_role_ids, r.id],
+                          )
+                        }
+                        className={`rounded-full px-3 py-1 text-xs ring-1 transition-colors ${
+                          active
+                            ? "bg-white/15 ring-white/40"
+                            : "bg-white/[0.03] ring-white/10 hover:bg-white/10"
+                        }`}
+                        style={
+                          r.color
+                            ? { color: `#${r.color.toString(16).padStart(6, "0")}` }
+                            : undefined
+                        }
+                      >
+                        @{r.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </Field>
+            </Section>
 
             <Section title="Embed">
               <Field label="Title" hint="Shown as the embed heading (max 256 characters).">
@@ -192,7 +327,7 @@ function TicketsPage() {
             </Section>
 
             <Section title="After ticket opens">
-              <Field label="Welcome message" hint="First message sent inside a new ticket.">
+              <Field label="Opening message" hint="First message sent inside a new ticket.">
                 <textarea
                   value={form.welcome_message}
                   maxLength={2000}
@@ -203,15 +338,32 @@ function TicketsPage() {
               </Field>
             </Section>
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
                 onClick={onSave}
-                disabled={saving}
-                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] disabled:opacity-50"
+                disabled={saving || publishing}
+                className="rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold ring-1 ring-white/15 transition-colors hover:bg-white/15 disabled:opacity-50"
               >
                 {saving ? "Saving…" : "Save changes"}
               </button>
+              <button
+                onClick={onPublish}
+                disabled={saving || publishing || !form.channel_id || !data.botInGuild}
+                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                title={
+                  !data.botInGuild
+                    ? "Invite the bot first"
+                    : !form.channel_id
+                      ? "Pick a channel"
+                      : "Post/update the panel in Discord"
+                }
+              >
+                {publishing ? "Publishing…" : "Publish to Discord"}
+              </button>
               {saved && <span className="text-sm text-emerald-400">Saved ✓</span>}
+              {publishResult && (
+                <span className="text-sm text-emerald-400">{publishResult}</span>
+              )}
             </div>
           </div>
 
@@ -257,7 +409,7 @@ function TicketsPage() {
 
             <div className="mt-4 rounded-lg bg-[#313338] p-4 text-[#dbdee1] shadow-2xl">
               <div className="text-xs uppercase tracking-widest text-[#949ba4]">
-                #ticket-0001 (welcome message)
+                #ticket-0001 (opening message)
               </div>
               <div className="mt-2 whitespace-pre-wrap text-sm">{form.welcome_message}</div>
             </div>

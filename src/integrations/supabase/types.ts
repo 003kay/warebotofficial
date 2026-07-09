@@ -55,12 +55,16 @@ export type Database = {
           button_emoji: string
           button_label: string
           button_style: string
+          category_id: string | null
+          channel_id: string | null
           color: string
           created_at: string
           description: string
           guild_id: string
           id: string
           owner_discord_id: string
+          panel_message_id: string | null
+          support_role_ids: string[]
           title: string
           updated_at: string
           welcome_message: string
@@ -69,12 +73,16 @@ export type Database = {
           button_emoji?: string
           button_label?: string
           button_style?: string
+          category_id?: string | null
+          channel_id?: string | null
           color?: string
           created_at?: string
           description?: string
           guild_id: string
           id?: string
           owner_discord_id: string
+          panel_message_id?: string | null
+          support_role_ids?: string[]
           title?: string
           updated_at?: string
           welcome_message?: string
@@ -83,12 +91,16 @@ export type Database = {
           button_emoji?: string
           button_label?: string
           button_style?: string
+          category_id?: string | null
+          channel_id?: string | null
           color?: string
           created_at?: string
           description?: string
           guild_id?: string
           id?: string
           owner_discord_id?: string
+          panel_message_id?: string | null
+          support_role_ids?: string[]
           title?: string
           updated_at?: string
           welcome_message?: string
