@@ -101,6 +101,21 @@
   backdrop-filter: blur(10px);
 }
 
+@utility input {
+  width: 100%;
+  border-radius: 0.5rem;
+  background: oklch(1 0 0 / 0.04);
+  border: 1px solid oklch(1 0 0 / 0.1);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-foreground);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.input:focus { border-color: oklch(1 0 0 / 0.3); background: oklch(1 0 0 / 0.06); }
+
+
+
 
 @keyframes twinkle {
   0%, 100% { opacity: 0.2; }
