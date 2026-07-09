@@ -14,13 +14,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "ware is the leading Discord bot for management and engagement — boost perks, vanity rewards, social feeds, roles, and moderation in one polished toolkit.",
+          "Help: https://gawn.bio\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
       },
       { property: "og:title", content: "ware — Discord's premier all-in-one app" },
       {
         property: "og:description",
         content:
-          "The leading Discord bot for management and engagement. Boost perks, vanity rewards, social feeds, roles, and moderation.",
+          "Help: https://gawn.bio\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
       },
     ],
   }),

@@ -81,10 +81,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "ware is the leading Discord bot for management and engagement — boost perks, vanity rewards, social feeds, roles, and moderation in one polished toolkit.",
+          "Help: https://gawn.bio\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "ware — Discord's premier all-in-one app" },
+      { name: "twitter:title", content: "ware — Discord's premier all-in-one app" },
+      { property: "og:description", content: "Help: https://gawn.bio\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help" },
+      { name: "twitter:description", content: "Help: https://gawn.bio\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0c03b3a-4682-4f9e-8087-29c5e1c8abd5/id-preview-17bb6b5b--8c07b575-86b6-4a2f-a21d-8788e908f794.lovable.app-1783607037275.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0c03b3a-4682-4f9e-8087-29c5e1c8abd5/id-preview-17bb6b5b--8c07b575-86b6-4a2f-a21d-8788e908f794.lovable.app-1783607037275.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -97,7 +103,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
