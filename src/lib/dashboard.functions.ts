@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
   const { readSessionFromCookie } = await import("@/lib/session.server");
   const { getValidAccessToken } = await import("@/lib/discord.server");
-  const req = getWebRequest();
+  const req = getRequest();
   const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
   if (!userId) return null;
   const session = await getValidAccessToken(userId);
@@ -22,7 +22,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(async ()
 export const getManagedGuildsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { readSessionFromCookie } = await import("@/lib/session.server");
   const { getValidAccessToken, getManagedGuilds } = await import("@/lib/discord.server");
-  const req = getWebRequest();
+  const req = getRequest();
   const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
   if (!userId) return { authenticated: false as const, guilds: [] };
   const session = await getValidAccessToken(userId);
@@ -45,7 +45,7 @@ export const getTicketPanel = createServerFn({ method: "GET" })
     const { readSessionFromCookie } = await import("@/lib/session.server");
     const { getValidAccessToken, userManagesGuild } = await import("@/lib/discord.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const req = getWebRequest();
+    const req = getRequest();
     const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
     if (!userId) throw new Error("Not signed in");
     const session = await getValidAccessToken(userId);
@@ -88,7 +88,7 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
     const { readSessionFromCookie } = await import("@/lib/session.server");
     const { getValidAccessToken, userManagesGuild } = await import("@/lib/discord.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const req = getWebRequest();
+    const req = getRequest();
     const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
     if (!userId) throw new Error("Not signed in");
     const session = await getValidAccessToken(userId);
