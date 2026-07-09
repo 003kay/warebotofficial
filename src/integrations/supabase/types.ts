@@ -14,7 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      discord_sessions: {
+        Row: {
+          access_token: string
+          avatar: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          refresh_token: string
+          updated_at: string
+          user_discord_id: string
+          username: string
+        }
+        Insert: {
+          access_token: string
+          avatar?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          refresh_token: string
+          updated_at?: string
+          user_discord_id: string
+          username: string
+        }
+        Update: {
+          access_token?: string
+          avatar?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string
+          updated_at?: string
+          user_discord_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      ticket_panels: {
+        Row: {
+          button_emoji: string
+          button_label: string
+          button_style: string
+          color: string
+          created_at: string
+          description: string
+          guild_id: string
+          id: string
+          owner_discord_id: string
+          title: string
+          updated_at: string
+          welcome_message: string
+        }
+        Insert: {
+          button_emoji?: string
+          button_label?: string
+          button_style?: string
+          color?: string
+          created_at?: string
+          description?: string
+          guild_id: string
+          id?: string
+          owner_discord_id: string
+          title?: string
+          updated_at?: string
+          welcome_message?: string
+        }
+        Update: {
+          button_emoji?: string
+          button_label?: string
+          button_style?: string
+          color?: string
+          created_at?: string
+          description?: string
+          guild_id?: string
+          id?: string
+          owner_discord_id?: string
+          title?: string
+          updated_at?: string
+          welcome_message?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
