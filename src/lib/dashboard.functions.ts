@@ -1,6 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 
+async function requireGuildManager(guildId: string) {
+  const { readSessionFromCookie } = await import("@/lib/session.server");
+  const { getValidAccessToken, userManagesGuild } = await import("@/lib/discord.server");
+  const req = getRequest();
+  const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
+  if (!userId) throw new Error("Not signed in");
+  const session = await getValidAccessToken(userId);
+  if (!session) throw new Error("Session expired");
+  const guild = await userManagesGuild(session.accessToken, guildId);
+  if (!guild) throw new Error("You don't manage this server");
+  return { userId, guild };
+}
+
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
   const { readSessionFromCookie } = await import("@/lib/session.server");
   const { getValidAccessToken } = await import("@/lib/discord.server");
@@ -42,22 +55,17 @@ export const getManagedGuildsFn = createServerFn({ method: "GET" }).handler(asyn
 export const getTicketPanel = createServerFn({ method: "GET" })
   .inputValidator((d: { guildId: string }) => d)
   .handler(async ({ data }) => {
-    const { readSessionFromCookie } = await import("@/lib/session.server");
-    const { getValidAccessToken, userManagesGuild } = await import("@/lib/discord.server");
+    const { guild } = await requireGuildManager(data.guildId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const req = getRequest();
-    const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
-    if (!userId) throw new Error("Not signed in");
-    const session = await getValidAccessToken(userId);
-    if (!session) throw new Error("Session expired");
-    const guild = await userManagesGuild(session.accessToken, data.guildId);
-    if (!guild) throw new Error("You don't manage this server");
+    const { fetchGuildChannels, fetchGuildRoles } = await import("@/lib/discord-bot.server");
 
-    const { data: panel } = await supabaseAdmin
-      .from("ticket_panels")
-      .select("*")
-      .eq("guild_id", data.guildId)
-      .maybeSingle();
+    const [panelRes, channels, roles] = await Promise.all([
+      supabaseAdmin.from("ticket_panels").select("*").eq("guild_id", data.guildId).maybeSingle(),
+      fetchGuildChannels(data.guildId).catch(() => null),
+      fetchGuildRoles(data.guildId).catch(() => null),
+    ]);
+
+    const botInGuild = channels !== null;
 
     return {
       guild: {
@@ -67,34 +75,42 @@ export const getTicketPanel = createServerFn({ method: "GET" })
           ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128`
           : null,
       },
-      panel: panel ?? null,
+      panel: panelRes.data ?? null,
+      botInGuild,
+      textChannels: (channels ?? [])
+        .filter((c) => c.type === 0 || c.type === 5)
+        .sort((a, b) => a.position - b.position)
+        .map((c) => ({ id: c.id, name: c.name, parent_id: c.parent_id })),
+      categories: (channels ?? [])
+        .filter((c) => c.type === 4)
+        .sort((a, b) => a.position - b.position)
+        .map((c) => ({ id: c.id, name: c.name })),
+      roles: (roles ?? [])
+        .filter((r) => r.name !== "@everyone" && !r.managed)
+        .sort((a, b) => b.position - a.position)
+        .map((r) => ({ id: r.id, name: r.name, color: r.color })),
     };
   });
 
+const panelInputSchema = (d: {
+  guildId: string;
+  title: string;
+  description: string;
+  color: string;
+  button_label: string;
+  button_emoji: string;
+  button_style: string;
+  welcome_message: string;
+  channel_id: string | null;
+  category_id: string | null;
+  support_role_ids: string[];
+}) => d;
+
 export const saveTicketPanel = createServerFn({ method: "POST" })
-  .inputValidator(
-    (d: {
-      guildId: string;
-      title: string;
-      description: string;
-      color: string;
-      button_label: string;
-      button_emoji: string;
-      button_style: string;
-      welcome_message: string;
-    }) => d,
-  )
+  .inputValidator(panelInputSchema)
   .handler(async ({ data }) => {
-    const { readSessionFromCookie } = await import("@/lib/session.server");
-    const { getValidAccessToken, userManagesGuild } = await import("@/lib/discord.server");
+    const { userId } = await requireGuildManager(data.guildId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const req = getRequest();
-    const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
-    if (!userId) throw new Error("Not signed in");
-    const session = await getValidAccessToken(userId);
-    if (!session) throw new Error("Session expired");
-    const guild = await userManagesGuild(session.accessToken, data.guildId);
-    if (!guild) throw new Error("You don't manage this server");
 
     const { error } = await supabaseAdmin.from("ticket_panels").upsert(
       {
@@ -107,9 +123,38 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
         button_emoji: data.button_emoji,
         button_style: data.button_style,
         welcome_message: data.welcome_message,
+        channel_id: data.channel_id,
+        category_id: data.category_id,
+        support_role_ids: data.support_role_ids,
       },
       { onConflict: "guild_id" },
     );
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+export const publishTicketPanel = createServerFn({ method: "POST" })
+  .inputValidator((d: { guildId: string }) => d)
+  .handler(async ({ data }) => {
+    await requireGuildManager(data.guildId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { publishPanelMessage } = await import("@/lib/discord-bot.server");
+
+    const { data: panel } = await supabaseAdmin
+      .from("ticket_panels")
+      .select("*")
+      .eq("guild_id", data.guildId)
+      .maybeSingle();
+
+    if (!panel) throw new Error("Save the panel before publishing.");
+    if (!panel.channel_id) throw new Error("Pick a channel to post the panel in first.");
+
+    const { messageId } = await publishPanelMessage(panel.channel_id, panel, panel.panel_message_id);
+
+    await supabaseAdmin
+      .from("ticket_panels")
+      .update({ panel_message_id: messageId })
+      .eq("guild_id", data.guildId);
+
+    return { ok: true, messageId };
   });
