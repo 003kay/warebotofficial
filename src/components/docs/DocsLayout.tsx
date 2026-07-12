@@ -24,7 +24,7 @@ export function DocsLayout({
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 border-b border-white/5 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-[1400px] items-center gap-4 px-4 py-3 md:px-8">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex shrink-0 items-center gap-2">
             <img
               src={avatarAsset.url}
               alt="ware"
@@ -33,16 +33,7 @@ export function DocsLayout({
             <span className="text-lg font-semibold tracking-tight">ware</span>
           </Link>
 
-          <div className="mx-auto flex w-full max-w-xl items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-muted-foreground">
-            <Search className="h-4 w-4" />
-            <input
-              className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
-              placeholder="Search..."
-            />
-            <kbd className="hidden rounded border border-white/10 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground md:inline">
-              Ctrl K
-            </kbd>
-          </div>
+          <DocsSearch />
 
           <a
             href="https://discord.gg/penthouses"
