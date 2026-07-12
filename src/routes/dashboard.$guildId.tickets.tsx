@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Starfield } from "@/components/Starfield";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
@@ -9,7 +9,6 @@ import {
   saveTicketPanel,
   publishTicketPanel,
 } from "@/lib/dashboard.functions";
-
 
 export const Route = createFileRoute("/dashboard/$guildId/tickets")({
   head: () => ({ meta: [{ title: "Tickets — ware dashboard" }] }),
@@ -37,6 +36,16 @@ const DEFAULTS = {
   button_label: "Open Ticket",
   button_emoji: "🎫",
   button_style: "primary",
+  close_button_label: "Close",
+  close_button_emoji: "🔒",
+  close_button_style: "danger",
+  claim_button_label: "Claim",
+  claim_button_emoji: "✋",
+  claim_button_style: "success",
+  command_prefix: "$",
+  close_command: "close",
+  reopen_command: "reopen",
+  delete_command: "delete",
   welcome_message: "Thanks for opening a ticket! Support will be with you shortly.",
 };
 
@@ -55,23 +64,37 @@ function TicketsPage() {
     queryFn: () => getTicketPanel({ data: { guildId } }),
   });
 
-  const p = data.panel;
+  const p = data.panel as Record<string, unknown> | null;
+  const s = (k: string, d: string) => (p && typeof p[k] === "string" ? (p[k] as string) : d);
+
   const [form, setForm] = useState({
-    title: p?.title ?? DEFAULTS.title,
-    description: p?.description ?? DEFAULTS.description,
-    color: p?.color ?? DEFAULTS.color,
-    button_label: p?.button_label ?? DEFAULTS.button_label,
-    button_emoji: p?.button_emoji ?? DEFAULTS.button_emoji,
-    button_style: p?.button_style ?? DEFAULTS.button_style,
-    welcome_message: p?.welcome_message ?? DEFAULTS.welcome_message,
-    channel_id: p?.channel_id ?? "",
-    category_id: p?.category_id ?? "",
-    support_role_ids: (p?.support_role_ids as string[] | null) ?? [],
+    title: s("title", DEFAULTS.title),
+    description: s("description", DEFAULTS.description),
+    color: s("color", DEFAULTS.color),
+    button_label: s("button_label", DEFAULTS.button_label),
+    button_emoji: s("button_emoji", DEFAULTS.button_emoji),
+    button_style: s("button_style", DEFAULTS.button_style),
+    close_button_label: s("close_button_label", DEFAULTS.close_button_label),
+    close_button_emoji: s("close_button_emoji", DEFAULTS.close_button_emoji),
+    close_button_style: s("close_button_style", DEFAULTS.close_button_style),
+    claim_button_label: s("claim_button_label", DEFAULTS.claim_button_label),
+    claim_button_emoji: s("claim_button_emoji", DEFAULTS.claim_button_emoji),
+    claim_button_style: s("claim_button_style", DEFAULTS.claim_button_style),
+    command_prefix: s("command_prefix", DEFAULTS.command_prefix),
+    close_command: s("close_command", DEFAULTS.close_command),
+    reopen_command: s("reopen_command", DEFAULTS.reopen_command),
+    delete_command: s("delete_command", DEFAULTS.delete_command),
+    welcome_message: s("welcome_message", DEFAULTS.welcome_message),
+    channel_id: s("channel_id", ""),
+    category_id: "",
+    support_role_ids: (p?.support_role_ids as string[] | undefined) ?? [],
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState<string | null>(null);
+  const [channelSearch, setChannelSearch] = useState("");
+  const [channelOpen, setChannelOpen] = useState(false);
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -79,17 +102,26 @@ function TicketsPage() {
     setPublishResult(null);
   };
 
+  const selectedChannel = data.textChannels.find((c) => c.id === form.channel_id);
+  const filteredChannels = useMemo(() => {
+    const q = channelSearch.trim().toLowerCase();
+    const list = q
+      ? data.textChannels.filter((c) => c.name.toLowerCase().includes(q))
+      : data.textChannels;
+    return list.slice(0, 50);
+  }, [data.textChannels, channelSearch]);
+
+  const payload = () => ({
+    guildId,
+    ...form,
+    channel_id: form.channel_id || null,
+    category_id: null as string | null,
+  });
+
   async function onSave() {
     setSaving(true);
     try {
-      await saveTicketPanel({
-        data: {
-          guildId,
-          ...form,
-          channel_id: form.channel_id || null,
-          category_id: form.category_id || null,
-        },
-      });
+      await saveTicketPanel({ data: payload() });
       setSaved(true);
       router.invalidate();
     } catch (e) {
@@ -107,14 +139,7 @@ function TicketsPage() {
     setPublishing(true);
     setPublishResult(null);
     try {
-      await saveTicketPanel({
-        data: {
-          guildId,
-          ...form,
-          channel_id: form.channel_id || null,
-          category_id: form.category_id || null,
-        },
-      });
+      await saveTicketPanel({ data: payload() });
       const res = await publishTicketPanel({ data: { guildId } });
       setPublishResult(`Panel posted to Discord (message ${res.messageId}).`);
       router.invalidate();
@@ -126,13 +151,16 @@ function TicketsPage() {
   }
 
   const btnStyle = BUTTON_STYLES.find((b) => b.value === form.button_style) ?? BUTTON_STYLES[0];
+  const closeStyle = BUTTON_STYLES.find((b) => b.value === form.close_button_style) ?? BUTTON_STYLES[3];
+  const claimStyle = BUTTON_STYLES.find((b) => b.value === form.claim_button_style) ?? BUTTON_STYLES[2];
+
+  const prefixInvalid = !form.command_prefix || /[a-zA-Z]/.test(form.command_prefix);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
       <Starfield />
       <Navbar />
       <main className="relative z-10 mx-auto max-w-6xl px-6 py-8">
-        {/* Guild header */}
         <div className="mb-8 flex items-center gap-4">
           <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
             ← Servers
@@ -164,33 +192,61 @@ function TicketsPage() {
         )}
 
         <div className="grid gap-8 lg:grid-cols-[1fr,420px]">
-          {/* Left: form */}
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Ticket Panel</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Customize the panel embed, the button, and where tickets get created.
+                Customize the panel embed, buttons, commands, and where tickets get posted.
               </p>
             </div>
 
             <Section title="Where">
-              <Field label="Panel channel" hint="The channel where the panel embed is posted.">
-                <select
-                  value={form.channel_id}
-                  onChange={(e) => set("channel_id", e.target.value)}
-                  className="input"
-                  disabled={!data.botInGuild}
-                >
-                  <option value="">— Select a channel —</option>
-                  {data.textChannels.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      #{c.name}
-                    </option>
-                  ))}
-                </select>
+              <Field label="Panel channel" hint="Search by name if you can't scroll to find it.">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={channelOpen ? channelSearch : selectedChannel ? `#${selectedChannel.name}` : channelSearch}
+                    onChange={(e) => {
+                      setChannelSearch(e.target.value);
+                      setChannelOpen(true);
+                    }}
+                    onFocus={() => {
+                      setChannelOpen(true);
+                      setChannelSearch("");
+                    }}
+                    onBlur={() => setTimeout(() => setChannelOpen(false), 150)}
+                    placeholder={data.botInGuild ? "Type to search channels…" : "Invite the bot first"}
+                    className="input"
+                    disabled={!data.botInGuild}
+                  />
+                  {channelOpen && data.botInGuild && (
+                    <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-white/10 bg-[#1a1a1e] shadow-2xl">
+                      {filteredChannels.length === 0 ? (
+                        <div className="px-3 py-2 text-xs text-muted-foreground">No channels match.</div>
+                      ) : (
+                        filteredChannels.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              set("channel_id", c.id);
+                              setChannelSearch("");
+                              setChannelOpen(false);
+                            }}
+                            className={`block w-full px-3 py-2 text-left text-sm hover:bg-white/10 ${
+                              c.id === form.channel_id ? "bg-white/5 text-white" : "text-[#dbdee1]"
+                            }`}
+                          >
+                            #{c.name}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
               </Field>
               <Field
-
                 label="Support roles"
                 hint="Members with these roles can see and reply in every ticket."
               >
@@ -234,126 +290,120 @@ function TicketsPage() {
             </Section>
 
             <Section title="Embed">
-              <Field label="Title" hint="Shown as the embed heading (max 256 characters).">
-                <input
-                  type="text"
-                  value={form.title}
-                  maxLength={256}
-                  onChange={(e) => set("title", e.target.value)}
-                  className="input"
-                />
+              <Field label="Title">
+                <input type="text" value={form.title} maxLength={256}
+                  onChange={(e) => set("title", e.target.value)} className="input" />
               </Field>
               <Field label="Description" hint="Supports basic Discord markdown.">
-                <textarea
-                  value={form.description}
-                  maxLength={4000}
-                  rows={5}
-                  onChange={(e) => set("description", e.target.value)}
-                  className="input resize-none"
-                />
+                <textarea value={form.description} maxLength={4000} rows={5}
+                  onChange={(e) => set("description", e.target.value)} className="input resize-none" />
               </Field>
               <Field label="Accent color">
                 <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    value={form.color}
+                  <input type="color" value={form.color}
                     onChange={(e) => set("color", e.target.value)}
-                    className="h-10 w-14 cursor-pointer rounded-md border border-white/10 bg-transparent"
-                  />
-                  <input
-                    type="text"
-                    value={form.color}
+                    className="h-10 w-14 cursor-pointer rounded-md border border-white/10 bg-transparent" />
+                  <input type="text" value={form.color}
                     onChange={(e) => set("color", e.target.value)}
-                    className="input w-32 font-mono"
-                  />
+                    className="input w-32 font-mono" />
                 </div>
               </Field>
             </Section>
 
-            <Section title="Button">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Label">
-                  <input
-                    type="text"
-                    value={form.button_label}
-                    maxLength={80}
-                    onChange={(e) => set("button_label", e.target.value)}
-                    className="input"
-                  />
+            <ButtonEditor
+              title="Open ticket button"
+              hint="Shown on the panel. Users click this to open a ticket."
+              label={form.button_label} onLabel={(v) => set("button_label", v)}
+              emoji={form.button_emoji} onEmoji={(v) => set("button_emoji", v)}
+              style={form.button_style} onStyle={(v) => set("button_style", v)}
+            />
+
+            <ButtonEditor
+              title="Close ticket button"
+              hint="Shown inside a ticket to close it."
+              label={form.close_button_label} onLabel={(v) => set("close_button_label", v)}
+              emoji={form.close_button_emoji} onEmoji={(v) => set("close_button_emoji", v)}
+              style={form.close_button_style} onStyle={(v) => set("close_button_style", v)}
+            />
+
+            <ButtonEditor
+              title="Claim ticket button"
+              hint="Support staff click this to take ownership of a ticket."
+              label={form.claim_button_label} onLabel={(v) => set("claim_button_label", v)}
+              emoji={form.claim_button_emoji} onEmoji={(v) => set("claim_button_emoji", v)}
+              style={form.claim_button_style} onStyle={(v) => set("claim_button_style", v)}
+            />
+
+            <Section title="Commands">
+              <Field
+                label="Prefix"
+                hint="Any character except letters — e.g. $, !, ?, ., -"
+              >
+                <input type="text" value={form.command_prefix} maxLength={4}
+                  onChange={(e) => set("command_prefix", e.target.value)}
+                  className={`input w-24 font-mono ${prefixInvalid ? "ring-1 ring-red-500/60" : ""}`} />
+                {prefixInvalid && (
+                  <div className="mt-1 text-xs text-red-400">Prefix can't contain letters.</div>
+                )}
+              </Field>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Field label="Close command">
+                  <div className="flex">
+                    <span className="grid place-items-center rounded-l-md border border-r-0 border-white/10 bg-white/5 px-3 font-mono text-sm text-muted-foreground">
+                      {form.command_prefix || "$"}
+                    </span>
+                    <input type="text" value={form.close_command}
+                      onChange={(e) => set("close_command", e.target.value.replace(/\s/g, ""))}
+                      className="input rounded-l-none font-mono" />
+                  </div>
                 </Field>
-                <Field label="Emoji">
-                  <input
-                    type="text"
-                    value={form.button_emoji}
-                    onChange={(e) => set("button_emoji", e.target.value)}
-                    className="input"
-                    placeholder="🎫"
-                  />
+                <Field label="Reopen command">
+                  <div className="flex">
+                    <span className="grid place-items-center rounded-l-md border border-r-0 border-white/10 bg-white/5 px-3 font-mono text-sm text-muted-foreground">
+                      {form.command_prefix || "$"}
+                    </span>
+                    <input type="text" value={form.reopen_command}
+                      onChange={(e) => set("reopen_command", e.target.value.replace(/\s/g, ""))}
+                      className="input rounded-l-none font-mono" />
+                  </div>
+                </Field>
+                <Field label="Delete command">
+                  <div className="flex">
+                    <span className="grid place-items-center rounded-l-md border border-r-0 border-white/10 bg-white/5 px-3 font-mono text-sm text-muted-foreground">
+                      {form.command_prefix || "$"}
+                    </span>
+                    <input type="text" value={form.delete_command}
+                      onChange={(e) => set("delete_command", e.target.value.replace(/\s/g, ""))}
+                      className="input rounded-l-none font-mono" />
+                  </div>
                 </Field>
               </div>
-              <Field label="Style">
-                <div className="grid grid-cols-4 gap-2">
-                  {BUTTON_STYLES.map((s) => (
-                    <button
-                      key={s.value}
-                      type="button"
-                      onClick={() => set("button_style", s.value)}
-                      className={`rounded-md px-3 py-2 text-xs font-medium ring-1 transition-colors ${
-                        form.button_style === s.value
-                          ? "ring-white/40 bg-white/10"
-                          : "ring-white/10 hover:bg-white/5"
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </Field>
             </Section>
 
             <Section title="After ticket opens">
               <Field label="Opening message" hint="First message sent inside a new ticket.">
-                <textarea
-                  value={form.welcome_message}
-                  maxLength={2000}
-                  rows={4}
-                  onChange={(e) => set("welcome_message", e.target.value)}
-                  className="input resize-none"
-                />
+                <textarea value={form.welcome_message} maxLength={2000} rows={4}
+                  onChange={(e) => set("welcome_message", e.target.value)} className="input resize-none" />
               </Field>
             </Section>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button
-                onClick={onSave}
-                disabled={saving || publishing}
-                className="rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold ring-1 ring-white/15 transition-colors hover:bg-white/15 disabled:opacity-50"
-              >
+              <button onClick={onSave} disabled={saving || publishing}
+                className="rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold ring-1 ring-white/15 transition-colors hover:bg-white/15 disabled:opacity-50">
                 {saving ? "Saving…" : "Save changes"}
               </button>
-              <button
-                onClick={onPublish}
+              <button onClick={onPublish}
                 disabled={saving || publishing || !form.channel_id || !data.botInGuild}
-                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
-                title={
-                  !data.botInGuild
-                    ? "Invite the bot first"
-                    : !form.channel_id
-                      ? "Pick a channel"
-                      : "Post/update the panel in Discord"
-                }
-              >
+                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50">
                 {publishing ? "Publishing…" : "Publish to Discord"}
               </button>
               {saved && <span className="text-sm text-emerald-400">Saved ✓</span>}
-              {publishResult && (
-                <span className="text-sm text-emerald-400">{publishResult}</span>
-              )}
+              {publishResult && <span className="text-sm text-emerald-400">{publishResult}</span>}
             </div>
           </div>
 
-          {/* Right: preview */}
-          <div className="lg:sticky lg:top-6 lg:self-start">
+          {/* Preview */}
+          <div className="lg:sticky lg:top-6 lg:self-start space-y-4">
             <div className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">
               Live preview
             </div>
@@ -363,45 +413,90 @@ function TicketsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2">
                     <span className="font-semibold text-white">Ware</span>
-                    <span className="rounded bg-[#5865F2] px-1 py-[1px] text-[10px] font-semibold text-white">
-                      APP
-                    </span>
+                    <span className="rounded bg-[#5865F2] px-1 py-[1px] text-[10px] font-semibold text-white">APP</span>
                     <span className="text-xs text-[#949ba4]">Today at 12:00 PM</span>
                   </div>
-
-                  <div
-                    className="mt-1 max-w-[440px] rounded border-l-4 bg-[#2b2d31] p-3"
-                    style={{ borderColor: form.color }}
-                  >
+                  <div className="mt-1 max-w-[440px] rounded border-l-4 bg-[#2b2d31] p-3"
+                    style={{ borderColor: form.color }}>
                     <div className="font-semibold text-white">{form.title || " "}</div>
-                    <div className="mt-1 whitespace-pre-wrap text-sm text-[#dbdee1]">
-                      {form.description}
-                    </div>
+                    <div className="mt-1 whitespace-pre-wrap text-sm text-[#dbdee1]">{form.description}</div>
                   </div>
-
                   <div className="mt-2">
-                    <button
-                      type="button"
-                      className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${btnStyle.className}`}
-                    >
-                      <span>{form.button_emoji}</span>
-                      <span>{form.button_label}</span>
+                    <button type="button"
+                      className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${btnStyle.className}`}>
+                      <span>{form.button_emoji}</span><span>{form.button_label}</span>
                     </button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 rounded-lg bg-[#313338] p-4 text-[#dbdee1] shadow-2xl">
+            <div className="rounded-lg bg-[#313338] p-4 text-[#dbdee1] shadow-2xl">
               <div className="text-xs uppercase tracking-widest text-[#949ba4]">
                 #ticket-0001 (opening message)
               </div>
               <div className="mt-2 whitespace-pre-wrap text-sm">{form.welcome_message}</div>
+              <div className="mt-3 flex gap-2">
+                <button type="button"
+                  className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${claimStyle.className}`}>
+                  <span>{form.claim_button_emoji}</span><span>{form.claim_button_label}</span>
+                </button>
+                <button type="button"
+                  className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${closeStyle.className}`}>
+                  <span>{form.close_button_emoji}</span><span>{form.close_button_label}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-[#313338] p-4 text-[13px] text-[#dbdee1] shadow-2xl">
+              <div className="text-xs uppercase tracking-widest text-[#949ba4]">Commands</div>
+              <ul className="mt-2 space-y-1 font-mono">
+                <li><span className="text-white">{form.command_prefix}{form.close_command}</span> <span className="text-[#949ba4]">— close the ticket</span></li>
+                <li><span className="text-white">{form.command_prefix}{form.reopen_command}</span> <span className="text-[#949ba4]">— reopen the ticket</span></li>
+                <li><span className="text-white">{form.command_prefix}{form.delete_command}</span> <span className="text-[#949ba4]">— delete the ticket</span></li>
+              </ul>
             </div>
           </div>
         </div>
       </main>
     </div>
+  );
+}
+
+function ButtonEditor({
+  title, hint, label, onLabel, emoji, onEmoji, style, onStyle,
+}: {
+  title: string; hint?: string;
+  label: string; onLabel: (v: string) => void;
+  emoji: string; onEmoji: (v: string) => void;
+  style: string; onStyle: (v: string) => void;
+}) {
+  return (
+    <Section title={title}>
+      {hint && <p className="-mt-2 text-xs text-muted-foreground">{hint}</p>}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Label">
+          <input type="text" value={label} maxLength={80}
+            onChange={(e) => onLabel(e.target.value)} className="input" />
+        </Field>
+        <Field label="Emoji">
+          <input type="text" value={emoji}
+            onChange={(e) => onEmoji(e.target.value)} className="input" />
+        </Field>
+      </div>
+      <Field label="Style">
+        <div className="grid grid-cols-4 gap-2">
+          {BUTTON_STYLES.map((s) => (
+            <button key={s.value} type="button" onClick={() => onStyle(s.value)}
+              className={`rounded-md px-3 py-2 text-xs font-medium ring-1 transition-colors ${
+                style === s.value ? "ring-white/40 bg-white/10" : "ring-white/10 hover:bg-white/5"
+              }`}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </Field>
+    </Section>
   );
 }
 
@@ -417,14 +512,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+  label, hint, children,
+}: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
       <div className="text-sm font-medium">{label}</div>

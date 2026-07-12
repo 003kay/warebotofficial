@@ -100,6 +100,16 @@ const panelInputSchema = (d: {
   button_label: string;
   button_emoji: string;
   button_style: string;
+  close_button_label: string;
+  close_button_emoji: string;
+  close_button_style: string;
+  claim_button_label: string;
+  claim_button_emoji: string;
+  claim_button_style: string;
+  command_prefix: string;
+  close_command: string;
+  reopen_command: string;
+  delete_command: string;
   welcome_message: string;
   channel_id: string | null;
   category_id: string | null;
@@ -112,6 +122,11 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
     const { userId } = await requireGuildManager(data.guildId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    // Validate prefix: must be non-empty and contain no letters
+    if (!data.command_prefix || /[a-zA-Z]/.test(data.command_prefix)) {
+      throw new Error("Command prefix must not contain letters (e.g. $, !, ?, .)");
+    }
+
     const { error } = await supabaseAdmin.from("ticket_panels").upsert(
       {
         guild_id: data.guildId,
@@ -122,6 +137,16 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
         button_label: data.button_label,
         button_emoji: data.button_emoji,
         button_style: data.button_style,
+        close_button_label: data.close_button_label,
+        close_button_emoji: data.close_button_emoji,
+        close_button_style: data.close_button_style,
+        claim_button_label: data.claim_button_label,
+        claim_button_emoji: data.claim_button_emoji,
+        claim_button_style: data.claim_button_style,
+        command_prefix: data.command_prefix,
+        close_command: data.close_command,
+        reopen_command: data.reopen_command,
+        delete_command: data.delete_command,
         welcome_message: data.welcome_message,
         channel_id: data.channel_id,
         category_id: data.category_id,
