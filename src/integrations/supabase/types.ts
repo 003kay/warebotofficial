@@ -50,6 +50,59 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_panel_options: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          description: string
+          emoji: string
+          id: string
+          label: string
+          panel_id: string
+          position: number
+          support_role_ids: string[]
+          ticket_name_format: string
+          updated_at: string
+          welcome_message: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          emoji?: string
+          id?: string
+          label?: string
+          panel_id: string
+          position?: number
+          support_role_ids?: string[]
+          ticket_name_format?: string
+          updated_at?: string
+          welcome_message?: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          emoji?: string
+          id?: string
+          label?: string
+          panel_id?: string
+          position?: number
+          support_role_ids?: string[]
+          ticket_name_format?: string
+          updated_at?: string
+          welcome_message?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_panel_options_panel_id_fkey"
+            columns: ["panel_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_panels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_panels: {
         Row: {
           button_emoji: string
@@ -69,11 +122,13 @@ export type Database = {
           created_at: string
           delete_command: string
           description: string
+          dropdown_placeholder: string
           guild_id: string
           id: string
           log_channel_id: string | null
           owner_discord_id: string
           panel_message_id: string | null
+          panel_type: string
           reopen_command: string
           support_role_ids: string[]
           title: string
@@ -98,11 +153,13 @@ export type Database = {
           created_at?: string
           delete_command?: string
           description?: string
+          dropdown_placeholder?: string
           guild_id: string
           id?: string
           log_channel_id?: string | null
           owner_discord_id: string
           panel_message_id?: string | null
+          panel_type?: string
           reopen_command?: string
           support_role_ids?: string[]
           title?: string
@@ -127,11 +184,13 @@ export type Database = {
           created_at?: string
           delete_command?: string
           description?: string
+          dropdown_placeholder?: string
           guild_id?: string
           id?: string
           log_channel_id?: string | null
           owner_discord_id?: string
           panel_message_id?: string | null
+          panel_type?: string
           reopen_command?: string
           support_role_ids?: string[]
           title?: string
