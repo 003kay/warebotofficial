@@ -63,27 +63,59 @@ const staticPages: Record<string, DocPage> = {
       </div>
     ),
   },
-  faq: {
-    title: "FAQ",
+  customization: {
+    title: "Customization",
     section: "Overview",
     body: (
-      <div className="space-y-6 text-muted-foreground">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">How do I invite ware?</h3>
-          <p>Click "Invite to Discord" on the home page and choose a server.</p>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">What's the default prefix?</h3>
-          <p>
-            The default prefix is <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs text-foreground">,</code>.
-            Change it with <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs text-foreground">,prefix set (symbol)</code>.
-          </p>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">Is ware free?</h3>
-          <p>Yes — core features are free forever. Donator perks add premium extras.</p>
-        </div>
-      </div>
+      <p className="text-muted-foreground">
+        Customize ware's prefix, embed color, welcome/goodbye messages, and per-command permissions from the dashboard or via commands.
+      </p>
+    ),
+  },
+  "join-gate": {
+    title: "Join Gate",
+    section: "Security Setup",
+    body: (
+      <p className="text-muted-foreground">
+        Screen new members with age/verification gates before they can chat.
+        See the Anti command category for the full list of protections.
+      </p>
+    ),
+  },
+  "moderation-guide": {
+    title: "Moderation",
+    section: "Security Setup",
+    body: (
+      <p className="text-muted-foreground">
+        Ban, kick, timeout, jail, mute — plus mass actions. See the Moderation command category for the full list.
+      </p>
+    ),
+  },
+  "fake-permissions": {
+    title: "Fake Permissions",
+    section: "Security Setup",
+    body: (
+      <p className="text-muted-foreground">
+        Grant ware-only permissions to roles without giving them native Discord permissions.
+      </p>
+    ),
+  },
+  starboard: {
+    title: "Starboard",
+    section: "Server Configuration",
+    body: (
+      <p className="text-muted-foreground">
+        Configure a starboard channel and threshold so popular messages get highlighted automatically.
+      </p>
+    ),
+  },
+  "level-rewards": {
+    title: "Level Rewards",
+    section: "Server Configuration",
+    body: (
+      <p className="text-muted-foreground">
+        Reward active members with roles as they level up in your server.
+      </p>
     ),
   },
   "security-setup": {
