@@ -113,6 +113,7 @@ const panelInputSchema = (d: {
   welcome_message: string;
   channel_id: string | null;
   category_id: string | null;
+  log_channel_id: string | null;
   support_role_ids: string[];
 }) => d;
 
