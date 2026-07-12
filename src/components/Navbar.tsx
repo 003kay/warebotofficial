@@ -6,7 +6,6 @@ import { getCurrentUser } from "@/lib/dashboard.functions";
 const links: { label: string; to: string }[] = [
   { label: "Commands", to: "/docs/commands" },
   { label: "Docs", to: "/docs" },
-  { label: "FAQ", to: "/docs/faq" },
 ];
 
 export function Navbar() {

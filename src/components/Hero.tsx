@@ -6,14 +6,18 @@ export function Hero() {
   return (
     <section className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 pb-24 pt-16 md:grid-cols-2 md:px-10 md:pb-32 md:pt-24">
       <div>
+        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-muted-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_2px_rgba(52,211,153,0.6)]" />
+          100% uptime — all systems operational
+        </div>
         <h1 className="text-5xl font-bold leading-[1.05] tracking-tight text-foreground md:text-7xl">
-          Ware is Discord's all in one app
+          One bot. Every module your server actually runs on.
         </h1>
 
         <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
-          One bot, every module your server actually uses — protection,
-          economy, voice tools, custom embeds, and AI, wired together with a
-          clean prefix system and a dashboard you'll actually open.
+          ware bundles protection, economy, voice tools, custom embeds, and AI
+          into a single prefix system with a dashboard you'll actually open —
+          without stitching seven different bots together.
         </p>
 
         <div className="mt-10 flex flex-wrap gap-3">
@@ -33,6 +37,21 @@ export function Hero() {
             View docs
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </a>
+        </div>
+
+        <div className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-white/5 pt-6">
+          <div>
+            <div className="text-2xl font-semibold tracking-tight">100%</div>
+            <div className="mt-0.5 text-xs uppercase tracking-widest text-muted-foreground">Uptime</div>
+          </div>
+          <div>
+            <div className="text-2xl font-semibold tracking-tight">200+</div>
+            <div className="mt-0.5 text-xs uppercase tracking-widest text-muted-foreground">Commands</div>
+          </div>
+          <div>
+            <div className="text-2xl font-semibold tracking-tight">14k+</div>
+            <div className="mt-0.5 text-xs uppercase tracking-widest text-muted-foreground">Servers</div>
+          </div>
         </div>
       </div>
 

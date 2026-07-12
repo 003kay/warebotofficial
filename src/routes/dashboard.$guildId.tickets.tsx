@@ -3,11 +3,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Starfield } from "@/components/Starfield";
+import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
 import {
   getTicketPanel,
   saveTicketPanel,
   publishTicketPanel,
 } from "@/lib/dashboard.functions";
+
 
 export const Route = createFileRoute("/dashboard/$guildId/tickets")({
   head: () => ({ meta: [{ title: "Tickets — ware dashboard" }] }),
@@ -188,24 +190,7 @@ function TicketsPage() {
                 </select>
               </Field>
               <Field
-                label="Ticket category"
-                hint="New tickets are created as channels under this category."
-              >
-                <select
-                  value={form.category_id}
-                  onChange={(e) => set("category_id", e.target.value)}
-                  className="input"
-                  disabled={!data.botInGuild}
-                >
-                  <option value="">— None (top-level) —</option>
-                  {data.categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field
+
                 label="Support roles"
                 hint="Members with these roles can see and reply in every ticket."
               >
@@ -374,7 +359,7 @@ function TicketsPage() {
             </div>
             <div className="rounded-lg bg-[#313338] p-4 text-[#dbdee1] shadow-2xl">
               <div className="flex gap-3">
-                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-[#5865F2]" />
+                <img src={avatarAsset.url} alt="ware" className="h-10 w-10 flex-shrink-0 rounded-full object-cover" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2">
                     <span className="font-semibold text-white">Ware</span>
