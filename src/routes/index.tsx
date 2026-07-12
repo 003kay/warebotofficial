@@ -13,13 +13,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Help: https://gawn.bio\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
+          "Help: https://warebot.xyz\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
       },
       { property: "og:title", content: "ware — Discord's premier all-in-one app" },
       {
         property: "og:description",
         content:
-          "Help: https://gawn.bio\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
+          "Help: https://warebot.xyz\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
       },
     ],
   }),
