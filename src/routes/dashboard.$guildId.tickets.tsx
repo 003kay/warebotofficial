@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { Plus, Trash2, ChevronDown } from "lucide-react";
+
 import { Navbar } from "@/components/Navbar";
 import { Starfield } from "@/components/Starfield";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
