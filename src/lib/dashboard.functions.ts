@@ -67,6 +67,16 @@ export const getTicketPanel = createServerFn({ method: "GET" })
 
     const botInGuild = channels !== null;
 
+    let options: unknown[] = [];
+    if (panelRes.data) {
+      const optRes = await supabaseAdmin
+        .from("ticket_panel_options")
+        .select("*")
+        .eq("panel_id", panelRes.data.id)
+        .order("position", { ascending: true });
+      options = optRes.data ?? [];
+    }
+
     return {
       guild: {
         id: guild.id,
@@ -76,6 +86,7 @@ export const getTicketPanel = createServerFn({ method: "GET" })
           : null,
       },
       panel: panelRes.data ?? null,
+      options,
       botInGuild,
       textChannels: (channels ?? [])
         .filter((c) => c.type === 0 || c.type === 5)
@@ -91,6 +102,7 @@ export const getTicketPanel = createServerFn({ method: "GET" })
         .map((r) => ({ id: r.id, name: r.name, color: r.color })),
     };
   });
+
 
 const panelInputSchema = (d: {
   guildId: string;
