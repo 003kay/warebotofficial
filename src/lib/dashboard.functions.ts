@@ -67,15 +67,28 @@ export const getTicketPanel = createServerFn({ method: "GET" })
 
     const botInGuild = channels !== null;
 
-    let options: unknown[] = [];
+    type OptionRow = {
+      id: string;
+      panel_id: string;
+      position: number;
+      label: string;
+      description: string;
+      emoji: string;
+      category_id: string | null;
+      support_role_ids: string[];
+      welcome_message: string;
+      ticket_name_format: string;
+    };
+    let options: OptionRow[] = [];
     if (panelRes.data) {
       const optRes = await supabaseAdmin
         .from("ticket_panel_options")
         .select("*")
         .eq("panel_id", panelRes.data.id)
         .order("position", { ascending: true });
-      options = optRes.data ?? [];
+      options = (optRes.data ?? []) as OptionRow[];
     }
+
 
     return {
       guild: {
