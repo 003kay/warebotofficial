@@ -74,18 +74,20 @@ export function DocsLayout({
                 <ul className="space-y-1">
                   {section.items.map((item) => {
                     const isActive = item.slug === active;
+                    const Icon = item.icon;
                     return (
                       <li key={item.slug}>
                         <Link
                           to="/docs/$slug"
                           params={{ slug: item.slug }}
-                          className={`block rounded-md px-2.5 py-1.5 transition-colors ${
+                          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 transition-colors ${
                             isActive
                               ? "bg-white/10 text-foreground"
                               : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
                           }`}
                         >
-                          {item.label}
+                          {Icon && <Icon className="h-4 w-4 shrink-0 opacity-80" />}
+                          <span>{item.label}</span>
                         </Link>
                       </li>
                     );
