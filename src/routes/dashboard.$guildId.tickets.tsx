@@ -87,6 +87,7 @@ function TicketsPage() {
     welcome_message: s("welcome_message", DEFAULTS.welcome_message),
     channel_id: s("channel_id", ""),
     category_id: "",
+    log_channel_id: s("log_channel_id", ""),
     support_role_ids: (p?.support_role_ids as string[] | undefined) ?? [],
   });
   const [saving, setSaving] = useState(false);
