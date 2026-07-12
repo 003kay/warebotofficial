@@ -1,4 +1,4 @@
-import { Sparkles, ArrowRight, Crown, Users, ShieldCheck } from "lucide-react";
+import { Sparkles, ArrowRight, Crown, Users, ShieldCheck, Heart } from "lucide-react";
 import { FeaturePill } from "./FeaturePill";
 import { INVITE_URL } from "@/lib/links";
 
