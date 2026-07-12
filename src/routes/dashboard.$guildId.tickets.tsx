@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { Plus, Trash2, ChevronDown } from "lucide-react";
+
 import { Navbar } from "@/components/Navbar";
 import { Starfield } from "@/components/Starfield";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
@@ -33,6 +35,8 @@ const DEFAULTS = {
   title: "Support",
   description: "Click the button below to open a ticket.",
   color: "#5865F2",
+  panel_type: "button",
+  dropdown_placeholder: "Select a ticket category…",
   button_label: "Open Ticket",
   button_emoji: "🎫",
   button_style: "primary",
@@ -48,6 +52,27 @@ const DEFAULTS = {
   delete_command: "delete",
   welcome_message: "Thanks for opening a ticket! Support will be with you shortly.",
 };
+
+type PanelOptionForm = {
+  label: string;
+  description: string;
+  emoji: string;
+  category_id: string | null;
+  support_role_ids: string[];
+  welcome_message: string;
+  ticket_name_format: string;
+};
+
+const DEFAULT_OPTION: PanelOptionForm = {
+  label: "Support",
+  description: "General help",
+  emoji: "🎫",
+  category_id: null,
+  support_role_ids: [],
+  welcome_message: "Thanks for opening a ticket! Support will be with you shortly.",
+  ticket_name_format: "ticket-{number}",
+};
+
 
 const BUTTON_STYLES: { value: string; label: string; className: string }[] = [
   { value: "primary", label: "Blurple", className: "bg-[#5865F2] hover:bg-[#4752c4] text-white" },
@@ -71,6 +96,8 @@ function TicketsPage() {
     title: s("title", DEFAULTS.title),
     description: s("description", DEFAULTS.description),
     color: s("color", DEFAULTS.color),
+    panel_type: s("panel_type", DEFAULTS.panel_type),
+    dropdown_placeholder: s("dropdown_placeholder", DEFAULTS.dropdown_placeholder),
     button_label: s("button_label", DEFAULTS.button_label),
     button_emoji: s("button_emoji", DEFAULTS.button_emoji),
     button_style: s("button_style", DEFAULTS.button_style),
@@ -90,6 +117,20 @@ function TicketsPage() {
     log_channel_id: s("log_channel_id", ""),
     support_role_ids: (p?.support_role_ids as string[] | undefined) ?? [],
   });
+  const [options, setOptions] = useState<PanelOptionForm[]>(() => {
+    const loaded = (data.options ?? []) as PanelOptionForm[];
+    return loaded.length > 0
+      ? loaded.map((o) => ({
+          label: o.label,
+          description: o.description ?? "",
+          emoji: o.emoji ?? "🎫",
+          category_id: o.category_id ?? null,
+          support_role_ids: o.support_role_ids ?? [],
+          welcome_message: o.welcome_message ?? DEFAULT_OPTION.welcome_message,
+          ticket_name_format: o.ticket_name_format ?? DEFAULT_OPTION.ticket_name_format,
+        }))
+      : [DEFAULT_OPTION];
+  });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -103,6 +144,21 @@ function TicketsPage() {
     setForm((f) => ({ ...f, [k]: v }));
     setSaved(false);
     setPublishResult(null);
+  };
+
+  const updateOption = (i: number, patch: Partial<PanelOptionForm>) => {
+    setOptions((os) => os.map((o, idx) => (idx === i ? { ...o, ...patch } : o)));
+    setSaved(false);
+    setPublishResult(null);
+  };
+  const addOption = () => {
+    if (options.length >= 8) return;
+    setOptions((os) => [...os, { ...DEFAULT_OPTION, label: `Category ${os.length + 1}` }]);
+    setSaved(false);
+  };
+  const removeOption = (i: number) => {
+    setOptions((os) => (os.length <= 1 ? os : os.filter((_, idx) => idx !== i)));
+    setSaved(false);
   };
 
   const selectedChannel = data.textChannels.find((c) => c.id === form.channel_id);
@@ -129,7 +185,18 @@ function TicketsPage() {
     channel_id: form.channel_id || null,
     category_id: null as string | null,
     log_channel_id: form.log_channel_id || null,
+    options: options.map((o, i) => ({
+      position: i,
+      label: o.label,
+      description: o.description,
+      emoji: o.emoji,
+      category_id: o.category_id,
+      support_role_ids: o.support_role_ids,
+      welcome_message: o.welcome_message,
+      ticket_name_format: o.ticket_name_format,
+    })),
   });
+
 
   async function onSave() {
     setSaving(true);
@@ -213,7 +280,45 @@ function TicketsPage() {
               </p>
             </div>
 
+            <Section title="Panel type">
+              <p className="-mt-2 text-xs text-muted-foreground">
+                Buttons show a single "Open Ticket" button. Dropdown shows a menu with up to 8 ticket categories — each with its own Discord category, support roles, and welcome message.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { v: "button", label: "Button", hint: "One-click ticket open." },
+                  { v: "dropdown", label: "Dropdown menu", hint: "Multiple ticket categories." },
+                ].map((t) => (
+                  <button
+                    key={t.v}
+                    type="button"
+                    onClick={() => set("panel_type", t.v)}
+                    className={`rounded-xl px-4 py-3 text-left ring-1 transition-colors ${
+                      form.panel_type === t.v
+                        ? "bg-white/10 ring-white/40"
+                        : "bg-white/[0.03] ring-white/10 hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <div className="text-sm font-semibold">{t.label}</div>
+                    <div className="text-xs text-muted-foreground">{t.hint}</div>
+                  </button>
+                ))}
+              </div>
+              {form.panel_type === "dropdown" && (
+                <Field label="Dropdown placeholder" hint="Shown when nothing is selected yet.">
+                  <input
+                    type="text"
+                    value={form.dropdown_placeholder}
+                    maxLength={100}
+                    onChange={(e) => set("dropdown_placeholder", e.target.value)}
+                    className="input"
+                  />
+                </Field>
+              )}
+            </Section>
+
             <Section title="Where">
+
               <Field label="Panel channel" hint="Search by name if you can't scroll to find it.">
                 <div className="relative">
                   <input
@@ -380,13 +485,44 @@ function TicketsPage() {
               </Field>
             </Section>
 
-            <ButtonEditor
-              title="Open ticket button"
-              hint="Shown on the panel. Users click this to open a ticket."
-              label={form.button_label} onLabel={(v) => set("button_label", v)}
-              emoji={form.button_emoji} onEmoji={(v) => set("button_emoji", v)}
-              style={form.button_style} onStyle={(v) => set("button_style", v)}
-            />
+            {form.panel_type === "button" ? (
+              <ButtonEditor
+                title="Open ticket button"
+                hint="Shown on the panel. Users click this to open a ticket."
+                label={form.button_label} onLabel={(v) => set("button_label", v)}
+                emoji={form.button_emoji} onEmoji={(v) => set("button_emoji", v)}
+                style={form.button_style} onStyle={(v) => set("button_style", v)}
+              />
+            ) : (
+              <Section title="Dropdown options">
+                <p className="-mt-2 text-xs text-muted-foreground">
+                  Up to 8 categories. Each one opens a ticket in its own Discord category, pings its own support roles, and posts its own welcome message.
+                </p>
+                <div className="space-y-4">
+                  {options.map((opt, i) => (
+                    <OptionEditor
+                      key={i}
+                      index={i}
+                      option={opt}
+                      categories={data.categories}
+                      roles={data.roles}
+                      onChange={(patch) => updateOption(i, patch)}
+                      onRemove={options.length > 1 ? () => removeOption(i) : undefined}
+                    />
+                  ))}
+                </div>
+                {options.length < 8 && (
+                  <button
+                    type="button"
+                    onClick={addOption}
+                    className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm ring-1 ring-white/10 hover:bg-white/10"
+                  >
+                    <Plus className="h-4 w-4" /> Add category
+                  </button>
+                )}
+              </Section>
+            )}
+
 
             <ButtonEditor
               title="Close ticket button"
@@ -492,11 +628,37 @@ function TicketsPage() {
                     <div className="mt-1 whitespace-pre-wrap text-sm text-[#dbdee1]">{form.description}</div>
                   </div>
                   <div className="mt-2">
-                    <button type="button"
-                      className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${btnStyle.className}`}>
-                      <span>{form.button_emoji}</span><span>{form.button_label}</span>
-                    </button>
+                    {form.panel_type === "dropdown" ? (
+                      <div className="flex w-full max-w-[440px] items-center justify-between rounded bg-[#1e1f22] px-3 py-2 text-sm text-[#b5bac1] ring-1 ring-[#1e1f22]">
+                        <span className="truncate">{form.dropdown_placeholder || "Select…"}</span>
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-[#949ba4]" />
+                      </div>
+                    ) : (
+                      <button type="button"
+                        className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${btnStyle.className}`}>
+                        <span>{form.button_emoji}</span><span>{form.button_label}</span>
+                      </button>
+                    )}
                   </div>
+                  {form.panel_type === "dropdown" && options.length > 0 && (
+                    <div className="mt-2 max-w-[440px] overflow-hidden rounded border border-[#1e1f22] bg-[#2b2d31]">
+                      {options.slice(0, 5).map((o, i) => (
+                        <div key={i} className="flex items-start gap-2 border-b border-[#1e1f22] px-3 py-2 last:border-b-0">
+                          <span className="text-base">{o.emoji}</span>
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-white">{o.label || "Untitled"}</div>
+                            {o.description && (
+                              <div className="truncate text-xs text-[#949ba4]">{o.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {options.length > 5 && (
+                        <div className="px-3 py-1.5 text-xs text-[#949ba4]">+{options.length - 5} more…</div>
+                      )}
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>
@@ -592,3 +754,154 @@ function Field({
     </label>
   );
 }
+
+function OptionEditor({
+  index,
+  option,
+  categories,
+  roles,
+  onChange,
+  onRemove,
+}: {
+  index: number;
+  option: PanelOptionForm;
+  categories: { id: string; name: string }[];
+  roles: { id: string; name: string; color: number }[];
+  onChange: (patch: Partial<PanelOptionForm>) => void;
+  onRemove?: () => void;
+}) {
+  const [open, setOpen] = useState(index === 0);
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02]">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between px-4 py-3 text-left"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-base">{option.emoji}</span>
+          <span className="text-sm font-semibold">{option.label || `Option ${index + 1}`}</span>
+          {option.description && (
+            <span className="text-xs text-muted-foreground">— {option.description}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          {onRemove && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+              className="rounded p-1.5 text-muted-foreground hover:bg-white/10 hover:text-red-400"
+            >
+              <Trash2 className="h-4 w-4" />
+            </span>
+          )}
+          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        </div>
+      </button>
+      {open && (
+        <div className="space-y-4 border-t border-white/10 p-4">
+          <div className="grid gap-4 sm:grid-cols-[1fr,120px]">
+            <Field label="Label">
+              <input
+                type="text"
+                value={option.label}
+                maxLength={100}
+                onChange={(e) => onChange({ label: e.target.value })}
+                className="input"
+              />
+            </Field>
+            <Field label="Emoji">
+              <input
+                type="text"
+                value={option.emoji}
+                onChange={(e) => onChange({ emoji: e.target.value })}
+                className="input"
+              />
+            </Field>
+          </div>
+          <Field label="Description" hint="Shown under the label in the dropdown.">
+            <input
+              type="text"
+              value={option.description}
+              maxLength={100}
+              onChange={(e) => onChange({ description: e.target.value })}
+              className="input"
+            />
+          </Field>
+          <Field label="Discord category" hint="Tickets for this option get created inside this category.">
+            <select
+              value={option.category_id ?? ""}
+              onChange={(e) => onChange({ category_id: e.target.value || null })}
+              className="input"
+            >
+              <option value="">— none (create in guild root) —</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Support roles" hint="These roles are pinged and can see tickets from this option.">
+            <div className="flex flex-wrap gap-2">
+              {roles.length === 0 && (
+                <span className="text-xs text-muted-foreground">No roles found.</span>
+              )}
+              {roles.map((r) => {
+                const active = option.support_role_ids.includes(r.id);
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() =>
+                      onChange({
+                        support_role_ids: active
+                          ? option.support_role_ids.filter((x) => x !== r.id)
+                          : [...option.support_role_ids, r.id],
+                      })
+                    }
+                    className={`rounded-full px-3 py-1 text-xs ring-1 transition-colors ${
+                      active
+                        ? "bg-white/15 ring-white/40"
+                        : "bg-white/[0.03] ring-white/10 hover:bg-white/10"
+                    }`}
+                    style={
+                      r.color
+                        ? { color: `#${r.color.toString(16).padStart(6, "0")}` }
+                        : undefined
+                    }
+                  >
+                    @{r.name}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+          <Field label="Ticket channel name" hint="Use {number} for the sequential ID and {user} for the opener's name.">
+            <input
+              type="text"
+              value={option.ticket_name_format}
+              maxLength={90}
+              onChange={(e) => onChange({ ticket_name_format: e.target.value })}
+              className="input font-mono"
+            />
+          </Field>
+          <Field label="Opening message" hint="First message posted in a new ticket from this option.">
+            <textarea
+              value={option.welcome_message}
+              maxLength={2000}
+              rows={3}
+              onChange={(e) => onChange({ welcome_message: e.target.value })}
+              className="input resize-none"
+            />
+          </Field>
+        </div>
+      )}
+    </div>
+  );
+}
+
