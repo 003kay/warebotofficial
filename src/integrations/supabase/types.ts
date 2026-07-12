@@ -57,13 +57,23 @@ export type Database = {
           button_style: string
           category_id: string | null
           channel_id: string | null
+          claim_button_emoji: string
+          claim_button_label: string
+          claim_button_style: string
+          close_button_emoji: string
+          close_button_label: string
+          close_button_style: string
+          close_command: string
           color: string
+          command_prefix: string
           created_at: string
+          delete_command: string
           description: string
           guild_id: string
           id: string
           owner_discord_id: string
           panel_message_id: string | null
+          reopen_command: string
           support_role_ids: string[]
           title: string
           updated_at: string
@@ -75,13 +85,23 @@ export type Database = {
           button_style?: string
           category_id?: string | null
           channel_id?: string | null
+          claim_button_emoji?: string
+          claim_button_label?: string
+          claim_button_style?: string
+          close_button_emoji?: string
+          close_button_label?: string
+          close_button_style?: string
+          close_command?: string
           color?: string
+          command_prefix?: string
           created_at?: string
+          delete_command?: string
           description?: string
           guild_id: string
           id?: string
           owner_discord_id: string
           panel_message_id?: string | null
+          reopen_command?: string
           support_role_ids?: string[]
           title?: string
           updated_at?: string
@@ -93,13 +113,23 @@ export type Database = {
           button_style?: string
           category_id?: string | null
           channel_id?: string | null
+          claim_button_emoji?: string
+          claim_button_label?: string
+          claim_button_style?: string
+          close_button_emoji?: string
+          close_button_label?: string
+          close_button_style?: string
+          close_command?: string
           color?: string
+          command_prefix?: string
           created_at?: string
+          delete_command?: string
           description?: string
           guild_id?: string
           id?: string
           owner_discord_id?: string
           panel_message_id?: string | null
+          reopen_command?: string
           support_role_ids?: string[]
           title?: string
           updated_at?: string
