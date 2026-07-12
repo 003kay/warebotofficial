@@ -114,11 +114,21 @@ function TicketsPage() {
     return list.slice(0, 50);
   }, [data.textChannels, channelSearch]);
 
+  const selectedLogChannel = data.textChannels.find((c) => c.id === form.log_channel_id);
+  const filteredLogChannels = useMemo(() => {
+    const q = logSearch.trim().toLowerCase();
+    const list = q
+      ? data.textChannels.filter((c) => c.name.toLowerCase().includes(q))
+      : data.textChannels;
+    return list.slice(0, 50);
+  }, [data.textChannels, logSearch]);
+
   const payload = () => ({
     guildId,
     ...form,
     channel_id: form.channel_id || null,
     category_id: null as string | null,
+    log_channel_id: form.log_channel_id || null,
   });
 
   async function onSave() {
