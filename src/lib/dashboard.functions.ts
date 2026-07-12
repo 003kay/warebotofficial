@@ -117,11 +117,24 @@ export const getTicketPanel = createServerFn({ method: "GET" })
   });
 
 
+export type PanelOptionInput = {
+  position: number;
+  label: string;
+  description: string;
+  emoji: string;
+  category_id: string | null;
+  support_role_ids: string[];
+  welcome_message: string;
+  ticket_name_format: string;
+};
+
 const panelInputSchema = (d: {
   guildId: string;
   title: string;
   description: string;
   color: string;
+  panel_type: string;
+  dropdown_placeholder: string;
   button_label: string;
   button_emoji: string;
   button_style: string;
@@ -140,6 +153,7 @@ const panelInputSchema = (d: {
   category_id: string | null;
   log_channel_id: string | null;
   support_role_ids: string[];
+  options: PanelOptionInput[];
 }) => d;
 
 export const saveTicketPanel = createServerFn({ method: "POST" })
@@ -148,40 +162,70 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
     const { userId } = await requireGuildManager(data.guildId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Validate prefix: must be non-empty and contain no letters
     if (!data.command_prefix || /[a-zA-Z]/.test(data.command_prefix)) {
       throw new Error("Command prefix must not contain letters (e.g. $, !, ?, .)");
     }
+    if (data.panel_type !== "button" && data.panel_type !== "dropdown") {
+      throw new Error("Invalid panel type");
+    }
+    if (data.panel_type === "dropdown" && data.options.length === 0) {
+      throw new Error("Add at least one dropdown option before saving.");
+    }
 
-    const { error } = await supabaseAdmin.from("ticket_panels").upsert(
-      {
-        guild_id: data.guildId,
-        owner_discord_id: userId,
-        title: data.title,
-        description: data.description,
-        color: data.color,
-        button_label: data.button_label,
-        button_emoji: data.button_emoji,
-        button_style: data.button_style,
-        close_button_label: data.close_button_label,
-        close_button_emoji: data.close_button_emoji,
-        close_button_style: data.close_button_style,
-        claim_button_label: data.claim_button_label,
-        claim_button_emoji: data.claim_button_emoji,
-        claim_button_style: data.claim_button_style,
-        command_prefix: data.command_prefix,
-        close_command: data.close_command,
-        reopen_command: data.reopen_command,
-        delete_command: data.delete_command,
-        welcome_message: data.welcome_message,
-        channel_id: data.channel_id,
-        category_id: data.category_id,
-        log_channel_id: data.log_channel_id,
-        support_role_ids: data.support_role_ids,
-      },
-      { onConflict: "guild_id" },
-    );
-    if (error) throw new Error(error.message);
+    const { data: upserted, error } = await supabaseAdmin
+      .from("ticket_panels")
+      .upsert(
+        {
+          guild_id: data.guildId,
+          owner_discord_id: userId,
+          title: data.title,
+          description: data.description,
+          color: data.color,
+          panel_type: data.panel_type,
+          dropdown_placeholder: data.dropdown_placeholder,
+          button_label: data.button_label,
+          button_emoji: data.button_emoji,
+          button_style: data.button_style,
+          close_button_label: data.close_button_label,
+          close_button_emoji: data.close_button_emoji,
+          close_button_style: data.close_button_style,
+          claim_button_label: data.claim_button_label,
+          claim_button_emoji: data.claim_button_emoji,
+          claim_button_style: data.claim_button_style,
+          command_prefix: data.command_prefix,
+          close_command: data.close_command,
+          reopen_command: data.reopen_command,
+          delete_command: data.delete_command,
+          welcome_message: data.welcome_message,
+          channel_id: data.channel_id,
+          category_id: data.category_id,
+          log_channel_id: data.log_channel_id,
+          support_role_ids: data.support_role_ids,
+        },
+        { onConflict: "guild_id" },
+      )
+      .select("id")
+      .single();
+    if (error || !upserted) throw new Error(error?.message ?? "Failed to save panel");
+
+    // Replace dropdown options
+    await supabaseAdmin.from("ticket_panel_options").delete().eq("panel_id", upserted.id);
+    if (data.options.length > 0) {
+      const rows = data.options.slice(0, 25).map((o, i) => ({
+        panel_id: upserted.id,
+        position: i,
+        label: o.label,
+        description: o.description,
+        emoji: o.emoji,
+        category_id: o.category_id,
+        support_role_ids: o.support_role_ids,
+        welcome_message: o.welcome_message,
+        ticket_name_format: o.ticket_name_format,
+      }));
+      const { error: optErr } = await supabaseAdmin.from("ticket_panel_options").insert(rows);
+      if (optErr) throw new Error(optErr.message);
+    }
+
     return { ok: true };
   });
 
@@ -201,7 +245,18 @@ export const publishTicketPanel = createServerFn({ method: "POST" })
     if (!panel) throw new Error("Save the panel before publishing.");
     if (!panel.channel_id) throw new Error("Pick a channel to post the panel in first.");
 
-    const { messageId } = await publishPanelMessage(panel.channel_id, panel, panel.panel_message_id);
+    const { data: opts } = await supabaseAdmin
+      .from("ticket_panel_options")
+      .select("id, position, label, description, emoji")
+      .eq("panel_id", panel.id)
+      .order("position", { ascending: true });
+
+    const { messageId } = await publishPanelMessage(
+      panel.channel_id,
+      panel,
+      panel.panel_message_id,
+      (opts ?? []) as { id: string; position: number; label: string; description: string; emoji: string }[],
+    );
 
     await supabaseAdmin
       .from("ticket_panels")
@@ -210,3 +265,4 @@ export const publishTicketPanel = createServerFn({ method: "POST" })
 
     return { ok: true, messageId };
   });
+
