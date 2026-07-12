@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
 
 export function Footer() {
@@ -13,12 +14,10 @@ export function Footer() {
           <span className="font-display text-xl">ware</span>
         </div>
         <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
-          <a href="#" className="hover:text-foreground">Commands</a>
-          <a href="#" className="hover:text-foreground">Status</a>
-          <a href="#" className="hover:text-foreground">Docs</a>
-          <a href="#" className="hover:text-foreground">FAQ</a>
-          <a href="#" className="hover:text-foreground">Terms</a>
-          <a href="#" className="hover:text-foreground">Privacy</a>
+          <Link to="/docs/commands" className="hover:text-foreground">Commands</Link>
+          <Link to="/docs" className="hover:text-foreground">Docs</Link>
+          <Link to="/terms" className="hover:text-foreground">Terms</Link>
+          <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
         </div>
         <p className="font-mono text-xs text-muted-foreground">
           © {new Date().getFullYear()} ware
