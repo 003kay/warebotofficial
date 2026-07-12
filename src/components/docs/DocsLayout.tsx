@@ -1,44 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Search, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
-import { commandCategories } from "@/lib/commands";
+import { docSections } from "./doc-sections";
+import { DocsSearch } from "./DocsSearch";
 
-export interface DocSection {
-  title: string;
-  items: { label: string; slug: string }[];
-}
-
-export const docSections: DocSection[] = [
-  {
-    title: "Overview",
-    items: [
-      { label: "Introduction", slug: "introduction" },
-      { label: "Donator Perks", slug: "donator-perks" },
-      { label: "FAQ", slug: "faq" },
-    ],
-  },
-  {
-    title: "Guides",
-    items: [
-      { label: "Security Setup", slug: "security-setup" },
-      { label: "Server Configuration", slug: "server-configuration" },
-      { label: "Integrations", slug: "integrations" },
-      { label: "Embed Scripting", slug: "embed-scripting" },
-    ],
-  },
-  {
-    title: "Commands",
-    items: [
-      { label: "All Commands", slug: "commands" },
-      ...commandCategories.map((c) => ({
-        label: c.name,
-        slug: `commands-${c.slug}`,
-      })),
-    ],
-  },
-];
+export type { DocSection } from "./doc-sections";
+export { docSections };
 
 export function DocsLayout({
   active,
