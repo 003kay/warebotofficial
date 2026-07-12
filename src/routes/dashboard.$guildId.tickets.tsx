@@ -280,7 +280,45 @@ function TicketsPage() {
               </p>
             </div>
 
+            <Section title="Panel type">
+              <p className="-mt-2 text-xs text-muted-foreground">
+                Buttons show a single "Open Ticket" button. Dropdown shows a menu with up to 8 ticket categories — each with its own Discord category, support roles, and welcome message.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { v: "button", label: "Button", hint: "One-click ticket open." },
+                  { v: "dropdown", label: "Dropdown menu", hint: "Multiple ticket categories." },
+                ].map((t) => (
+                  <button
+                    key={t.v}
+                    type="button"
+                    onClick={() => set("panel_type", t.v)}
+                    className={`rounded-xl px-4 py-3 text-left ring-1 transition-colors ${
+                      form.panel_type === t.v
+                        ? "bg-white/10 ring-white/40"
+                        : "bg-white/[0.03] ring-white/10 hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <div className="text-sm font-semibold">{t.label}</div>
+                    <div className="text-xs text-muted-foreground">{t.hint}</div>
+                  </button>
+                ))}
+              </div>
+              {form.panel_type === "dropdown" && (
+                <Field label="Dropdown placeholder" hint="Shown when nothing is selected yet.">
+                  <input
+                    type="text"
+                    value={form.dropdown_placeholder}
+                    maxLength={100}
+                    onChange={(e) => set("dropdown_placeholder", e.target.value)}
+                    className="input"
+                  />
+                </Field>
+              )}
+            </Section>
+
             <Section title="Where">
+
               <Field label="Panel channel" hint="Search by name if you can't scroll to find it.">
                 <div className="relative">
                   <input
