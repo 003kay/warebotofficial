@@ -35,6 +35,8 @@ const DEFAULTS = {
   title: "Support",
   description: "Click the button below to open a ticket.",
   color: "#5865F2",
+  panel_type: "button",
+  dropdown_placeholder: "Select a ticket category…",
   button_label: "Open Ticket",
   button_emoji: "🎫",
   button_style: "primary",
@@ -50,6 +52,27 @@ const DEFAULTS = {
   delete_command: "delete",
   welcome_message: "Thanks for opening a ticket! Support will be with you shortly.",
 };
+
+type PanelOptionForm = {
+  label: string;
+  description: string;
+  emoji: string;
+  category_id: string | null;
+  support_role_ids: string[];
+  welcome_message: string;
+  ticket_name_format: string;
+};
+
+const DEFAULT_OPTION: PanelOptionForm = {
+  label: "Support",
+  description: "General help",
+  emoji: "🎫",
+  category_id: null,
+  support_role_ids: [],
+  welcome_message: "Thanks for opening a ticket! Support will be with you shortly.",
+  ticket_name_format: "ticket-{number}",
+};
+
 
 const BUTTON_STYLES: { value: string; label: string; className: string }[] = [
   { value: "primary", label: "Blurple", className: "bg-[#5865F2] hover:bg-[#4752c4] text-white" },
