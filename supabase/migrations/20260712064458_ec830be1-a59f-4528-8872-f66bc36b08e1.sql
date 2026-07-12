@@ -1,0 +1,1 @@
+ALTER TABLE public.ticket_panels ADD COLUMN IF NOT EXISTS log_channel_id text;

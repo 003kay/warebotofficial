@@ -71,6 +71,7 @@ export type Database = {
           description: string
           guild_id: string
           id: string
+          log_channel_id: string | null
           owner_discord_id: string
           panel_message_id: string | null
           reopen_command: string
@@ -99,6 +100,7 @@ export type Database = {
           description?: string
           guild_id: string
           id?: string
+          log_channel_id?: string | null
           owner_discord_id: string
           panel_message_id?: string | null
           reopen_command?: string
@@ -127,6 +129,7 @@ export type Database = {
           description?: string
           guild_id?: string
           id?: string
+          log_channel_id?: string | null
           owner_discord_id?: string
           panel_message_id?: string | null
           reopen_command?: string

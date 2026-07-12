@@ -113,6 +113,7 @@ const panelInputSchema = (d: {
   welcome_message: string;
   channel_id: string | null;
   category_id: string | null;
+  log_channel_id: string | null;
   support_role_ids: string[];
 }) => d;
 
@@ -150,6 +151,7 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
         welcome_message: data.welcome_message,
         channel_id: data.channel_id,
         category_id: data.category_id,
+        log_channel_id: data.log_channel_id,
         support_role_ids: data.support_role_ids,
       },
       { onConflict: "guild_id" },

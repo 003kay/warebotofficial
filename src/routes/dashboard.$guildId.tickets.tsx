@@ -87,6 +87,7 @@ function TicketsPage() {
     welcome_message: s("welcome_message", DEFAULTS.welcome_message),
     channel_id: s("channel_id", ""),
     category_id: "",
+    log_channel_id: s("log_channel_id", ""),
     support_role_ids: (p?.support_role_ids as string[] | undefined) ?? [],
   });
   const [saving, setSaving] = useState(false);
@@ -95,6 +96,8 @@ function TicketsPage() {
   const [publishResult, setPublishResult] = useState<string | null>(null);
   const [channelSearch, setChannelSearch] = useState("");
   const [channelOpen, setChannelOpen] = useState(false);
+  const [logSearch, setLogSearch] = useState("");
+  const [logOpen, setLogOpen] = useState(false);
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -111,11 +114,21 @@ function TicketsPage() {
     return list.slice(0, 50);
   }, [data.textChannels, channelSearch]);
 
+  const selectedLogChannel = data.textChannels.find((c) => c.id === form.log_channel_id);
+  const filteredLogChannels = useMemo(() => {
+    const q = logSearch.trim().toLowerCase();
+    const list = q
+      ? data.textChannels.filter((c) => c.name.toLowerCase().includes(q))
+      : data.textChannels;
+    return list.slice(0, 50);
+  }, [data.textChannels, logSearch]);
+
   const payload = () => ({
     guildId,
     ...form,
     channel_id: form.channel_id || null,
     category_id: null as string | null,
+    log_channel_id: form.log_channel_id || null,
   });
 
   async function onSave() {
@@ -285,6 +298,63 @@ function TicketsPage() {
                       </button>
                     );
                   })}
+                </div>
+              </Field>
+              <Field
+                label="Log channel"
+                hint="All transcripts and open, close, reopen, and delete events get posted here."
+              >
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={logOpen ? logSearch : selectedLogChannel ? `#${selectedLogChannel.name}` : logSearch}
+                    onChange={(e) => {
+                      setLogSearch(e.target.value);
+                      setLogOpen(true);
+                    }}
+                    onFocus={() => {
+                      setLogOpen(true);
+                      setLogSearch("");
+                    }}
+                    onBlur={() => setTimeout(() => setLogOpen(false), 150)}
+                    placeholder={data.botInGuild ? "Type to search channels…" : "Invite the bot first"}
+                    className="input"
+                    disabled={!data.botInGuild}
+                  />
+                  {form.log_channel_id && (
+                    <button
+                      type="button"
+                      onClick={() => set("log_channel_id", "")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-0.5 text-xs text-muted-foreground hover:bg-white/10 hover:text-white"
+                    >
+                      clear
+                    </button>
+                  )}
+                  {logOpen && data.botInGuild && (
+                    <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-white/10 bg-[#1a1a1e] shadow-2xl">
+                      {filteredLogChannels.length === 0 ? (
+                        <div className="px-3 py-2 text-xs text-muted-foreground">No channels match.</div>
+                      ) : (
+                        filteredLogChannels.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              set("log_channel_id", c.id);
+                              setLogSearch("");
+                              setLogOpen(false);
+                            }}
+                            className={`block w-full px-3 py-2 text-left text-sm hover:bg-white/10 ${
+                              c.id === form.log_channel_id ? "bg-white/5 text-white" : "text-[#dbdee1]"
+                            }`}
+                          >
+                            #{c.name}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               </Field>
             </Section>
