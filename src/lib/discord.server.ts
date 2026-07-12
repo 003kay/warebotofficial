@@ -94,12 +94,25 @@ export async function fetchDiscordUser(accessToken: string) {
   return (await res.json()) as { id: string; username: string; global_name?: string; avatar: string | null };
 }
 
+type CacheEntry = { at: number; guilds: DiscordGuild[] };
+const guildsCache = new Map<string, CacheEntry>();
+const GUILDS_TTL_MS = 30_000;
+
 async function fetchGuildsRaw(accessToken: string): Promise<DiscordGuild[]> {
+  const cached = guildsCache.get(accessToken);
+  if (cached && Date.now() - cached.at < GUILDS_TTL_MS) return cached.guilds;
+
   const res = await fetch(`${DISCORD_API}/users/@me/guilds`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
-  if (!res.ok) throw new Error(`Failed to fetch guilds: ${res.status}`);
-  return (await res.json()) as DiscordGuild[];
+  if (res.status === 429 && cached) return cached.guilds;
+  if (!res.ok) {
+    if (cached) return cached.guilds;
+    throw new Error(`Failed to fetch guilds: ${res.status}`);
+  }
+  const guilds = (await res.json()) as DiscordGuild[];
+  guildsCache.set(accessToken, { at: Date.now(), guilds });
+  return guilds;
 }
 
 export async function getValidAccessToken(discordUserId: string): Promise<{ accessToken: string; username: string; avatar: string | null } | null> {

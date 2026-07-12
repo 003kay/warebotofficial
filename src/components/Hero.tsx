@@ -65,14 +65,11 @@ export function Hero() {
           className="absolute left-8 bottom-8 animate-float-slower"
         />
 
-        <div
-          className="pointer-events-none absolute inset-x-10 top-1/2 -z-10 h-72 -translate-y-1/2 rounded-full opacity-60 blur-3xl"
-          style={{
-            background:
-              "radial-gradient(closest-side, oklch(0.55 0.2 265 / 0.5), transparent)",
-          }}
-          aria-hidden
-        />
+        <div className="absolute inset-0 grid place-items-center">
+          <span className="font-mono text-xs tracking-widest text-muted-foreground/70">
+            made by <span className="text-foreground/90">@003kay</span>
+          </span>
+        </div>
       </div>
     </section>
   );
