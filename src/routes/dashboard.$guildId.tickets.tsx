@@ -628,11 +628,37 @@ function TicketsPage() {
                     <div className="mt-1 whitespace-pre-wrap text-sm text-[#dbdee1]">{form.description}</div>
                   </div>
                   <div className="mt-2">
-                    <button type="button"
-                      className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${btnStyle.className}`}>
-                      <span>{form.button_emoji}</span><span>{form.button_label}</span>
-                    </button>
+                    {form.panel_type === "dropdown" ? (
+                      <div className="flex w-full max-w-[440px] items-center justify-between rounded bg-[#1e1f22] px-3 py-2 text-sm text-[#b5bac1] ring-1 ring-[#1e1f22]">
+                        <span className="truncate">{form.dropdown_placeholder || "Select…"}</span>
+                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-[#949ba4]" />
+                      </div>
+                    ) : (
+                      <button type="button"
+                        className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${btnStyle.className}`}>
+                        <span>{form.button_emoji}</span><span>{form.button_label}</span>
+                      </button>
+                    )}
                   </div>
+                  {form.panel_type === "dropdown" && options.length > 0 && (
+                    <div className="mt-2 max-w-[440px] overflow-hidden rounded border border-[#1e1f22] bg-[#2b2d31]">
+                      {options.slice(0, 5).map((o, i) => (
+                        <div key={i} className="flex items-start gap-2 border-b border-[#1e1f22] px-3 py-2 last:border-b-0">
+                          <span className="text-base">{o.emoji}</span>
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-white">{o.label || "Untitled"}</div>
+                            {o.description && (
+                              <div className="truncate text-xs text-[#949ba4]">{o.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {options.length > 5 && (
+                        <div className="px-3 py-1.5 text-xs text-[#949ba4]">+{options.length - 5} more…</div>
+                      )}
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>
