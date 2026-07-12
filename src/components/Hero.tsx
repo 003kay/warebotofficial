@@ -64,12 +64,12 @@ export function Hero() {
           label="role features"
           className="absolute left-8 bottom-8 animate-float-slower"
         />
+        <FeaturePill
+          icon={<Heart className="h-3 w-3" />}
+          label="Made by @003kay"
+          className="absolute right-6 bottom-16 animate-float-slow"
+        />
 
-        <div className="absolute inset-0 grid place-items-center">
-          <span className="font-mono text-xs tracking-widest text-muted-foreground/70">
-            made by <span className="text-foreground/90">@003kay</span>
-          </span>
-        </div>
       </div>
     </section>
   );
