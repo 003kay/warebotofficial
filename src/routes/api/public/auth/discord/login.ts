@@ -33,7 +33,7 @@ export const Route = createFileRoute("/api/public/auth/discord/login")({
     <script>
       const discordUrl = ${JSON.stringify(url)};
       try {
-        if (!window.frameElement) {
+        if (window.self === window.top) {
           window.location.replace(discordUrl);
         }
       } catch (error) {
