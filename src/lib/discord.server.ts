@@ -1,8 +1,8 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const DISCORD_API = "https://discord.com/api/v10";
-const PRIMARY_AUTH_ORIGIN = "https://warebot.xyz";
-const ALLOWED_AUTH_ORIGINS = new Set([PRIMARY_AUTH_ORIGIN, "https://www.warebot.xyz"]);
+const PRIMARY_AUTH_ORIGIN = "https://www.warebot.xyz";
+const ALLOWED_AUTH_ORIGINS = new Set([PRIMARY_AUTH_ORIGIN, "https://warebot.xyz"]);
 const MANAGE_GUILD = 0x20n;
 const ADMINISTRATOR = 0x8n;
 
