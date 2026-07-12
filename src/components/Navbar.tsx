@@ -54,7 +54,8 @@ export function Navbar() {
       ) : (
         <a
           href="/api/public/auth/discord/login"
-          target="_top"
+          target="_blank"
+          rel="noreferrer"
           className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-transform hover:scale-[1.02]"
         >
           <span>Sign in</span>
