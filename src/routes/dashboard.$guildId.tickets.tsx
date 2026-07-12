@@ -359,7 +359,7 @@ function TicketsPage() {
             </div>
             <div className="rounded-lg bg-[#313338] p-4 text-[#dbdee1] shadow-2xl">
               <div className="flex gap-3">
-                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-[#5865F2]" />
+                <img src={avatarAsset.url} alt="ware" className="h-10 w-10 flex-shrink-0 rounded-full object-cover" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2">
                     <span className="font-semibold text-white">Ware</span>
