@@ -96,6 +96,8 @@ function TicketsPage() {
     title: s("title", DEFAULTS.title),
     description: s("description", DEFAULTS.description),
     color: s("color", DEFAULTS.color),
+    panel_type: s("panel_type", DEFAULTS.panel_type),
+    dropdown_placeholder: s("dropdown_placeholder", DEFAULTS.dropdown_placeholder),
     button_label: s("button_label", DEFAULTS.button_label),
     button_emoji: s("button_emoji", DEFAULTS.button_emoji),
     button_style: s("button_style", DEFAULTS.button_style),
@@ -115,6 +117,20 @@ function TicketsPage() {
     log_channel_id: s("log_channel_id", ""),
     support_role_ids: (p?.support_role_ids as string[] | undefined) ?? [],
   });
+  const [options, setOptions] = useState<PanelOptionForm[]>(() => {
+    const loaded = (data.options ?? []) as PanelOptionForm[];
+    return loaded.length > 0
+      ? loaded.map((o) => ({
+          label: o.label,
+          description: o.description ?? "",
+          emoji: o.emoji ?? "🎫",
+          category_id: o.category_id ?? null,
+          support_role_ids: o.support_role_ids ?? [],
+          welcome_message: o.welcome_message ?? DEFAULT_OPTION.welcome_message,
+          ticket_name_format: o.ticket_name_format ?? DEFAULT_OPTION.ticket_name_format,
+        }))
+      : [DEFAULT_OPTION];
+  });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -128,6 +144,21 @@ function TicketsPage() {
     setForm((f) => ({ ...f, [k]: v }));
     setSaved(false);
     setPublishResult(null);
+  };
+
+  const updateOption = (i: number, patch: Partial<PanelOptionForm>) => {
+    setOptions((os) => os.map((o, idx) => (idx === i ? { ...o, ...patch } : o)));
+    setSaved(false);
+    setPublishResult(null);
+  };
+  const addOption = () => {
+    if (options.length >= 8) return;
+    setOptions((os) => [...os, { ...DEFAULT_OPTION, label: `Category ${os.length + 1}` }]);
+    setSaved(false);
+  };
+  const removeOption = (i: number) => {
+    setOptions((os) => (os.length <= 1 ? os : os.filter((_, idx) => idx !== i)));
+    setSaved(false);
   };
 
   const selectedChannel = data.textChannels.find((c) => c.id === form.channel_id);
@@ -154,7 +185,18 @@ function TicketsPage() {
     channel_id: form.channel_id || null,
     category_id: null as string | null,
     log_channel_id: form.log_channel_id || null,
+    options: options.map((o, i) => ({
+      position: i,
+      label: o.label,
+      description: o.description,
+      emoji: o.emoji,
+      category_id: o.category_id,
+      support_role_ids: o.support_role_ids,
+      welcome_message: o.welcome_message,
+      ticket_name_format: o.ticket_name_format,
+    })),
   });
+
 
   async function onSave() {
     setSaving(true);
