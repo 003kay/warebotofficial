@@ -3,11 +3,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Starfield } from "@/components/Starfield";
+import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
 import {
   getTicketPanel,
   saveTicketPanel,
   publishTicketPanel,
 } from "@/lib/dashboard.functions";
+
 
 export const Route = createFileRoute("/dashboard/$guildId/tickets")({
   head: () => ({ meta: [{ title: "Tickets — ware dashboard" }] }),
