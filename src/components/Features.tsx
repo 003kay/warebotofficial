@@ -42,20 +42,25 @@ export function Features() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {features.map((f) => (
-          <div
-            key={f.title}
-            className="pill-surface group relative overflow-hidden rounded-2xl p-6 transition-transform hover:-translate-y-0.5"
-          >
-            <div className="mb-5 grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-foreground">
-              <f.icon className="h-5 w-5" />
+        {features.map((f, i) => {
+          const isLast = i === features.length - 1;
+          return (
+            <div
+              key={f.title}
+              className={`pill-surface group relative overflow-hidden rounded-2xl p-6 transition-transform hover:-translate-y-0.5 ${
+                isLast ? "md:col-span-2" : ""
+              }`}
+            >
+              <div className="mb-5 grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-foreground">
+                <f.icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-semibold tracking-tight">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {f.body}
+              </p>
             </div>
-            <h3 className="text-xl font-semibold tracking-tight">{f.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {f.body}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

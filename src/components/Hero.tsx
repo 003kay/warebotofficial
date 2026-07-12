@@ -6,12 +6,9 @@ export function Hero() {
   return (
     <section className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 pb-24 pt-16 md:grid-cols-2 md:px-10 md:pb-32 md:pt-24">
       <div>
-        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-muted-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_2px_rgba(52,211,153,0.6)]" />
-          100% uptime — all systems operational
-        </div>
         <h1 className="text-5xl font-bold leading-[1.05] tracking-tight text-foreground md:text-7xl">
-          One bot. Every module your server actually runs on.
+          Run your entire server from{" "}
+          <span className="text-gradient-accent">one bot.</span>
         </h1>
 
         <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -39,18 +36,14 @@ export function Hero() {
           </a>
         </div>
 
-        <div className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-white/5 pt-6">
+        <div className="mt-10 grid max-w-md grid-cols-2 gap-6 border-t border-white/5 pt-6">
           <div>
             <div className="text-2xl font-semibold tracking-tight">100%</div>
             <div className="mt-0.5 text-xs uppercase tracking-widest text-muted-foreground">Uptime</div>
           </div>
           <div>
-            <div className="text-2xl font-semibold tracking-tight">200+</div>
+            <div className="text-2xl font-semibold tracking-tight">1000+</div>
             <div className="mt-0.5 text-xs uppercase tracking-widest text-muted-foreground">Commands</div>
-          </div>
-          <div>
-            <div className="text-2xl font-semibold tracking-tight">14k+</div>
-            <div className="mt-0.5 text-xs uppercase tracking-widest text-muted-foreground">Servers</div>
           </div>
         </div>
       </div>
