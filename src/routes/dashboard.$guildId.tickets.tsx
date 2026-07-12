@@ -485,13 +485,44 @@ function TicketsPage() {
               </Field>
             </Section>
 
-            <ButtonEditor
-              title="Open ticket button"
-              hint="Shown on the panel. Users click this to open a ticket."
-              label={form.button_label} onLabel={(v) => set("button_label", v)}
-              emoji={form.button_emoji} onEmoji={(v) => set("button_emoji", v)}
-              style={form.button_style} onStyle={(v) => set("button_style", v)}
-            />
+            {form.panel_type === "button" ? (
+              <ButtonEditor
+                title="Open ticket button"
+                hint="Shown on the panel. Users click this to open a ticket."
+                label={form.button_label} onLabel={(v) => set("button_label", v)}
+                emoji={form.button_emoji} onEmoji={(v) => set("button_emoji", v)}
+                style={form.button_style} onStyle={(v) => set("button_style", v)}
+              />
+            ) : (
+              <Section title="Dropdown options">
+                <p className="-mt-2 text-xs text-muted-foreground">
+                  Up to 8 categories. Each one opens a ticket in its own Discord category, pings its own support roles, and posts its own welcome message.
+                </p>
+                <div className="space-y-4">
+                  {options.map((opt, i) => (
+                    <OptionEditor
+                      key={i}
+                      index={i}
+                      option={opt}
+                      categories={data.categories}
+                      roles={data.roles}
+                      onChange={(patch) => updateOption(i, patch)}
+                      onRemove={options.length > 1 ? () => removeOption(i) : undefined}
+                    />
+                  ))}
+                </div>
+                {options.length < 8 && (
+                  <button
+                    type="button"
+                    onClick={addOption}
+                    className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm ring-1 ring-white/10 hover:bg-white/10"
+                  >
+                    <Plus className="h-4 w-4" /> Add category
+                  </button>
+                )}
+              </Section>
+            )}
+
 
             <ButtonEditor
               title="Close ticket button"
