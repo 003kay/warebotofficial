@@ -96,6 +96,8 @@ function TicketsPage() {
   const [publishResult, setPublishResult] = useState<string | null>(null);
   const [channelSearch, setChannelSearch] = useState("");
   const [channelOpen, setChannelOpen] = useState(false);
+  const [logSearch, setLogSearch] = useState("");
+  const [logOpen, setLogOpen] = useState(false);
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
