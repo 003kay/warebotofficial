@@ -1,15 +1,20 @@
 import { useMemo } from "react";
 
+function seededRandom(seed: number) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
 export function Starfield({ count = 80 }: { count?: number }) {
   const stars = useMemo(
     () =>
       Array.from({ length: count }).map((_, i) => ({
         id: i,
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        size: Math.random() * 1.6 + 0.4,
-        delay: Math.random() * 4,
-        duration: 3 + Math.random() * 4,
+        top: seededRandom(i * 7 + 1) * 100,
+        left: seededRandom(i * 7 + 2) * 100,
+        size: seededRandom(i * 7 + 3) * 1.6 + 0.4,
+        delay: seededRandom(i * 7 + 4) * 4,
+        duration: 3 + seededRandom(i * 7 + 5) * 4,
       })),
     [count],
   );
