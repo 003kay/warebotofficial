@@ -754,3 +754,154 @@ function Field({
     </label>
   );
 }
+
+function OptionEditor({
+  index,
+  option,
+  categories,
+  roles,
+  onChange,
+  onRemove,
+}: {
+  index: number;
+  option: PanelOptionForm;
+  categories: { id: string; name: string }[];
+  roles: { id: string; name: string; color: number }[];
+  onChange: (patch: Partial<PanelOptionForm>) => void;
+  onRemove?: () => void;
+}) {
+  const [open, setOpen] = useState(index === 0);
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02]">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between px-4 py-3 text-left"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-base">{option.emoji}</span>
+          <span className="text-sm font-semibold">{option.label || `Option ${index + 1}`}</span>
+          {option.description && (
+            <span className="text-xs text-muted-foreground">— {option.description}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          {onRemove && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+              className="rounded p-1.5 text-muted-foreground hover:bg-white/10 hover:text-red-400"
+            >
+              <Trash2 className="h-4 w-4" />
+            </span>
+          )}
+          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        </div>
+      </button>
+      {open && (
+        <div className="space-y-4 border-t border-white/10 p-4">
+          <div className="grid gap-4 sm:grid-cols-[1fr,120px]">
+            <Field label="Label">
+              <input
+                type="text"
+                value={option.label}
+                maxLength={100}
+                onChange={(e) => onChange({ label: e.target.value })}
+                className="input"
+              />
+            </Field>
+            <Field label="Emoji">
+              <input
+                type="text"
+                value={option.emoji}
+                onChange={(e) => onChange({ emoji: e.target.value })}
+                className="input"
+              />
+            </Field>
+          </div>
+          <Field label="Description" hint="Shown under the label in the dropdown.">
+            <input
+              type="text"
+              value={option.description}
+              maxLength={100}
+              onChange={(e) => onChange({ description: e.target.value })}
+              className="input"
+            />
+          </Field>
+          <Field label="Discord category" hint="Tickets for this option get created inside this category.">
+            <select
+              value={option.category_id ?? ""}
+              onChange={(e) => onChange({ category_id: e.target.value || null })}
+              className="input"
+            >
+              <option value="">— none (create in guild root) —</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Support roles" hint="These roles are pinged and can see tickets from this option.">
+            <div className="flex flex-wrap gap-2">
+              {roles.length === 0 && (
+                <span className="text-xs text-muted-foreground">No roles found.</span>
+              )}
+              {roles.map((r) => {
+                const active = option.support_role_ids.includes(r.id);
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() =>
+                      onChange({
+                        support_role_ids: active
+                          ? option.support_role_ids.filter((x) => x !== r.id)
+                          : [...option.support_role_ids, r.id],
+                      })
+                    }
+                    className={`rounded-full px-3 py-1 text-xs ring-1 transition-colors ${
+                      active
+                        ? "bg-white/15 ring-white/40"
+                        : "bg-white/[0.03] ring-white/10 hover:bg-white/10"
+                    }`}
+                    style={
+                      r.color
+                        ? { color: `#${r.color.toString(16).padStart(6, "0")}` }
+                        : undefined
+                    }
+                  >
+                    @{r.name}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+          <Field label="Ticket channel name" hint="Use {number} for the sequential ID and {user} for the opener's name.">
+            <input
+              type="text"
+              value={option.ticket_name_format}
+              maxLength={90}
+              onChange={(e) => onChange({ ticket_name_format: e.target.value })}
+              className="input font-mono"
+            />
+          </Field>
+          <Field label="Opening message" hint="First message posted in a new ticket from this option.">
+            <textarea
+              value={option.welcome_message}
+              maxLength={2000}
+              rows={3}
+              onChange={(e) => onChange({ welcome_message: e.target.value })}
+              className="input resize-none"
+            />
+          </Field>
+        </div>
+      )}
+    </div>
+  );
+}
+
