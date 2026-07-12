@@ -188,24 +188,7 @@ function TicketsPage() {
                 </select>
               </Field>
               <Field
-                label="Ticket category"
-                hint="New tickets are created as channels under this category."
-              >
-                <select
-                  value={form.category_id}
-                  onChange={(e) => set("category_id", e.target.value)}
-                  className="input"
-                  disabled={!data.botInGuild}
-                >
-                  <option value="">— None (top-level) —</option>
-                  {data.categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field
+
                 label="Support roles"
                 hint="Members with these roles can see and reply in every ticket."
               >
