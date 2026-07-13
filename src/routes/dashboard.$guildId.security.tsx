@@ -20,6 +20,7 @@ import {
   removeSecurityListEntry,
   type SecurityLoadResult,
 } from "@/lib/security.functions";
+import type { Json } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/dashboard/$guildId/security")({
   head: () => ({ meta: [{ title: "Security — ware dashboard" }] }),
