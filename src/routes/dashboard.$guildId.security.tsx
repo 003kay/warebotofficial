@@ -400,7 +400,7 @@ function ModuleCard({
                     className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm outline-none focus:border-primary"
                     value={cur}
                     placeholder={f.placeholder}
-                    onChange={(e) => setState({ ...state, extra: { ...extra, [f.key]: e.target.value } })}
+                    onChange={(e) => setState({ ...state, extra: { ...extra, [f.key]: e.target.value } as Json })}
                     onBlur={() => save(state)}
                   />
                 </Field>
