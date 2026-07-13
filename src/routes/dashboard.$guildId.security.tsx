@@ -571,8 +571,8 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
       aria-pressed={value}
     >
       <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
-          value ? "translate-x-5" : "translate-x-0.5"
+        className={`absolute left-0 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+          value ? "translate-x-[1.5rem]" : "translate-x-0.5"
         }`}
       />
     </button>
