@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { ALL_MODULES, LIST_TYPES, MODULE_KEYS, type ListType } from "@/lib/security-modules";
+import type { Json } from "@/integrations/supabase/types";
 
 async function requireGuildManager(guildId: string) {
   const { readSessionFromCookie } = await import("@/lib/session.server");
