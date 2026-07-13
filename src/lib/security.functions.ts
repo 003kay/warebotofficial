@@ -112,7 +112,7 @@ export const getSecurityConfig = createServerFn({ method: "GET" })
         punishment: row.punishment,
         threshold_count: row.threshold_count,
         threshold_seconds: row.threshold_seconds,
-        extra: (row.extra as Record<string, unknown>) ?? {},
+        extra: (row.extra as Json) ?? {},
       };
     }
 
