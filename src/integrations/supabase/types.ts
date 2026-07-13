@@ -50,6 +50,174 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          dry_run: boolean
+          event_type: string
+          guild_id: string
+          id: string
+          metadata: Json
+          module_key: string | null
+          punishment: string | null
+          reason: string | null
+          target_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          dry_run?: boolean
+          event_type: string
+          guild_id: string
+          id?: string
+          metadata?: Json
+          module_key?: string | null
+          punishment?: string | null
+          reason?: string | null
+          target_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          dry_run?: boolean
+          event_type?: string
+          guild_id?: string
+          id?: string
+          metadata?: Json
+          module_key?: string | null
+          punishment?: string | null
+          reason?: string | null
+          target_id?: string | null
+        }
+        Relationships: []
+      }
+      security_list_entries: {
+        Row: {
+          created_at: string
+          entry_type: string
+          guild_id: string
+          id: string
+          list_type: string
+          note: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          entry_type: string
+          guild_id: string
+          id?: string
+          list_type: string
+          note?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string
+          entry_type?: string
+          guild_id?: string
+          id?: string
+          list_type?: string
+          note?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
+      security_modules: {
+        Row: {
+          created_at: string
+          dry_run: boolean
+          enabled: boolean
+          extra: Json
+          guild_id: string
+          id: string
+          module_key: string
+          punishment: string
+          threshold_count: number
+          threshold_seconds: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dry_run?: boolean
+          enabled?: boolean
+          extra?: Json
+          guild_id: string
+          id?: string
+          module_key: string
+          punishment?: string
+          threshold_count?: number
+          threshold_seconds?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dry_run?: boolean
+          enabled?: boolean
+          extra?: Json
+          guild_id?: string
+          id?: string
+          module_key?: string
+          punishment?: string
+          threshold_count?: number
+          threshold_seconds?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      security_settings: {
+        Row: {
+          captcha_difficulty: string
+          created_at: string
+          dry_run_global: boolean
+          guild_id: string
+          id: string
+          log_channel_id: string | null
+          owner_discord_id: string
+          panicmode: boolean
+          profile: string
+          quarantine_channel_id: string | null
+          quarantine_role_id: string | null
+          raidmode: boolean
+          updated_at: string
+          verification_mode: string
+          verification_role_id: string | null
+        }
+        Insert: {
+          captcha_difficulty?: string
+          created_at?: string
+          dry_run_global?: boolean
+          guild_id: string
+          id?: string
+          log_channel_id?: string | null
+          owner_discord_id: string
+          panicmode?: boolean
+          profile?: string
+          quarantine_channel_id?: string | null
+          quarantine_role_id?: string | null
+          raidmode?: boolean
+          updated_at?: string
+          verification_mode?: string
+          verification_role_id?: string | null
+        }
+        Update: {
+          captcha_difficulty?: string
+          created_at?: string
+          dry_run_global?: boolean
+          guild_id?: string
+          id?: string
+          log_channel_id?: string | null
+          owner_discord_id?: string
+          panicmode?: boolean
+          profile?: string
+          quarantine_channel_id?: string | null
+          quarantine_role_id?: string | null
+          raidmode?: boolean
+          updated_at?: string
+          verification_mode?: string
+          verification_role_id?: string | null
+        }
+        Relationships: []
+      }
       ticket_panel_options: {
         Row: {
           category_id: string | null

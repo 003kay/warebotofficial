@@ -16,6 +16,7 @@ import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DocsSlugRouteImport } from './routes/docs.$slug'
 import { Route as DashboardGuildIdTicketsRouteImport } from './routes/dashboard.$guildId.tickets'
+import { Route as DashboardGuildIdSecurityRouteImport } from './routes/dashboard.$guildId.security'
 import { Route as ApiPublicAuthDiscordLogoutRouteImport } from './routes/api/public/auth/discord/logout'
 import { Route as ApiPublicAuthDiscordLoginRouteImport } from './routes/api/public/auth/discord/login'
 import { Route as ApiPublicAuthDiscordCallbackRouteImport } from './routes/api/public/auth/discord/callback'
@@ -55,6 +56,12 @@ const DashboardGuildIdTicketsRoute = DashboardGuildIdTicketsRouteImport.update({
   path: '/dashboard/$guildId/tickets',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardGuildIdSecurityRoute =
+  DashboardGuildIdSecurityRouteImport.update({
+    id: '/dashboard/$guildId/security',
+    path: '/dashboard/$guildId/security',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAuthDiscordLogoutRoute =
   ApiPublicAuthDiscordLogoutRouteImport.update({
     id: '/api/public/auth/discord/logout',
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/docs/$slug': typeof DocsSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/docs/': typeof DocsIndexRoute
+  '/dashboard/$guildId/security': typeof DashboardGuildIdSecurityRoute
   '/dashboard/$guildId/tickets': typeof DashboardGuildIdTicketsRoute
   '/api/public/auth/discord/callback': typeof ApiPublicAuthDiscordCallbackRoute
   '/api/public/auth/discord/login': typeof ApiPublicAuthDiscordLoginRoute
@@ -93,6 +101,7 @@ export interface FileRoutesByTo {
   '/docs/$slug': typeof DocsSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/docs': typeof DocsIndexRoute
+  '/dashboard/$guildId/security': typeof DashboardGuildIdSecurityRoute
   '/dashboard/$guildId/tickets': typeof DashboardGuildIdTicketsRoute
   '/api/public/auth/discord/callback': typeof ApiPublicAuthDiscordCallbackRoute
   '/api/public/auth/discord/login': typeof ApiPublicAuthDiscordLoginRoute
@@ -106,6 +115,7 @@ export interface FileRoutesById {
   '/docs/$slug': typeof DocsSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/docs/': typeof DocsIndexRoute
+  '/dashboard/$guildId/security': typeof DashboardGuildIdSecurityRoute
   '/dashboard/$guildId/tickets': typeof DashboardGuildIdTicketsRoute
   '/api/public/auth/discord/callback': typeof ApiPublicAuthDiscordCallbackRoute
   '/api/public/auth/discord/login': typeof ApiPublicAuthDiscordLoginRoute
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/docs/$slug'
     | '/dashboard/'
     | '/docs/'
+    | '/dashboard/$guildId/security'
     | '/dashboard/$guildId/tickets'
     | '/api/public/auth/discord/callback'
     | '/api/public/auth/discord/login'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/docs/$slug'
     | '/dashboard'
     | '/docs'
+    | '/dashboard/$guildId/security'
     | '/dashboard/$guildId/tickets'
     | '/api/public/auth/discord/callback'
     | '/api/public/auth/discord/login'
@@ -144,6 +156,7 @@ export interface FileRouteTypes {
     | '/docs/$slug'
     | '/dashboard/'
     | '/docs/'
+    | '/dashboard/$guildId/security'
     | '/dashboard/$guildId/tickets'
     | '/api/public/auth/discord/callback'
     | '/api/public/auth/discord/login'
@@ -157,6 +170,7 @@ export interface RootRouteChildren {
   DocsSlugRoute: typeof DocsSlugRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DocsIndexRoute: typeof DocsIndexRoute
+  DashboardGuildIdSecurityRoute: typeof DashboardGuildIdSecurityRoute
   DashboardGuildIdTicketsRoute: typeof DashboardGuildIdTicketsRoute
   ApiPublicAuthDiscordCallbackRoute: typeof ApiPublicAuthDiscordCallbackRoute
   ApiPublicAuthDiscordLoginRoute: typeof ApiPublicAuthDiscordLoginRoute
@@ -214,6 +228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardGuildIdTicketsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/$guildId/security': {
+      id: '/dashboard/$guildId/security'
+      path: '/dashboard/$guildId/security'
+      fullPath: '/dashboard/$guildId/security'
+      preLoaderRoute: typeof DashboardGuildIdSecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/auth/discord/logout': {
       id: '/api/public/auth/discord/logout'
       path: '/api/public/auth/discord/logout'
@@ -245,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocsSlugRoute: DocsSlugRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DocsIndexRoute: DocsIndexRoute,
+  DashboardGuildIdSecurityRoute: DashboardGuildIdSecurityRoute,
   DashboardGuildIdTicketsRoute: DashboardGuildIdTicketsRoute,
   ApiPublicAuthDiscordCallbackRoute: ApiPublicAuthDiscordCallbackRoute,
   ApiPublicAuthDiscordLoginRoute: ApiPublicAuthDiscordLoginRoute,
