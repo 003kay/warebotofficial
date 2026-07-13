@@ -385,7 +385,7 @@ function ModuleCard({
                     value={cur}
                     min={f.min}
                     max={f.max}
-                    onChange={(v) => save({ ...state, extra: { ...extra, [f.key]: v } })}
+                    onChange={(v) => save({ ...state, extra: { ...extra, [f.key]: v } as Json })}
                   />
                 </Field>
               );
