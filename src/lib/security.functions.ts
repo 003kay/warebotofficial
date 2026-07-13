@@ -208,7 +208,7 @@ export const saveSecurityModule = createServerFn({ method: "POST" })
       punishment: string;
       threshold_count: number;
       threshold_seconds: number;
-      extra: Record<string, unknown>;
+      extra: Json;
     }) => d,
   )
   .handler(async ({ data }) => {
