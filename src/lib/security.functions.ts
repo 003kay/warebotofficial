@@ -38,7 +38,7 @@ export type SecurityLoadResult = {
       punishment: string;
       threshold_count: number;
       threshold_seconds: number;
-      extra: Record<string, unknown>;
+      extra: Json;
     }
   >;
   lists: Record<ListType, { id: string; entry_type: string; value: string; note: string | null }[]>;
