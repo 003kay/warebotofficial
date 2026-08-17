@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
 import { getCurrentUser } from "@/lib/dashboard.functions";
 
-const links: { label: string; to: string }[] = [
-  { label: "Commands", to: "/docs/commands" },
-  { label: "Docs", to: "/docs" },
+const links = [
+  { label: "Commands", to: "/docs/$slug" as const, params: { slug: "commands" } },
+  { label: "Docs", to: "/docs" as const, params: undefined },
 ];
 
 export function Navbar() {
@@ -31,6 +31,7 @@ export function Navbar() {
           <Link
             key={l.label}
             to={l.to}
+            params={l.params as never}
             className="rounded-full px-4 py-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
           >
             {l.label}
@@ -51,15 +52,19 @@ export function Navbar() {
           <span className="hidden sm:inline">Dashboard</span>
         </Link>
       ) : (
-        <a
-          href="/api/public/auth/discord/login"
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-transform hover:scale-[1.02]"
-        >
-          <span>Sign in</span>
-        </a>
-
+        <div className="flex flex-col items-center gap-0.5">
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className="cursor-not-allowed rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-muted-foreground"
+          >
+            Dashboard
+          </button>
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            Coming soon
+          </span>
+        </div>
       )}
     </header>
   );

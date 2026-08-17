@@ -14,7 +14,7 @@ export function Footer() {
           <span className="font-display text-xl">ware</span>
         </div>
         <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
-          <Link to="/docs/commands" className="hover:text-foreground">Commands</Link>
+          <Link to="/docs/$slug" params={{ slug: "commands" }} className="hover:text-foreground">Commands</Link>
           <Link to="/docs" className="hover:text-foreground">Docs</Link>
           <Link to="/terms" className="hover:text-foreground">Terms</Link>
           <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
