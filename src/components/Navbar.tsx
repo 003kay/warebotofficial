@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
 import { getCurrentUser } from "@/lib/dashboard.functions";
 
-const links: { label: string; to: string }[] = [
-  { label: "Commands", to: "/docs/commands" },
-  { label: "Docs", to: "/docs" },
+const links = [
+  { label: "Commands", to: "/docs/$slug" as const, params: { slug: "commands" } },
+  { label: "Docs", to: "/docs" as const, params: undefined },
 ];
 
 export function Navbar() {
@@ -31,6 +31,7 @@ export function Navbar() {
           <Link
             key={l.label}
             to={l.to}
+            params={l.params as never}
             className="rounded-full px-4 py-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
           >
             {l.label}
