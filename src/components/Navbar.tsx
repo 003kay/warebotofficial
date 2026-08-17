@@ -51,15 +51,19 @@ export function Navbar() {
           <span className="hidden sm:inline">Dashboard</span>
         </Link>
       ) : (
-        <a
-          href="/api/public/auth/discord/login"
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-transform hover:scale-[1.02]"
-        >
-          <span>Sign in</span>
-        </a>
-
+        <div className="flex flex-col items-center gap-0.5">
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className="cursor-not-allowed rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-muted-foreground"
+          >
+            Dashboard
+          </button>
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            Coming soon
+          </span>
+        </div>
       )}
     </header>
   );
