@@ -16,7 +16,7 @@ function renderCommandText(value: string) {
 
 function CommandList({ commands }: { commands: CommandDef[] }) {
   return (
-    <div className="mt-7 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+    <div className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {commands.map((command) => {
         const usage = renderCommandText(command.usage);
         const example = renderCommandText(command.example);
@@ -25,32 +25,32 @@ function CommandList({ commands }: { commands: CommandDef[] }) {
           <article
             key={command.name}
             id={commandAnchor(command.name)}
-            className="group scroll-mt-28 rounded-2xl border border-white/[0.09] bg-white/[0.025] p-5 [content-visibility:auto] [contain-intrinsic-size:190px] transition-colors duration-150 hover:border-white/[0.16] hover:bg-white/[0.04]"
+            className="group scroll-mt-28 rounded-2xl border border-white/[0.09] bg-white/[0.025] p-5 [content-visibility:auto] [contain-intrinsic-size:200px] transition-colors duration-150 hover:border-white/[0.16] hover:bg-white/[0.04]"
           >
             <div className="flex items-start justify-between gap-3">
-              <code className="max-w-full truncate rounded-lg border border-white/[0.12] bg-white/[0.08] px-3 py-1.5 font-mono text-[14px] font-semibold tracking-[-0.01em] text-white">
+              <span className="max-w-full truncate rounded-lg border border-white/[0.12] bg-white/[0.08] px-3 py-1.5 text-[15px] font-semibold tracking-[-0.015em] text-white">
                 ,{command.name}
-              </code>
+              </span>
               {command.aliases && command.aliases.length > 0 && (
-                <span className="shrink-0 pt-1 text-[11px] font-medium text-white/40">
+                <span className="shrink-0 pt-1 text-[11px] font-medium text-white/45">
                   +{command.aliases.length}
                 </span>
               )}
             </div>
 
-            <code className="mt-3 block break-words font-mono text-[12px] leading-[1.55] tracking-normal text-white/55">
+            <div className="mt-3 break-words text-[13px] font-medium leading-6 tracking-[-0.01em] text-white/50">
               ,{usage}
-            </code>
+            </div>
 
-            <p className="mt-3 text-[14px] leading-[1.6] tracking-[-0.005em] text-white/70">
+            <p className="mt-3 text-[15px] leading-6 tracking-[-0.01em] text-white/78">
               {command.description}
             </p>
 
             <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t border-white/[0.07] pt-3.5">
-              <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-white/35">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/38">
                 Example
               </span>
-              <code className="min-w-0 flex-1 break-words rounded-lg bg-white/[0.055] px-2.5 py-1.5 font-mono text-[12px] leading-5 tracking-normal text-white/80">
+              <code className="min-w-0 flex-1 break-words rounded-lg bg-white/[0.055] px-2.5 py-1.5 font-mono text-[12px] leading-5 tracking-normal text-white/82">
                 {example}
               </code>
             </div>
@@ -60,13 +60,13 @@ function CommandList({ commands }: { commands: CommandDef[] }) {
                 {command.aliases.slice(0, 3).map((alias) => (
                   <span
                     key={alias}
-                    className="rounded-md border border-white/[0.07] bg-white/[0.025] px-2 py-0.5 font-mono text-[10px] leading-4 text-white/50"
+                    className="rounded-md border border-white/[0.07] bg-white/[0.025] px-2 py-0.5 font-mono text-[11px] leading-4 text-white/55"
                   >
                     ,{alias}
                   </span>
                 ))}
                 {command.aliases.length > 3 && (
-                  <span className="rounded-md border border-white/[0.07] bg-white/[0.025] px-2 py-0.5 font-mono text-[10px] leading-4 text-white/40">
+                  <span className="rounded-md border border-white/[0.07] bg-white/[0.025] px-2 py-0.5 font-mono text-[11px] leading-4 text-white/45">
                     +{command.aliases.length - 3}
                   </span>
                 )}
@@ -230,7 +230,7 @@ function DocPageComponent() {
                 {category.name}
               </h2>
             </div>
-            <span className="rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 font-mono text-xs text-muted-foreground">
+            <span className="rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 text-xs text-muted-foreground">
               {category.commands.length} documented commands
             </span>
           </div>
