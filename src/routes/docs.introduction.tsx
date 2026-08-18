@@ -1,194 +1,145 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
-import { ArrowLeft, Home } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { ArrowLeft, BookOpen, Search, ShieldCheck, Settings, Terminal } from "lucide-react";
+import { DocsLayout } from "@/components/docs/DocsLayout";
 
-import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
-
-function BackButton() {
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          window.location.href = "/";
-        }
-      }}
-      className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-    >
-      <ArrowLeft className="h-4 w-4" />
-      Go back
-    </button>
-  );
-}
-
-function NotFoundComponent() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <BackButton />
-
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <Home className="h-4 w-4" />
-            Go home
-          </Link>
-
-          <Link
-            to="/docs/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            Documentation
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
-  const router = useRouter();
-
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try again, go back, or head home.
-        </p>
-
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Try again
-          </button>
-
-          <BackButton />
-
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            Go home
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createFileRoute("/docs/introduction")({
   head: () => ({
     meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ware — Discord's premier all-in-one app" },
+      { title: "Introduction — ware docs" },
       {
         name: "description",
         content:
-          "Help: https://warebot.xyz\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "ware — Discord's premier all-in-one app" },
-      { name: "twitter:title", content: "ware — Discord's premier all-in-one app" },
-      {
-        property: "og:description",
-        content:
-          "Help: https://warebot.xyz\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Help: https://warebot.xyz\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0c03b3a-4682-4f9e-8087-29c5e1c8abd5/id-preview-17bb6b5b--8c07b575-86b6-4a2f-a21d-8788e908f794.lovable.app-1783607037275.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0c03b3a-4682-4f9e-8087-29c5e1c8abd5/id-preview-17bb6b5b--8c07b575-86b6-4a2f-a21d-8788e908f794.lovable.app-1783607037275.png",
-      },
-    ],
-    links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "stylesheet",
-        href:
-          "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: appCss,
+          "Learn how to get started with ware, browse commands, configure your server, and use the documentation.",
       },
     ],
   }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
+  component: IntroductionPage,
 });
 
-function RootShell({ children }: { children: ReactNode }) {
+function IntroductionPage() {
   return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
+    <DocsLayout
+      active="introduction"
+      toc={[
+        { id: "getting-started", label: "Getting Started" },
+        { id: "commands", label: "Finding Commands" },
+        { id: "next-steps", label: "Next Steps" },
+      ]}
+    >
+      <p className="text-sm text-muted-foreground">Overview</p>
 
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
+      <h1 className="mt-1 text-4xl font-bold tracking-tight md:text-5xl">
+        Introduction
+      </h1>
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
+      <p className="mt-4 max-w-3xl text-lg text-muted-foreground">
+        ware is an all-in-one Discord bot built for server moderation, security,
+        configuration, utilities, economy, VoiceMaster, tickets, giveaways,
+        logging, and more. These docs show you what each command does and how to
+        use it.
+      </p>
+
+      <div className="mt-6">
+        <Link
+          to="/docs/"
+          className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-foreground transition-colors hover:bg-white/[0.07]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to docs
+        </Link>
+      </div>
+
+      <section id="getting-started" className="scroll-mt-28">
+        <h2 className="mt-12 text-2xl font-semibold tracking-tight">
+          Getting Started
+        </h2>
+
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <BookOpen className="h-5 w-5 text-muted-foreground" />
+            <h3 className="mt-3 font-semibold">Default prefix</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              ware uses a comma as the default command prefix.
+            </p>
+            <code className="mt-3 inline-block rounded bg-white/10 px-2 py-1 font-mono text-sm">
+              ,help
+            </code>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <Settings className="h-5 w-5 text-muted-foreground" />
+            <h3 className="mt-3 font-semibold">Server setup</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Use the setup command to begin configuring ware for your server.
+            </p>
+            <code className="mt-3 inline-block rounded bg-white/10 px-2 py-1 font-mono text-sm">
+              ,setup
+            </code>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+            <h3 className="mt-3 font-semibold">Security</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Configure AntiNuke, moderation, AutoMod, logging, and other
+              protections from the security sections.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <Terminal className="h-5 w-5 text-muted-foreground" />
+            <h3 className="mt-3 font-semibold">Command documentation</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Each command entry includes its syntax, description, example, and
+              aliases when available.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="commands" className="scroll-mt-28">
+        <h2 className="mt-12 text-2xl font-semibold tracking-tight">
+          Finding Commands
+        </h2>
+
+        <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+          <div className="flex items-start gap-3">
+            <Search className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+            <div>
+              <h3 className="font-semibold">Use the live search</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Start typing a command name in the search bar. Matching commands
+                appear while you type. Click a result to jump directly to that
+                command and see how to use it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="next-steps" className="scroll-mt-28">
+        <h2 className="mt-12 text-2xl font-semibold tracking-tight">
+          Next Steps
+        </h2>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link
+            to="/docs/$slug"
+            params={{ slug: "commands" }}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Browse all commands
+          </Link>
+
+          <Link
+            to="/docs/$slug"
+            params={{ slug: "security-setup" }}
+            className="rounded-md border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-foreground transition-colors hover:bg-white/[0.07]"
+          >
+            Security setup
+          </Link>
+        </div>
+      </section>
+    </DocsLayout>
   );
 }
