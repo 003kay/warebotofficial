@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ArrowUpRight, Copy } from "lucide-react";
 import { DocsLayout } from "@/components/docs/DocsLayout";
 import { commandCategories, type CommandDef } from "@/lib/commands";
 
@@ -16,45 +17,80 @@ function renderCommandText(value: string) {
 
 function CommandList({ commands }: { commands: CommandDef[] }) {
   return (
-    <div className="mt-7 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {commands.map((command) => (
-        <article
-          key={command.name}
-          id={commandAnchor(command.name)}
-          className="group scroll-mt-28 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 [content-visibility:auto] [contain-intrinsic-size:180px] transition-colors duration-150 hover:border-white/[0.14] hover:bg-white/[0.04] md:p-5"
-        >
-          <div className="flex flex-wrap items-center gap-2">
-            <code className="rounded-lg border border-white/10 bg-white/[0.07] px-2.5 py-1 font-mono text-sm text-white">
-              ,{command.name}
-            </code>
-            <code className="break-words font-mono text-xs text-muted-foreground">
-              {renderCommandText(command.usage)}
-            </code>
-          </div>
+    <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {commands.map((command) => {
+        const usage = renderCommandText(command.usage);
+        const example = renderCommandText(command.example);
 
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            {command.description}
-          </p>
+        return (
+          <article
+            key={command.name}
+            id={commandAnchor(command.name)}
+            className="group relative scroll-mt-28 overflow-hidden rounded-[22px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,.038),rgba(255,255,255,.018))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,.025)] [content-visibility:auto] [contain-intrinsic-size:245px] transition-[border-color,background-color,box-shadow] duration-200 hover:border-white/[0.16] hover:bg-white/[0.045] hover:shadow-[0_18px_50px_-34px_rgba(255,255,255,.22)]"
+          >
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-50" />
+            <div className="pointer-events-none absolute -right-10 -top-12 h-28 w-28 rounded-full bg-white/[0.025] blur-2xl transition-opacity duration-200 group-hover:opacity-100" />
 
-          <div className="mt-4 space-y-2 text-xs text-muted-foreground">
-            <div>
-              Example:{" "}
-              <code className="break-words rounded-md bg-white/[0.06] px-1.5 py-1 font-mono text-white/80">
-                {renderCommandText(command.example)}
-              </code>
-            </div>
+            <div className="relative flex min-h-[215px] flex-col">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="inline-flex max-w-full items-center rounded-xl border border-white/[0.12] bg-white/[0.075] px-3 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,.04)]">
+                    <code className="truncate font-mono text-[13px] font-medium text-white">
+                      ,{command.name}
+                    </code>
+                  </div>
+                </div>
 
-            {command.aliases && command.aliases.length > 0 && (
-              <div>
-                Aliases:{" "}
-                <span className="break-words font-mono text-white/65">
-                  {command.aliases.map((alias) => `,${alias}`).join(", ")}
-                </span>
+                <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-white/20 transition-colors duration-200 group-hover:text-white/55" />
               </div>
-            )}
-          </div>
-        </article>
-      ))}
+
+              <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/25 px-3 py-2.5">
+                <div className="mb-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/30">
+                  Syntax
+                </div>
+                <code className="block break-words font-mono text-[11px] leading-5 text-white/60">
+                  ,{usage}
+                </code>
+              </div>
+
+              <p className="mt-4 text-[13px] leading-6 text-white/55">
+                {command.description}
+              </p>
+
+              <div className="mt-auto pt-5">
+                <div className="border-t border-white/[0.065] pt-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/30">
+                      Example
+                    </div>
+                    <Copy className="h-3 w-3 text-white/20" />
+                  </div>
+
+                  <code className="mt-2 block break-words rounded-lg bg-white/[0.045] px-2.5 py-2 font-mono text-[11px] leading-5 text-white/75">
+                    {example}
+                  </code>
+                </div>
+
+                {command.aliases && command.aliases.length > 0 && (
+                  <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                    <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/25">
+                      Aliases
+                    </span>
+                    {command.aliases.map((alias) => (
+                      <span
+                        key={alias}
+                        className="rounded-md border border-white/[0.06] bg-white/[0.025] px-1.5 py-0.5 font-mono text-[10px] text-white/45"
+                      >
+                        ,{alias}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }
