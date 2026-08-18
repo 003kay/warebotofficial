@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
 import { getCurrentUser } from "@/lib/dashboard.functions";
+
+const WARE_LOGO = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
 
 const links = [
   { label: "Commands", to: "/docs/$slug" as const, params: { slug: "commands" } },
@@ -17,11 +18,11 @@ export function Navbar() {
 
   return (
     <header className="relative z-20 flex items-center justify-between px-6 py-5 md:px-10">
-      <Link to="/" className="flex items-center gap-2">
+      <Link to="/" className="flex items-center gap-2.5">
         <img
-          src={avatarAsset.url}
+          src={WARE_LOGO}
           alt="ware"
-          className="h-9 w-9 rounded-full object-cover ring-1 ring-white/10"
+          className="h-9 w-9 rounded-lg object-cover ring-1 ring-white/10"
         />
         <span className="text-2xl font-bold leading-none tracking-tight">ware</span>
       </Link>
