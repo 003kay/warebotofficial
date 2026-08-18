@@ -3,6 +3,8 @@ import { ArrowRight, Search } from "lucide-react";
 import { DocsLayout } from "@/components/docs/DocsLayout";
 import { commandCategories } from "@/lib/commands";
 
+const BOT_COMMAND_COUNT = 821;
+
 export const Route = createFileRoute("/docs/commands")({
   head: () => ({
     meta: [
@@ -14,11 +16,6 @@ export const Route = createFileRoute("/docs/commands")({
 });
 
 function CommandsIndex() {
-  const commandCount = commandCategories.reduce(
-    (total, category) => total + category.commands.length,
-    0,
-  );
-
   return (
     <DocsLayout active="commands" toc={[{ id: "categories", label: "Categories" }]}>
       <p className="text-sm text-muted-foreground">Commands</p>
@@ -33,8 +30,8 @@ function CommandsIndex() {
 
       <div className="mt-7 flex flex-wrap gap-3 text-sm">
         <div className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-muted-foreground">
-          <span className="font-semibold text-foreground">{commandCount}</span>{" "}
-          documented commands
+          <span className="font-semibold text-foreground">{BOT_COMMAND_COUNT}</span>{" "}
+          bot commands
         </div>
         <div className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-muted-foreground">
           <span className="font-semibold text-foreground">{commandCategories.length}</span>{" "}
@@ -59,7 +56,7 @@ function CommandsIndex() {
             key={category.slug}
             to="/docs/$slug"
             params={{ slug: `commands-${category.slug}` }}
-            className="group flex min-h-36 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.05]"
+            className="group flex min-h-36 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-5 transition-colors duration-150 hover:border-white/20 hover:bg-white/[0.05]"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -67,10 +64,10 @@ function CommandsIndex() {
                   {category.name}
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {category.commands.length} commands
+                  {category.commands.length} documented commands
                 </p>
               </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-foreground" />
+              <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform duration-150 group-hover:translate-x-1 group-hover:text-foreground" />
             </div>
 
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
