@@ -41,7 +41,7 @@ export function DocsLayout({
           <DocsSearch />
 
           <a
-            href="https://discord.gg/GEMMS5pxQs"
+            href="https://discord.gg/wept"
             target="_blank"
             rel="noreferrer"
             className="hidden rounded-full border border-white/10 bg-white/[0.025] px-3.5 py-2 text-xs text-muted-foreground transition-all hover:border-white/20 hover:bg-white/[0.055] hover:text-white md:inline-block"
