@@ -1,20 +1,6 @@
-import {
-  createFileRoute,
-  notFound,
-} from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { DocsLayout } from "@/components/docs/DocsLayout";
-import {
-  commandCategories,
-  type CommandDef,
-} from "@/lib/commands";
-import type { ReactNode } from "react";
-
-type DocPage = {
-  title: string;
-  section: string;
-  body: ReactNode;
-  toc?: { id: string; label: string }[];
-};
+import { commandCategories, type CommandDef } from "@/lib/commands";
 
 function commandAnchor(name: string) {
   return `command-${name
@@ -24,441 +10,229 @@ function commandAnchor(name: string) {
     .replace(/^-+|-+$/g, "")}`;
 }
 
-/*
- * Some older command examples in commands.ts still use
- * @alex. We change that only when displaying the
- * documentation so the command database itself does not
- * need to be modified.
- */
 function renderCommandText(value: string) {
   return value.replaceAll("@alex", "@timmy");
 }
 
-function CommandList({
-  commands,
-}: {
-  commands: CommandDef[];
-}) {
+function CommandList({ commands }: { commands: CommandDef[] }) {
   return (
-    <div className="mt-6 space-y-4">
-      {commands.map((c) => (
-        <div
-          key={c.name}
-          id={commandAnchor(c.name)}
-          className="scroll-mt-28 rounded-xl border border-white/10 bg-white/[0.03] p-4"
+    <div className="mt-7 grid gap-3">
+      {commands.map((command) => (
+        <article
+          key={command.name}
+          id={commandAnchor(command.name)}
+          className="group scroll-mt-28 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-white/[0.04]"
         >
-          <div className="flex flex-wrap items-baseline gap-2">
-            <code className="rounded-md bg-white/10 px-2 py-0.5 font-mono text-sm text-foreground">
-              ,{c.name}
+          <div className="flex flex-wrap items-center gap-2">
+            <code className="rounded-lg border border-white/10 bg-white/[0.07] px-2.5 py-1 font-mono text-sm text-white">
+              ,{command.name}
             </code>
-
-            <span className="font-mono text-xs text-muted-foreground">
-              {renderCommandText(c.usage)}
-            </span>
+            <code className="font-mono text-xs text-muted-foreground">
+              {renderCommandText(command.usage)}
+            </code>
           </div>
 
-          <p className="mt-2 text-sm text-muted-foreground">
-            {c.description}
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            {command.description}
           </p>
 
-          <div className="mt-2 text-xs text-muted-foreground">
-            Example:{" "}
-            <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-foreground">
-              {renderCommandText(c.example)}
-            </code>
-          </div>
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
+            <span>
+              Example:{" "}
+              <code className="rounded-md bg-white/[0.06] px-1.5 py-1 font-mono text-white/80">
+                {renderCommandText(command.example)}
+              </code>
+            </span>
 
-          {c.aliases &&
-            c.aliases.length > 0 && (
-              <div className="mt-2 text-xs text-muted-foreground">
+            {command.aliases && command.aliases.length > 0 && (
+              <span>
                 Aliases:{" "}
-                <span className="font-mono text-foreground/80">
-                  {c.aliases
-                    .map(
-                      (alias) => `,${alias}`,
-                    )
-                    .join(", ")}
+                <span className="font-mono text-white/65">
+                  {command.aliases.map((alias) => `,${alias}`).join(", ")}
                 </span>
-              </div>
+              </span>
             )}
-        </div>
+          </div>
+        </article>
       ))}
     </div>
   );
 }
 
-const staticPages: Record<
+const pageInfo: Record<
   string,
-  DocPage
+  { title: string; section: string; description: string; commandCategory?: string }
 > = {
+  introduction: {
+    title: "Introduction",
+    section: "Overview",
+    description:
+      "Learn how to set up ware in your server, find commands, and configure the features you need.",
+  },
   "donator-perks": {
     title: "Donator Perks",
     section: "Overview",
-    toc: [
-      {
-        id: "perks",
-        label: "Perks",
-      },
-    ],
-    body: (
-      <div className="space-y-4 text-muted-foreground">
-        <p>
-          Supporting ware unlocks premium
-          features across every module —
-          extended limits, exclusive commands,
-          and priority processing.
-        </p>
-
-        <h2
-          id="perks"
-          className="mt-6 text-xl font-semibold text-foreground"
-        >
-          Perks
-        </h2>
-
-        <ul className="ml-6 list-disc space-y-2">
-          <li>
-            Priority command processing on
-            shared shards
-          </li>
-          <li>
-            Extended tag, alias, and
-            autoresponder limits
-          </li>
-          <li>
-            Custom vanity role glow and colors
-          </li>
-          <li>
-            Higher economy and giveaway limits
-          </li>
-        </ul>
-      </div>
-    ),
+    description:
+      "Supporting ware unlocks expanded limits, premium features, and additional server tools.",
   },
-
   customization: {
     title: "Customization",
     section: "Overview",
-    body: (
-      <p className="text-muted-foreground">
-        Customize ware's prefix, embed color,
-        welcome/goodbye messages, and
-        per-command permissions from the
-        dashboard or via commands.
-      </p>
-    ),
+    description:
+      "Customize ware's prefix, messages, embeds, permissions, and server behavior.",
   },
-
-  "join-gate": {
-    title: "Join Gate",
-    section: "Security Setup",
-    body: (
-      <p className="text-muted-foreground">
-        Screen new members with
-        age/verification gates before they can
-        chat. See the Anti command category for
-        the full list of protections.
-      </p>
-    ),
-  },
-
-  "moderation-guide": {
-    title: "Moderation",
-    section: "Security Setup",
-    toc: [
-      {
-        id: "commands",
-        label: "Commands",
-      },
-    ],
-    body: (
-      <div>
-        <p className="text-muted-foreground">
-          Ban, kick, timeout, jail, mute, warn,
-          and mass actions like lockdown and
-          role cleanup — everything you need to
-          keep a server in line.
-        </p>
-
-        <h2
-          id="commands"
-          className="mt-10 text-xl font-semibold text-foreground"
-        >
-          Commands
-        </h2>
-
-        <CommandList
-          commands={
-            commandCategories.find(
-              (c) =>
-                c.slug ===
-                "moderation",
-            )?.commands ?? []
-          }
-        />
-      </div>
-    ),
-  },
-
-  "fake-permissions": {
-    title: "Fake Permissions",
-    section: "Security Setup",
-    body: (
-      <p className="text-muted-foreground">
-        Grant ware-only permissions to roles
-        without giving them native Discord
-        permissions.
-      </p>
-    ),
-  },
-
-  starboard: {
-    title: "Starboard",
-    section: "Server Configuration",
-    body: (
-      <p className="text-muted-foreground">
-        Configure a starboard channel and
-        threshold so popular messages get
-        highlighted automatically.
-      </p>
-    ),
-  },
-
-  "level-rewards": {
-    title: "Level Rewards",
-    section: "Server Configuration",
-    body: (
-      <p className="text-muted-foreground">
-        Reward active members with roles as
-        they level up in your server.
-      </p>
-    ),
-  },
-
   "security-setup": {
     title: "Antinuke",
     section: "Security Setup",
-    toc: [
-      {
-        id: "commands",
-        label: "Commands",
-      },
-    ],
-    body: (
-      <div>
-        <p className="text-muted-foreground">
-          Enable AntiNuke first to protect the
-          server from malicious admins,
-          compromised staff accounts, and bots
-          that ban, kick, or destroy channels
-          and roles in bulk. Pair it with
-          AutoMod and logging for full coverage
-          — see the Config/Logs command
-          category for those.
-        </p>
-
-        <h2
-          id="commands"
-          className="mt-10 text-xl font-semibold text-foreground"
-        >
-          Commands
-        </h2>
-
-        <CommandList
-          commands={
-            commandCategories.find(
-              (c) =>
-                c.slug ===
-                "antinuke",
-            )?.commands ?? []
-          }
-        />
-      </div>
-    ),
+    description:
+      "Protect your server from malicious admins, compromised staff accounts, destructive bots, and mass actions.",
+    commandCategory: "antinuke",
   },
-
+  "join-gate": {
+    title: "Join Gate",
+    section: "Security Setup",
+    description:
+      "Control how new members enter your server and add verification or screening before they can chat.",
+    commandCategory: "anti",
+  },
+  "moderation-guide": {
+    title: "Moderation",
+    section: "Security Setup",
+    description:
+      "Ban, kick, timeout, jail, mute, warn, lock down, and manage members with Ware's moderation system.",
+    commandCategory: "moderation",
+  },
+  "fake-permissions": {
+    title: "Fake Permissions",
+    section: "Security Setup",
+    description:
+      "Give staff Ware-specific command access without granting unnecessary native Discord permissions.",
+    commandCategory: "administration",
+  },
   "server-configuration": {
-    title: "Server Configuration",
-    section: "Guides",
-    body: (
-      <p className="text-muted-foreground">
-        Configure welcomes, autoroles, boost
-        messages, and counting from the Welcome
-        command category.
-      </p>
-    ),
+    title: "Tickets",
+    section: "Server Configuration",
+    description:
+      "Create and manage ticket workflows, support panels, and server support tools.",
+    commandCategory: "tickets",
   },
-
   integrations: {
-    title: "Integrations",
-    section: "Guides",
-    body: (
-      <p className="text-muted-foreground">
-        Connect social platforms and post
-        feeds directly into your channels.
-      </p>
-    ),
+    title: "Roles",
+    section: "Server Configuration",
+    description:
+      "Configure role utilities, role management, and server role automation.",
+    commandCategory: "channels-roles",
   },
-
   "embed-scripting": {
-    title: "Embed Scripting",
-    section: "Guides",
-    body: (
-      <p className="text-muted-foreground">
-        Build rich embeds with variables using
-        the Message Tools commands (
-        <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs text-foreground">
-          embed
-        </code>
-        ,{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs text-foreground">
-          embeds
-        </code>
-        ).
-      </p>
-    ),
+    title: "Messages",
+    section: "Server Configuration",
+    description:
+      "Build embeds, manage messages, and use Ware's message tools for cleaner server presentation.",
+    commandCategory: "message-tools",
   },
-
-  commands: {
-    title: "All Commands",
-    section: "Commands",
-    toc: commandCategories.map(
-      (c) => ({
-        id: c.slug,
-        label: c.name,
-      }),
-    ),
-    body: (
-      <div className="space-y-12">
-        {commandCategories.map(
-          (category) => (
-            <section
-              key={category.slug}
-            >
-              <h2
-                id={category.slug}
-                className="text-2xl font-semibold text-foreground"
-              >
-                {category.name}
-              </h2>
-
-              <p className="mt-1 text-sm text-muted-foreground">
-                {category.description}
-              </p>
-
-              <CommandList
-                commands={
-                  category.commands
-                }
-              />
-            </section>
-          ),
-        )}
-      </div>
-    ),
+  starboard: {
+    title: "Starboard",
+    section: "Server Configuration",
+    description:
+      "Highlight popular messages automatically with a configurable starboard system.",
+    commandCategory: "fun",
+  },
+  "level-rewards": {
+    title: "Level Rewards",
+    section: "Server Configuration",
+    description:
+      "Reward active members with progression, levels, and role rewards.",
+    commandCategory: "leveling",
   },
 };
 
-function buildPage(
-  slug: string,
-): DocPage | undefined {
-  if (staticPages[slug]) {
-    return staticPages[slug];
-  }
-
-  if (
-    slug.startsWith("commands-")
-  ) {
-    const catSlug = slug.replace(
-      /^commands-/,
-      "",
-    );
-
-    const category =
-      commandCategories.find(
-        (c) => c.slug === catSlug,
-      );
-
-    if (!category) {
-      return undefined;
-    }
-
-    return {
-      title: `${category.name} Commands`,
-      section: "Commands",
-
-      body: (
-        <div>
-          <p className="text-muted-foreground">
-            {category.description}
-          </p>
-
-          <CommandList
-            commands={
-              category.commands
-            }
-          />
-        </div>
-      ),
-    };
-  }
-
-  return undefined;
+function findCategory(slug: string) {
+  return commandCategories.find((category) => category.slug === slug);
 }
 
-export const Route = createFileRoute(
-  "/docs/$slug",
-)({
-  loader: ({ params }) => {
-    const page = buildPage(
-      params.slug,
-    );
-
-    if (!page) {
-      throw notFound();
-    }
-
-    return {
-      page,
-    };
-  },
-
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: loaderData
-          ? `${loaderData.page.title} — ware docs`
-          : "ware docs",
-      },
-    ],
+export const Route = createFileRoute("/docs/$slug")({
+  head: () => ({
+    meta: [{ title: "ware docs" }],
   }),
-
   component: DocPageComponent,
 });
 
 function DocPageComponent() {
-  const { slug } =
-    Route.useParams();
+  const { slug } = Route.useParams();
 
-  const { page } =
-    Route.useLoaderData();
+  const directCategorySlug = slug.startsWith("commands-")
+    ? slug.replace(/^commands-/, "")
+    : undefined;
+  const directCategory = directCategorySlug
+    ? findCategory(directCategorySlug)
+    : undefined;
+
+  const info = pageInfo[slug];
+  const category = directCategory ??
+    (info?.commandCategory ? findCategory(info.commandCategory) : undefined);
+
+  const title = directCategory
+    ? `${directCategory.name} Commands`
+    : info?.title ?? "Documentation";
+  const section = directCategory ? "Commands" : info?.section ?? "Ware Docs";
+  const description = directCategory?.description ??
+    info?.description ??
+    "Browse Ware documentation, commands, configuration, and server tools.";
+
+  const toc = category
+    ? [{ id: "commands", label: "Commands" }]
+    : undefined;
 
   return (
-    <DocsLayout
-      active={slug}
-      toc={page.toc}
-    >
-      <p className="text-sm text-muted-foreground">
-        {page.section}
-      </p>
+    <DocsLayout active={slug} toc={toc}>
+      <div className="mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          {section}
+        </div>
 
-      <h1 className="mt-1 text-4xl font-bold tracking-tight md:text-5xl">
-        {page.title}
-      </h1>
+        <h1 className="mt-5 text-4xl font-bold tracking-[-0.045em] text-white md:text-6xl">
+          {title}
+        </h1>
 
-      <div className="mt-8">
-        {page.body}
+        <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
+          {description}
+        </p>
       </div>
+
+      {category ? (
+        <section id="commands" className="mt-10">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.07] pb-5">
+            <div>
+              <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                Command library
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                {category.name}
+              </h2>
+            </div>
+            <span className="rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 font-mono text-xs text-muted-foreground">
+              {category.commands.length} commands
+            </span>
+          </div>
+
+          <CommandList commands={category.commands} />
+        </section>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
+            <p className="text-sm font-medium text-white">Fast setup</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Use the navigation on the left to jump between setup guides, security tools, and command categories.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
+            <p className="text-sm font-medium text-white">Search everything</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Use the search bar above or press Ctrl K to find commands and documentation instantly.
+            </p>
+          </div>
+        </div>
+      )}
     </DocsLayout>
   );
 }
