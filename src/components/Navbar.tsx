@@ -39,33 +39,19 @@ export function Navbar() {
         ))}
       </nav>
 
-      {user ? (
-        <Link
-          to="/dashboard"
-          className="flex items-center gap-2 rounded-full bg-white/5 px-2 py-1.5 pr-4 text-sm font-medium ring-1 ring-white/10 transition-colors hover:bg-white/10"
-        >
-          {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt="" className="h-7 w-7 rounded-full" />
-          ) : (
-            <div className="h-7 w-7 rounded-full bg-white/10" />
-          )}
-          <span className="hidden sm:inline">Dashboard</span>
-        </Link>
-      ) : (
-        <div className="flex flex-col items-center gap-0.5">
-          <button
-            type="button"
-            disabled
-            aria-disabled="true"
-            className="cursor-not-allowed rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-muted-foreground"
-          >
-            Dashboard
-          </button>
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            Coming soon
-          </span>
-        </div>
-      )}
+      <Link
+        to="/dashboard"
+        className="flex items-center gap-2 rounded-full bg-white/5 px-2 py-1.5 pr-4 text-sm font-medium ring-1 ring-white/10 transition-colors hover:bg-white/10"
+      >
+        {user?.avatarUrl ? (
+          <img src={user.avatarUrl} alt="" className="h-7 w-7 rounded-full" />
+        ) : (
+          <div className="grid h-7 w-7 place-items-center rounded-full bg-white/10 text-[10px] font-semibold">
+            W
+          </div>
+        )}
+        <span className="hidden sm:inline">Dashboard</span>
+      </Link>
     </header>
   );
 }
