@@ -85,10 +85,24 @@ const staticPages: Record<string, DocPage> = {
   "moderation-guide": {
     title: "Moderation",
     section: "Security Setup",
+    toc: [{ id: "commands", label: "Commands" }],
     body: (
-      <p className="text-muted-foreground">
-        Ban, kick, timeout, jail, mute — plus mass actions. See the Moderation command category for the full list.
-      </p>
+      <div>
+        <p className="text-muted-foreground">
+          Ban, kick, timeout, jail, mute, warn, and mass actions like
+          lockdown and role cleanup — everything you need to keep a server
+          in line.
+        </p>
+        <h2 id="commands" className="mt-10 text-xl font-semibold text-foreground">
+          Commands
+        </h2>
+        <CommandList
+          commands={
+            commandCategories.find((c) => c.slug === "moderation")
+              ?.commands ?? []
+          }
+        />
+      </div>
     ),
   },
   "fake-permissions": {
@@ -119,13 +133,27 @@ const staticPages: Record<string, DocPage> = {
     ),
   },
   "security-setup": {
-    title: "Security Setup",
-    section: "Guides",
+    title: "Antinuke",
+    section: "Security Setup",
+    toc: [{ id: "commands", label: "Commands" }],
     body: (
-      <p className="text-muted-foreground">
-        Enable antinuke, automod, and logging first. See the Anti and Logging
-        command categories for the full command list.
-      </p>
+      <div>
+        <p className="text-muted-foreground">
+          Enable AntiNuke first to protect the server from malicious admins,
+          compromised staff accounts, and bots that ban, kick, or destroy
+          channels and roles in bulk. Pair it with AutoMod and logging for
+          full coverage — see the Config/Logs command category for those.
+        </p>
+        <h2 id="commands" className="mt-10 text-xl font-semibold text-foreground">
+          Commands
+        </h2>
+        <CommandList
+          commands={
+            commandCategories.find((c) => c.slug === "antinuke")
+              ?.commands ?? []
+          }
+        />
+      </div>
     ),
   },
   "server-configuration": {
