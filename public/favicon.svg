@@ -1,6 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#0a0a0f"/>
-  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
-        font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
-        font-weight="700" font-size="22" fill="#ffffff" letter-spacing="-1">ware</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" fill="none">
+  <path d="M22 22C18 22 15 25 15 29V45C15 51 18 55 23 57C26 75 39 86 56 86C60 86 63 84 66 80L72 72L78 80C81 84 84 86 88 86C105 86 118 75 121 57C126 55 129 51 129 45V29C129 25 126 22 122 22C118 22 115 25 115 29V45C115 46 115 47 114 48C111 35 100 28 87 28H41C28 28 17 35 14 48C13 47 13 46 13 45V29C13 25 10 22 6 22" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 -8) scale(.98)"/>
+  <path d="M41 38H87C99 38 107 46 107 58V61C107 72 99 80 88 80C84 80 81 78 78 74L70 62C67 57 61 57 58 62L50 74C47 78 44 80 40 80C29 80 21 72 21 61V58C21 46 29 38 41 38Z" fill="#fff"/>
+  <path d="M42 47H86C93 47 98 52 98 59V61C98 67 94 71 88 71C85 71 83 70 81 67L72 54C68 48 60 48 56 54L47 67C45 70 43 71 40 71C34 71 30 67 30 61V59C30 52 35 47 42 47Z" fill="#000"/>
 </svg>
