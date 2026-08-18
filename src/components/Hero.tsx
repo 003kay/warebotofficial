@@ -41,7 +41,7 @@ export function Hero() {
             </span>
             All systems operational
             <span className="h-3 w-px bg-white/10" />
-            <span className="text-white/80">1000+ commands</span>
+            <span className="text-white/80">821 commands</span>
           </div>
 
           <h1 className="max-w-3xl text-5xl font-bold leading-[0.98] tracking-[-0.055em] text-foreground sm:text-6xl md:text-7xl xl:text-[82px]">
@@ -178,8 +178,8 @@ export function Hero() {
 
               <div className="grid grid-cols-3 divide-x divide-white/[0.07] border-t border-white/[0.07]">
                 {[
-                  ["100%", "uptime"],
-                  ["1000+", "commands"],
+                  ["99.99%", "uptime"],
+                  ["821", "commands"],
                   ["24/7", "protection"],
                 ].map(([value, label]) => (
                   <div key={label} className="px-3 py-4 text-center">
