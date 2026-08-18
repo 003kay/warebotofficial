@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
+const WARE_LOGO = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -77,23 +79,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ware — Discord's premier all-in-one app" },
+      { title: "ware" },
       {
         name: "description",
-        content:
-          "Help: https://warebot.xyz\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help",
+        content: "@003kay on instagram\nhttps://discord.gg/GEMMS5pxQs",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "ware — Discord's premier all-in-one app" },
-      { name: "twitter:title", content: "ware — Discord's premier all-in-one app" },
-      { property: "og:description", content: "Help: https://warebot.xyz\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help" },
-      { name: "twitter:description", content: "Help: https://warebot.xyz\nSupport: https://discord.gg/equip\nAdd: hurtfulol, or ilarpfundss on discord For More Help" },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0c03b3a-4682-4f9e-8087-29c5e1c8abd5/id-preview-17bb6b5b--8c07b575-86b6-4a2f-a21d-8788e908f794.lovable.app-1783607037275.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0c03b3a-4682-4f9e-8087-29c5e1c8abd5/id-preview-17bb6b5b--8c07b575-86b6-4a2f-a21d-8788e908f794.lovable.app-1783607037275.png" },
+      { property: "og:title", content: "Run your entire server from one bot." },
+      { name: "twitter:title", content: "Run your entire server from one bot." },
+      { property: "og:description", content: "@003kay on instagram\nhttps://discord.gg/GEMMS5pxQs" },
+      { name: "twitter:description", content: "@003kay on instagram\nhttps://discord.gg/GEMMS5pxQs" },
+      { property: "og:image", content: WARE_LOGO },
+      { name: "twitter:image", content: WARE_LOGO },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", type: "image/png", href: WARE_LOGO },
+      { rel: "shortcut icon", type: "image/png", href: WARE_LOGO },
+      { rel: "apple-touch-icon", href: WARE_LOGO },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
