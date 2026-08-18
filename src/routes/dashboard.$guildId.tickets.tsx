@@ -1,19 +1,27 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Plus, Trash2, ChevronDown } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  Eye,
+  Hash,
+  Plus,
+  Save,
+  Send,
+  Settings,
+  Trash2,
+} from "lucide-react";
 
-import { Navbar } from "@/components/Navbar";
-import { Starfield } from "@/components/Starfield";
-import avatarAsset from "@/assets/ware-avatar.jpg.asset.json";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import {
   getTicketPanel,
-  saveTicketPanel,
   publishTicketPanel,
+  saveTicketPanel,
 } from "@/lib/dashboard.functions";
 
 export const Route = createFileRoute("/dashboard/$guildId/tickets")({
-  head: () => ({ meta: [{ title: "Tickets — ware dashboard" }] }),
+  head: () => ({ meta: [{ title: "Panel Designer — ware dashboard" }] }),
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData({
       queryKey: ["ticketPanel", params.guildId],
@@ -22,13 +30,6 @@ export const Route = createFileRoute("/dashboard/$guildId/tickets")({
     return null;
   },
   component: TicketsPage,
-  errorComponent: ({ error }) => (
-    <div className="p-10 text-center text-muted-foreground">
-      {error.message === "You don't manage this server"
-        ? "You don't have Manage Server permission for this guild."
-        : `Error: ${error.message}`}
-    </div>
-  ),
 });
 
 const DEFAULTS = {
@@ -73,31 +74,55 @@ const DEFAULT_OPTION: PanelOptionForm = {
   ticket_name_format: "ticket-{number}",
 };
 
-
-const BUTTON_STYLES: { value: string; label: string; className: string }[] = [
-  { value: "primary", label: "Blurple", className: "bg-[#5865F2] hover:bg-[#4752c4] text-white" },
-  { value: "secondary", label: "Grey", className: "bg-[#4e5058] hover:bg-[#6d6f78] text-white" },
-  { value: "success", label: "Green", className: "bg-[#248046] hover:bg-[#1a6334] text-white" },
-  { value: "danger", label: "Red", className: "bg-[#da373c] hover:bg-[#a12828] text-white" },
+const BUTTON_STYLES: {
+  value: string;
+  label: string;
+  className: string;
+}[] = [
+  {
+    value: "primary",
+    label: "Blurple",
+    className: "bg-[#5865F2] text-white",
+  },
+  {
+    value: "secondary",
+    label: "Grey",
+    className: "bg-[#4e5058] text-white",
+  },
+  {
+    value: "success",
+    label: "Green",
+    className: "bg-[#248046] text-white",
+  },
+  {
+    value: "danger",
+    label: "Red",
+    className: "bg-[#da373c] text-white",
+  },
 ];
 
 function TicketsPage() {
   const { guildId } = Route.useParams();
   const router = useRouter();
+
   const { data } = useSuspenseQuery({
     queryKey: ["ticketPanel", guildId],
     queryFn: () => getTicketPanel({ data: { guildId } }),
   });
 
   const p = data.panel as Record<string, unknown> | null;
-  const s = (k: string, d: string) => (p && typeof p[k] === "string" ? (p[k] as string) : d);
+  const s = (key: string, fallback: string) =>
+    p && typeof p[key] === "string" ? (p[key] as string) : fallback;
 
   const [form, setForm] = useState({
     title: s("title", DEFAULTS.title),
     description: s("description", DEFAULTS.description),
     color: s("color", DEFAULTS.color),
     panel_type: s("panel_type", DEFAULTS.panel_type),
-    dropdown_placeholder: s("dropdown_placeholder", DEFAULTS.dropdown_placeholder),
+    dropdown_placeholder: s(
+      "dropdown_placeholder",
+      DEFAULTS.dropdown_placeholder,
+    ),
     button_label: s("button_label", DEFAULTS.button_label),
     button_emoji: s("button_emoji", DEFAULTS.button_emoji),
     button_style: s("button_style", DEFAULTS.button_style),
@@ -113,99 +138,112 @@ function TicketsPage() {
     delete_command: s("delete_command", DEFAULTS.delete_command),
     welcome_message: s("welcome_message", DEFAULTS.welcome_message),
     channel_id: s("channel_id", ""),
-    category_id: "",
+    category_id: s("category_id", ""),
     log_channel_id: s("log_channel_id", ""),
-    support_role_ids: (p?.support_role_ids as string[] | undefined) ?? [],
+    support_role_ids:
+      (p?.support_role_ids as string[] | undefined) ?? [],
   });
+
   const [options, setOptions] = useState<PanelOptionForm[]>(() => {
     const loaded = (data.options ?? []) as PanelOptionForm[];
-    return loaded.length > 0
-      ? loaded.map((o) => ({
-          label: o.label,
-          description: o.description ?? "",
-          emoji: o.emoji ?? "🎫",
-          category_id: o.category_id ?? null,
-          support_role_ids: o.support_role_ids ?? [],
-          welcome_message: o.welcome_message ?? DEFAULT_OPTION.welcome_message,
-          ticket_name_format: o.ticket_name_format ?? DEFAULT_OPTION.ticket_name_format,
+
+    return loaded.length
+      ? loaded.map((option) => ({
+          label: option.label,
+          description: option.description ?? "",
+          emoji: option.emoji ?? "🎫",
+          category_id: option.category_id ?? null,
+          support_role_ids: option.support_role_ids ?? [],
+          welcome_message:
+            option.welcome_message ?? DEFAULT_OPTION.welcome_message,
+          ticket_name_format:
+            option.ticket_name_format ?? DEFAULT_OPTION.ticket_name_format,
         }))
       : [DEFAULT_OPTION];
   });
+
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [publishResult, setPublishResult] = useState<string | null>(null);
   const [channelSearch, setChannelSearch] = useState("");
   const [channelOpen, setChannelOpen] = useState(false);
   const [logSearch, setLogSearch] = useState("");
   const [logOpen, setLogOpen] = useState(false);
 
-  const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => {
-    setForm((f) => ({ ...f, [k]: v }));
+  const set = <K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) => {
+    setForm((current) => ({ ...current, [key]: value }));
     setSaved(false);
     setPublishResult(null);
   };
 
-  const updateOption = (i: number, patch: Partial<PanelOptionForm>) => {
-    setOptions((os) => os.map((o, idx) => (idx === i ? { ...o, ...patch } : o)));
+  const updateOption = (
+    index: number,
+    patch: Partial<PanelOptionForm>,
+  ) => {
+    setOptions((current) =>
+      current.map((option, i) =>
+        i === index ? { ...option, ...patch } : option,
+      ),
+    );
     setSaved(false);
     setPublishResult(null);
   };
-  const addOption = () => {
-    if (options.length >= 8) return;
-    setOptions((os) => [...os, { ...DEFAULT_OPTION, label: `Category ${os.length + 1}` }]);
-    setSaved(false);
-  };
-  const removeOption = (i: number) => {
-    setOptions((os) => (os.length <= 1 ? os : os.filter((_, idx) => idx !== i)));
-    setSaved(false);
-  };
 
-  const selectedChannel = data.textChannels.find((c) => c.id === form.channel_id);
+  const selectedChannel = data.textChannels.find(
+    (channel) => channel.id === form.channel_id,
+  );
+  const selectedLogChannel = data.textChannels.find(
+    (channel) => channel.id === form.log_channel_id,
+  );
+
   const filteredChannels = useMemo(() => {
-    const q = channelSearch.trim().toLowerCase();
-    const list = q
-      ? data.textChannels.filter((c) => c.name.toLowerCase().includes(q))
-      : data.textChannels;
-    return list.slice(0, 50);
-  }, [data.textChannels, channelSearch]);
+    const query = channelSearch.trim().toLowerCase();
+    return data.textChannels
+      .filter((channel) =>
+        query ? channel.name.toLowerCase().includes(query) : true,
+      )
+      .slice(0, 50);
+  }, [channelSearch, data.textChannels]);
 
-  const selectedLogChannel = data.textChannels.find((c) => c.id === form.log_channel_id);
   const filteredLogChannels = useMemo(() => {
-    const q = logSearch.trim().toLowerCase();
-    const list = q
-      ? data.textChannels.filter((c) => c.name.toLowerCase().includes(q))
-      : data.textChannels;
-    return list.slice(0, 50);
-  }, [data.textChannels, logSearch]);
+    const query = logSearch.trim().toLowerCase();
+    return data.textChannels
+      .filter((channel) =>
+        query ? channel.name.toLowerCase().includes(query) : true,
+      )
+      .slice(0, 50);
+  }, [logSearch, data.textChannels]);
 
   const payload = () => ({
     guildId,
     ...form,
     channel_id: form.channel_id || null,
-    category_id: null as string | null,
+    category_id: form.category_id || null,
     log_channel_id: form.log_channel_id || null,
-    options: options.map((o, i) => ({
-      position: i,
-      label: o.label,
-      description: o.description,
-      emoji: o.emoji,
-      category_id: o.category_id,
-      support_role_ids: o.support_role_ids,
-      welcome_message: o.welcome_message,
-      ticket_name_format: o.ticket_name_format,
+    options: options.map((option, index) => ({
+      position: index,
+      label: option.label,
+      description: option.description,
+      emoji: option.emoji,
+      category_id: option.category_id,
+      support_role_ids: option.support_role_ids,
+      welcome_message: option.welcome_message,
+      ticket_name_format: option.ticket_name_format,
     })),
   });
-
 
   async function onSave() {
     setSaving(true);
     try {
       await saveTicketPanel({ data: payload() });
       setSaved(true);
-      router.invalidate();
-    } catch (e) {
-      alert((e as Error).message);
+      await router.invalidate();
+    } catch (error) {
+      alert((error as Error).message);
     } finally {
       setSaving(false);
     }
@@ -213,690 +251,879 @@ function TicketsPage() {
 
   async function onPublish() {
     if (!form.channel_id) {
-      alert("Choose a channel first, then save.");
+      alert("Choose a panel channel first.");
       return;
     }
+
     setPublishing(true);
     setPublishResult(null);
+
     try {
       await saveTicketPanel({ data: payload() });
-      const res = await publishTicketPanel({ data: { guildId } });
-      setPublishResult(`Panel posted to Discord (message ${res.messageId}).`);
-      router.invalidate();
-    } catch (e) {
-      alert((e as Error).message);
+      const result = await publishTicketPanel({ data: { guildId } });
+      setSaved(true);
+      setPublishResult(`Published to Discord · ${result.messageId}`);
+      await router.invalidate();
+    } catch (error) {
+      alert((error as Error).message);
     } finally {
       setPublishing(false);
     }
   }
 
-  const btnStyle = BUTTON_STYLES.find((b) => b.value === form.button_style) ?? BUTTON_STYLES[0];
-  const closeStyle = BUTTON_STYLES.find((b) => b.value === form.close_button_style) ?? BUTTON_STYLES[3];
-  const claimStyle = BUTTON_STYLES.find((b) => b.value === form.claim_button_style) ?? BUTTON_STYLES[2];
-
-  const prefixInvalid = !form.command_prefix || /[a-zA-Z]/.test(form.command_prefix);
+  const btnStyle =
+    BUTTON_STYLES.find((style) => style.value === form.button_style) ??
+    BUTTON_STYLES[0];
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <Starfield />
-      <Navbar />
-      <main className="relative z-10 mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-8 flex items-center gap-4">
-          <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Servers
-          </Link>
-          <span className="text-muted-foreground">/</span>
-          <div className="flex items-center gap-3">
-            {data.guild.iconUrl ? (
-              <img src={data.guild.iconUrl} alt="" className="h-8 w-8 rounded-full" />
-            ) : (
-              <div className="h-8 w-8 rounded-full bg-white/10" />
-            )}
-            <span className="font-semibold">{data.guild.name}</span>
+    <DashboardShell guild={data.guild} guildId={guildId} active="designer">
+      <div className="mx-auto max-w-[1500px]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Link
+                to="/dashboard/$guildId/panels"
+                params={{ guildId }}
+                className="hover:text-white"
+              >
+                Panels
+              </Link>
+              <span>/</span>
+              <span>Panel Designer</span>
+            </div>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+              Panel Designer
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Edit, preview, save, and publish your live Ware ticket panel.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={saving || publishing}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-medium hover:bg-white/[0.08] disabled:opacity-50"
+            >
+              <Save className="h-4 w-4" />
+              {saving ? "Saving…" : saved ? "Saved" : "Save Changes"}
+            </button>
+
+            <button
+              type="button"
+              onClick={onPublish}
+              disabled={
+                saving || publishing || !form.channel_id || !data.botInGuild
+              }
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Send className="h-4 w-4" />
+              {publishing ? "Publishing…" : "Publish to Discord"}
+            </button>
           </div>
         </div>
 
-        {!data.botInGuild && (
-          <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
-            The Ware bot isn't in this server yet, so channels and roles can't be listed.{" "}
-            <a
-              href={`https://discord.com/oauth2/authorize?client_id=1519976058923778058&permissions=8&scope=bot+applications.commands&guild_id=${guildId}`}
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              Invite Ware to this server
-            </a>{" "}
-            and refresh.
+        {publishResult && (
+          <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] px-4 py-3 text-sm text-emerald-300">
+            {publishResult}
           </div>
         )}
 
-        <div className="grid gap-8 lg:grid-cols-[1fr,420px]">
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Ticket Panel</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Customize the panel embed, buttons, commands, and where tickets get posted.
-              </p>
+        {!data.botInGuild && (
+          <div className="mt-4 rounded-xl border border-amber-500/25 bg-amber-500/[0.07] px-4 py-3 text-sm text-amber-200">
+            Ware is not in this server, so channels and roles cannot be loaded yet.
+          </div>
+        )}
+
+        <div className="mt-7 grid gap-5 xl:grid-cols-[minmax(0,1fr),minmax(440px,0.9fr)]">
+          <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.025]">
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+              <div>
+                <div className="font-semibold">Panel Preview</div>
+                <div className="text-xs text-muted-foreground">
+                  Live Discord-style preview
+                </div>
+              </div>
+
+              <div className="inline-flex rounded-lg border border-white/10 bg-black/30 p-1 text-xs">
+                <span className="inline-flex items-center gap-1 rounded-md bg-white/[0.08] px-2.5 py-1.5">
+                  <Eye className="h-3 w-3" />
+                  Preview
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1.5 text-muted-foreground">
+                  <Settings className="h-3 w-3" />
+                  Live Editing
+                </span>
+              </div>
             </div>
 
-            <Section title="Panel type">
-              <p className="-mt-2 text-xs text-muted-foreground">
-                Buttons show a single "Open Ticket" button. Dropdown shows a menu with up to 8 ticket categories — each with its own Discord category, support roles, and welcome message.
-              </p>
+            <div className="p-5">
+              <div className="rounded-xl border border-white/10 bg-[#111214] p-4">
+                <div className="flex gap-3">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-bold">
+                    W
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold text-white">ware</span>
+                      <span className="rounded bg-[#5865F2] px-1 py-0.5 text-[9px] font-bold text-white">
+                        APP
+                      </span>
+                    </div>
+
+                    <div
+                      className="mt-2 rounded-lg border-l-4 bg-[#1b1c1f] p-4"
+                      style={{ borderColor: form.color }}
+                    >
+                      <div className="font-semibold text-white">
+                        {form.title || "Support"}
+                      </div>
+                      <div className="mt-1 whitespace-pre-wrap text-sm text-[#c7c9ce]">
+                        {form.description || " "}
+                      </div>
+                    </div>
+
+                    <div className="mt-2">
+                      {form.panel_type === "dropdown" ? (
+                        <div className="flex max-w-lg items-center justify-between rounded-md bg-[#1b1c1f] px-3 py-2 text-sm text-[#b5bac1]">
+                          <span>{form.dropdown_placeholder}</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium ${btnStyle.className}`}
+                        >
+                          <span>{form.button_emoji}</span>
+                          {form.button_label}
+                        </button>
+                      )}
+                    </div>
+
+                    {form.panel_type === "dropdown" && (
+                      <div className="mt-2 max-w-lg overflow-hidden rounded-lg border border-white/10 bg-[#1b1c1f]">
+                        {options.slice(0, 5).map((option, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-2 border-b border-white/5 px-3 py-2 last:border-0"
+                          >
+                            <span>{option.emoji}</span>
+                            <div>
+                              <div className="text-sm font-medium text-white">
+                                {option.label || `Category ${index + 1}`}
+                              </div>
+                              <div className="text-xs text-[#949ba4]">
+                                {option.description}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-xl border border-white/10 bg-black/20 p-4">
+                <div className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                  Ticket opening message
+                </div>
+                <div className="mt-3 whitespace-pre-wrap text-sm">
+                  {form.welcome_message}
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <PreviewButton
+                    label={form.claim_button_label}
+                    emoji={form.claim_button_emoji}
+                    style={form.claim_button_style}
+                  />
+                  <PreviewButton
+                    label={form.close_button_label}
+                    emoji={form.close_button_emoji}
+                    style={form.close_button_style}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-xl border border-white/10 bg-black/20 p-4">
+                <div className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                  Ticket commands
+                </div>
+                <div className="mt-3 grid gap-2 text-sm font-mono sm:grid-cols-3">
+                  <CommandChip value={`${form.command_prefix}${form.close_command}`} label="Close" />
+                  <CommandChip value={`${form.command_prefix}${form.reopen_command}`} label="Reopen" />
+                  <CommandChip value={`${form.command_prefix}${form.delete_command}`} label="Delete" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <DesignerSection title="Ticket Style" icon={Settings}>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { v: "button", label: "Button", hint: "One-click ticket open." },
-                  { v: "dropdown", label: "Dropdown menu", hint: "Multiple ticket categories." },
-                ].map((t) => (
+                  ["button", "Button", "One-click ticket opening"],
+                  ["dropdown", "Dropdown", "Multiple ticket categories"],
+                ].map(([value, label, hint]) => (
                   <button
-                    key={t.v}
+                    key={value}
                     type="button"
-                    onClick={() => set("panel_type", t.v)}
-                    className={`rounded-xl px-4 py-3 text-left ring-1 transition-colors ${
-                      form.panel_type === t.v
-                        ? "bg-white/10 ring-white/40"
-                        : "bg-white/[0.03] ring-white/10 hover:bg-white/[0.06]"
+                    onClick={() => set("panel_type", value)}
+                    className={`rounded-xl border p-4 text-left transition-colors ${
+                      form.panel_type === value
+                        ? "border-white/35 bg-white/[0.08]"
+                        : "border-white/10 bg-black/20 hover:bg-white/[0.04]"
                     }`}
                   >
-                    <div className="text-sm font-semibold">{t.label}</div>
-                    <div className="text-xs text-muted-foreground">{t.hint}</div>
+                    <div className="text-sm font-semibold">{label}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{hint}</div>
                   </button>
                 ))}
               </div>
+
               {form.panel_type === "dropdown" && (
-                <Field label="Dropdown placeholder" hint="Shown when nothing is selected yet.">
+                <Field label="Dropdown placeholder">
                   <input
-                    type="text"
+                    className={inputClass}
                     value={form.dropdown_placeholder}
-                    maxLength={100}
-                    onChange={(e) => set("dropdown_placeholder", e.target.value)}
-                    className="input"
+                    onChange={(event) =>
+                      set("dropdown_placeholder", event.target.value)
+                    }
                   />
                 </Field>
               )}
-            </Section>
+            </DesignerSection>
 
-            <Section title="Where">
-
-              <Field label="Panel channel" hint="Search by name if you can't scroll to find it.">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={channelOpen ? channelSearch : selectedChannel ? `#${selectedChannel.name}` : channelSearch}
-                    onChange={(e) => {
-                      setChannelSearch(e.target.value);
-                      setChannelOpen(true);
-                    }}
-                    onFocus={() => {
-                      setChannelOpen(true);
-                      setChannelSearch("");
-                    }}
-                    onBlur={() => setTimeout(() => setChannelOpen(false), 150)}
-                    placeholder={data.botInGuild ? "Type to search channels…" : "Invite the bot first"}
-                    className="input"
-                    disabled={!data.botInGuild}
-                  />
-                  {channelOpen && data.botInGuild && (
-                    <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-white/10 bg-[#1a1a1e] shadow-2xl">
-                      {filteredChannels.length === 0 ? (
-                        <div className="px-3 py-2 text-xs text-muted-foreground">No channels match.</div>
-                      ) : (
-                        filteredChannels.map((c) => (
-                          <button
-                            key={c.id}
-                            type="button"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => {
-                              set("channel_id", c.id);
-                              setChannelSearch("");
-                              setChannelOpen(false);
-                            }}
-                            className={`block w-full px-3 py-2 text-left text-sm hover:bg-white/10 ${
-                              c.id === form.channel_id ? "bg-white/5 text-white" : "text-[#dbdee1]"
-                            }`}
-                          >
-                            #{c.name}
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-              </Field>
-              <Field
-                label="Support roles"
-                hint="Members with these roles can see and reply in every ticket."
-              >
-                <div className="flex flex-wrap gap-2">
-                  {data.roles.length === 0 && (
-                    <span className="text-xs text-muted-foreground">
-                      {data.botInGuild ? "No roles found." : "Invite the bot to load roles."}
-                    </span>
-                  )}
-                  {data.roles.map((r) => {
-                    const active = form.support_role_ids.includes(r.id);
-                    return (
-                      <button
-                        key={r.id}
-                        type="button"
-                        onClick={() =>
-                          set(
-                            "support_role_ids",
-                            active
-                              ? form.support_role_ids.filter((x) => x !== r.id)
-                              : [...form.support_role_ids, r.id],
-                          )
-                        }
-                        className={`rounded-full px-3 py-1 text-xs ring-1 transition-colors ${
-                          active
-                            ? "bg-white/15 ring-white/40"
-                            : "bg-white/[0.03] ring-white/10 hover:bg-white/10"
-                        }`}
-                        style={
-                          r.color
-                            ? { color: `#${r.color.toString(16).padStart(6, "0")}` }
-                            : undefined
-                        }
-                      >
-                        @{r.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </Field>
-              <Field
-                label="Log channel"
-                hint="All transcripts and open, close, reopen, and delete events get posted here."
-              >
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={logOpen ? logSearch : selectedLogChannel ? `#${selectedLogChannel.name}` : logSearch}
-                    onChange={(e) => {
-                      setLogSearch(e.target.value);
-                      setLogOpen(true);
-                    }}
-                    onFocus={() => {
-                      setLogOpen(true);
-                      setLogSearch("");
-                    }}
-                    onBlur={() => setTimeout(() => setLogOpen(false), 150)}
-                    placeholder={data.botInGuild ? "Type to search channels…" : "Invite the bot first"}
-                    className="input"
-                    disabled={!data.botInGuild}
-                  />
-                  {form.log_channel_id && (
-                    <button
-                      type="button"
-                      onClick={() => set("log_channel_id", "")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-0.5 text-xs text-muted-foreground hover:bg-white/10 hover:text-white"
-                    >
-                      clear
-                    </button>
-                  )}
-                  {logOpen && data.botInGuild && (
-                    <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-white/10 bg-[#1a1a1e] shadow-2xl">
-                      {filteredLogChannels.length === 0 ? (
-                        <div className="px-3 py-2 text-xs text-muted-foreground">No channels match.</div>
-                      ) : (
-                        filteredLogChannels.map((c) => (
-                          <button
-                            key={c.id}
-                            type="button"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => {
-                              set("log_channel_id", c.id);
-                              setLogSearch("");
-                              setLogOpen(false);
-                            }}
-                            className={`block w-full px-3 py-2 text-left text-sm hover:bg-white/10 ${
-                              c.id === form.log_channel_id ? "bg-white/5 text-white" : "text-[#dbdee1]"
-                            }`}
-                          >
-                            #{c.name}
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-              </Field>
-            </Section>
-
-            <Section title="Embed">
+            <DesignerSection title="Panel Embed" icon={BookOpen}>
               <Field label="Title">
-                <input type="text" value={form.title} maxLength={256}
-                  onChange={(e) => set("title", e.target.value)} className="input" />
+                <input
+                  className={inputClass}
+                  value={form.title}
+                  maxLength={256}
+                  onChange={(event) => set("title", event.target.value)}
+                />
               </Field>
-              <Field label="Description" hint="Supports basic Discord markdown.">
-                <textarea value={form.description} maxLength={4000} rows={5}
-                  onChange={(e) => set("description", e.target.value)} className="input resize-none" />
+
+              <Field label="Description">
+                <textarea
+                  className={`${inputClass} min-h-28 resize-y`}
+                  value={form.description}
+                  maxLength={4000}
+                  onChange={(event) => set("description", event.target.value)}
+                />
               </Field>
+
               <Field label="Accent color">
-                <div className="flex items-center gap-3">
-                  <input type="color" value={form.color}
-                    onChange={(e) => set("color", e.target.value)}
-                    className="h-10 w-14 cursor-pointer rounded-md border border-white/10 bg-transparent" />
-                  <input type="text" value={form.color}
-                    onChange={(e) => set("color", e.target.value)}
-                    className="input w-32 font-mono" />
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={form.color}
+                    onChange={(event) => set("color", event.target.value)}
+                    className="h-11 w-14 rounded-lg border border-white/10 bg-transparent p-1"
+                  />
+                  <input
+                    className={`${inputClass} font-mono`}
+                    value={form.color}
+                    onChange={(event) => set("color", event.target.value)}
+                  />
                 </div>
               </Field>
-            </Section>
+            </DesignerSection>
+
+            <DesignerSection title="Panel Settings" icon={Settings}>
+              <ChannelPicker
+                label="Panel Channel"
+                value={form.channel_id}
+                selectedName={selectedChannel?.name}
+                search={channelSearch}
+                open={channelOpen}
+                onSearch={setChannelSearch}
+                onOpen={setChannelOpen}
+                channels={filteredChannels}
+                disabled={!data.botInGuild}
+                onSelect={(id) => set("channel_id", id)}
+              />
+
+              <Field label="Default Ticket Category" hint="Used by button-style tickets.">
+                <select
+                  className={inputClass}
+                  value={form.category_id}
+                  onChange={(event) => set("category_id", event.target.value)}
+                  disabled={!data.botInGuild}
+                >
+                  <option value="">Server root / no category</option>
+                  {data.categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+
+              <Field
+                label="Default Support Roles"
+                hint="Roles that can access and manage tickets."
+              >
+                <RolePicker
+                  roles={data.roles}
+                  selected={form.support_role_ids}
+                  onToggle={(roleId) => {
+                    const active = form.support_role_ids.includes(roleId);
+                    set(
+                      "support_role_ids",
+                      active
+                        ? form.support_role_ids.filter((id) => id !== roleId)
+                        : [...form.support_role_ids, roleId],
+                    );
+                  }}
+                />
+              </Field>
+
+              <ChannelPicker
+                label="Log Channel"
+                value={form.log_channel_id}
+                selectedName={selectedLogChannel?.name}
+                search={logSearch}
+                open={logOpen}
+                onSearch={setLogSearch}
+                onOpen={setLogOpen}
+                channels={filteredLogChannels}
+                disabled={!data.botInGuild}
+                allowClear
+                onClear={() => set("log_channel_id", "")}
+                onSelect={(id) => set("log_channel_id", id)}
+              />
+            </DesignerSection>
 
             {form.panel_type === "button" ? (
-              <ButtonEditor
-                title="Open ticket button"
-                hint="Shown on the panel. Users click this to open a ticket."
-                label={form.button_label} onLabel={(v) => set("button_label", v)}
-                emoji={form.button_emoji} onEmoji={(v) => set("button_emoji", v)}
-                style={form.button_style} onStyle={(v) => set("button_style", v)}
-              />
+              <DesignerSection title="Interaction Button" icon={Hash}>
+                <ButtonFields
+                  label={form.button_label}
+                  emoji={form.button_emoji}
+                  style={form.button_style}
+                  onLabel={(value) => set("button_label", value)}
+                  onEmoji={(value) => set("button_emoji", value)}
+                  onStyle={(value) => set("button_style", value)}
+                />
+              </DesignerSection>
             ) : (
-              <Section title="Dropdown options">
-                <p className="-mt-2 text-xs text-muted-foreground">
-                  Up to 8 categories. Each one opens a ticket in its own Discord category, pings its own support roles, and posts its own welcome message.
-                </p>
-                <div className="space-y-4">
-                  {options.map((opt, i) => (
+              <DesignerSection title="Dropdown Categories" icon={Hash}>
+                <div className="space-y-3">
+                  {options.map((option, index) => (
                     <OptionEditor
-                      key={i}
-                      index={i}
-                      option={opt}
+                      key={index}
+                      option={option}
+                      index={index}
                       categories={data.categories}
                       roles={data.roles}
-                      onChange={(patch) => updateOption(i, patch)}
-                      onRemove={options.length > 1 ? () => removeOption(i) : undefined}
+                      onChange={(patch) => updateOption(index, patch)}
+                      onRemove={
+                        options.length > 1
+                          ? () =>
+                              setOptions((current) =>
+                                current.filter((_, i) => i !== index),
+                              )
+                          : undefined
+                      }
                     />
                   ))}
+
+                  {options.length < 8 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOptions((current) => [
+                          ...current,
+                          {
+                            ...DEFAULT_OPTION,
+                            label: `Category ${current.length + 1}`,
+                          },
+                        ])
+                      }
+                      className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm hover:bg-white/[0.06]"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Category
+                    </button>
+                  )}
                 </div>
-                {options.length < 8 && (
-                  <button
-                    type="button"
-                    onClick={addOption}
-                    className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm ring-1 ring-white/10 hover:bg-white/10"
-                  >
-                    <Plus className="h-4 w-4" /> Add category
-                  </button>
-                )}
-              </Section>
+              </DesignerSection>
             )}
 
+            <DesignerSection title="Ticket Controls" icon={Settings}>
+              <div className="grid gap-4 md:grid-cols-2">
+                <ButtonFields
+                  heading="Claim Button"
+                  label={form.claim_button_label}
+                  emoji={form.claim_button_emoji}
+                  style={form.claim_button_style}
+                  onLabel={(value) => set("claim_button_label", value)}
+                  onEmoji={(value) => set("claim_button_emoji", value)}
+                  onStyle={(value) => set("claim_button_style", value)}
+                />
 
-            <ButtonEditor
-              title="Close ticket button"
-              hint="Shown inside a ticket to close it."
-              label={form.close_button_label} onLabel={(v) => set("close_button_label", v)}
-              emoji={form.close_button_emoji} onEmoji={(v) => set("close_button_emoji", v)}
-              style={form.close_button_style} onStyle={(v) => set("close_button_style", v)}
-            />
+                <ButtonFields
+                  heading="Close Button"
+                  label={form.close_button_label}
+                  emoji={form.close_button_emoji}
+                  style={form.close_button_style}
+                  onLabel={(value) => set("close_button_label", value)}
+                  onEmoji={(value) => set("close_button_emoji", value)}
+                  onStyle={(value) => set("close_button_style", value)}
+                />
+              </div>
 
-            <ButtonEditor
-              title="Claim ticket button"
-              hint="Support staff click this to take ownership of a ticket."
-              label={form.claim_button_label} onLabel={(v) => set("claim_button_label", v)}
-              emoji={form.claim_button_emoji} onEmoji={(v) => set("claim_button_emoji", v)}
-              style={form.claim_button_style} onStyle={(v) => set("claim_button_style", v)}
-            />
-
-            <Section title="Commands">
               <Field
-                label="Prefix"
-                hint="Any character except letters — e.g. $, !, ?, ., -"
+                label="Opening Message"
+                hint="Sent immediately inside each newly opened ticket."
               >
-                <input type="text" value={form.command_prefix} maxLength={4}
-                  onChange={(e) => set("command_prefix", e.target.value)}
-                  className={`input w-24 font-mono ${prefixInvalid ? "ring-1 ring-red-500/60" : ""}`} />
-                {prefixInvalid && (
-                  <div className="mt-1 text-xs text-red-400">Prefix can't contain letters.</div>
-                )}
+                <textarea
+                  className={`${inputClass} min-h-28 resize-y`}
+                  value={form.welcome_message}
+                  maxLength={2000}
+                  onChange={(event) =>
+                    set("welcome_message", event.target.value)
+                  }
+                />
               </Field>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <Field label="Close command">
-                  <div className="flex">
-                    <span className="grid place-items-center rounded-l-md border border-r-0 border-white/10 bg-white/5 px-3 font-mono text-sm text-muted-foreground">
-                      {form.command_prefix || "$"}
-                    </span>
-                    <input type="text" value={form.close_command}
-                      onChange={(e) => set("close_command", e.target.value.replace(/\s/g, ""))}
-                      className="input rounded-l-none font-mono" />
-                  </div>
+            </DesignerSection>
+
+            <DesignerSection title="Ticket Commands" icon={Hash}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label="Prefix">
+                  <input
+                    className={`${inputClass} font-mono`}
+                    maxLength={4}
+                    value={form.command_prefix}
+                    onChange={(event) =>
+                      set("command_prefix", event.target.value)
+                    }
+                  />
                 </Field>
-                <Field label="Reopen command">
-                  <div className="flex">
-                    <span className="grid place-items-center rounded-l-md border border-r-0 border-white/10 bg-white/5 px-3 font-mono text-sm text-muted-foreground">
-                      {form.command_prefix || "$"}
-                    </span>
-                    <input type="text" value={form.reopen_command}
-                      onChange={(e) => set("reopen_command", e.target.value.replace(/\s/g, ""))}
-                      className="input rounded-l-none font-mono" />
-                  </div>
+                <Field label="Close">
+                  <input
+                    className={`${inputClass} font-mono`}
+                    value={form.close_command}
+                    onChange={(event) =>
+                      set("close_command", event.target.value.replace(/\s/g, ""))
+                    }
+                  />
                 </Field>
-                <Field label="Delete command">
-                  <div className="flex">
-                    <span className="grid place-items-center rounded-l-md border border-r-0 border-white/10 bg-white/5 px-3 font-mono text-sm text-muted-foreground">
-                      {form.command_prefix || "$"}
-                    </span>
-                    <input type="text" value={form.delete_command}
-                      onChange={(e) => set("delete_command", e.target.value.replace(/\s/g, ""))}
-                      className="input rounded-l-none font-mono" />
-                  </div>
+                <Field label="Reopen">
+                  <input
+                    className={`${inputClass} font-mono`}
+                    value={form.reopen_command}
+                    onChange={(event) =>
+                      set("reopen_command", event.target.value.replace(/\s/g, ""))
+                    }
+                  />
+                </Field>
+                <Field label="Delete">
+                  <input
+                    className={`${inputClass} font-mono`}
+                    value={form.delete_command}
+                    onChange={(event) =>
+                      set("delete_command", event.target.value.replace(/\s/g, ""))
+                    }
+                  />
                 </Field>
               </div>
-            </Section>
-
-            <Section title="After ticket opens">
-              <Field label="Opening message" hint="First message sent inside a new ticket.">
-                <textarea value={form.welcome_message} maxLength={2000} rows={4}
-                  onChange={(e) => set("welcome_message", e.target.value)} className="input resize-none" />
-              </Field>
-            </Section>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button onClick={onSave} disabled={saving || publishing}
-                className="rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold ring-1 ring-white/15 transition-colors hover:bg-white/15 disabled:opacity-50">
-                {saving ? "Saving…" : "Save changes"}
-              </button>
-              <button onClick={onPublish}
-                disabled={saving || publishing || !form.channel_id || !data.botInGuild}
-                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50">
-                {publishing ? "Publishing…" : "Publish to Discord"}
-              </button>
-              {saved && <span className="text-sm text-emerald-400">Saved ✓</span>}
-              {publishResult && <span className="text-sm text-emerald-400">{publishResult}</span>}
-            </div>
-          </div>
-
-          {/* Preview */}
-          <div className="lg:sticky lg:top-6 lg:self-start space-y-4">
-            <div className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">
-              Live preview
-            </div>
-            <div className="rounded-lg bg-[#313338] p-4 text-[#dbdee1] shadow-2xl">
-              <div className="flex gap-3">
-                <img src={avatarAsset.url} alt="ware" className="h-10 w-10 flex-shrink-0 rounded-full object-cover" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-semibold text-white">Ware</span>
-                    <span className="rounded bg-[#5865F2] px-1 py-[1px] text-[10px] font-semibold text-white">APP</span>
-                    <span className="text-xs text-[#949ba4]">Today at 12:00 PM</span>
-                  </div>
-                  <div className="mt-1 max-w-[440px] rounded border-l-4 bg-[#2b2d31] p-3"
-                    style={{ borderColor: form.color }}>
-                    <div className="font-semibold text-white">{form.title || " "}</div>
-                    <div className="mt-1 whitespace-pre-wrap text-sm text-[#dbdee1]">{form.description}</div>
-                  </div>
-                  <div className="mt-2">
-                    {form.panel_type === "dropdown" ? (
-                      <div className="flex w-full max-w-[440px] items-center justify-between rounded bg-[#1e1f22] px-3 py-2 text-sm text-[#b5bac1] ring-1 ring-[#1e1f22]">
-                        <span className="truncate">{form.dropdown_placeholder || "Select…"}</span>
-                        <ChevronDown className="h-4 w-4 flex-shrink-0 text-[#949ba4]" />
-                      </div>
-                    ) : (
-                      <button type="button"
-                        className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${btnStyle.className}`}>
-                        <span>{form.button_emoji}</span><span>{form.button_label}</span>
-                      </button>
-                    )}
-                  </div>
-                  {form.panel_type === "dropdown" && options.length > 0 && (
-                    <div className="mt-2 max-w-[440px] overflow-hidden rounded border border-[#1e1f22] bg-[#2b2d31]">
-                      {options.slice(0, 5).map((o, i) => (
-                        <div key={i} className="flex items-start gap-2 border-b border-[#1e1f22] px-3 py-2 last:border-b-0">
-                          <span className="text-base">{o.emoji}</span>
-                          <div className="min-w-0">
-                            <div className="text-sm font-medium text-white">{o.label || "Untitled"}</div>
-                            {o.description && (
-                              <div className="truncate text-xs text-[#949ba4]">{o.description}</div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                      {options.length > 5 && (
-                        <div className="px-3 py-1.5 text-xs text-[#949ba4]">+{options.length - 5} more…</div>
-                      )}
-                    </div>
-                  )}
-
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg bg-[#313338] p-4 text-[#dbdee1] shadow-2xl">
-              <div className="text-xs uppercase tracking-widest text-[#949ba4]">
-                #ticket-0001 (opening message)
-              </div>
-              <div className="mt-2 whitespace-pre-wrap text-sm">{form.welcome_message}</div>
-              <div className="mt-3 flex gap-2">
-                <button type="button"
-                  className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${claimStyle.className}`}>
-                  <span>{form.claim_button_emoji}</span><span>{form.claim_button_label}</span>
-                </button>
-                <button type="button"
-                  className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium ${closeStyle.className}`}>
-                  <span>{form.close_button_emoji}</span><span>{form.close_button_label}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="rounded-lg bg-[#313338] p-4 text-[13px] text-[#dbdee1] shadow-2xl">
-              <div className="text-xs uppercase tracking-widest text-[#949ba4]">Commands</div>
-              <ul className="mt-2 space-y-1 font-mono">
-                <li><span className="text-white">{form.command_prefix}{form.close_command}</span> <span className="text-[#949ba4]">— close the ticket</span></li>
-                <li><span className="text-white">{form.command_prefix}{form.reopen_command}</span> <span className="text-[#949ba4]">— reopen the ticket</span></li>
-                <li><span className="text-white">{form.command_prefix}{form.delete_command}</span> <span className="text-[#949ba4]">— delete the ticket</span></li>
-              </ul>
-            </div>
-          </div>
+            </DesignerSection>
+          </section>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }
 
-function ButtonEditor({
-  title, hint, label, onLabel, emoji, onEmoji, style, onStyle,
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-muted-foreground focus:border-white/25";
+
+function DesignerSection({
+  title,
+  icon: Icon,
+  children,
 }: {
-  title: string; hint?: string;
-  label: string; onLabel: (v: string) => void;
-  emoji: string; onEmoji: (v: string) => void;
-  style: string; onStyle: (v: string) => void;
+  title: string;
+  icon: typeof Settings;
+  children: React.ReactNode;
 }) {
   return (
-    <Section title={title}>
-      {hint && <p className="-mt-2 text-xs text-muted-foreground">{hint}</p>}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Label">
-          <input type="text" value={label} maxLength={80}
-            onChange={(e) => onLabel(e.target.value)} className="input" />
-        </Field>
-        <Field label="Emoji">
-          <input type="text" value={emoji}
-            onChange={(e) => onEmoji(e.target.value)} className="input" />
-        </Field>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.025]">
+      <div className="flex items-center gap-2 border-b border-white/10 px-5 py-4">
+        <Icon className="h-4 w-4 text-muted-foreground" />
+        <div className="font-semibold">{title}</div>
       </div>
-      <Field label="Style">
-        <div className="grid grid-cols-4 gap-2">
-          {BUTTON_STYLES.map((s) => (
-            <button key={s.value} type="button" onClick={() => onStyle(s.value)}
-              className={`rounded-md px-3 py-2 text-xs font-medium ring-1 transition-colors ${
-                style === s.value ? "ring-white/40 bg-white/10" : "ring-white/10 hover:bg-white/5"
-              }`}>
-              {s.label}
-            </button>
-          ))}
-        </div>
-      </Field>
-    </Section>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="pill-surface space-y-4 rounded-2xl p-5">
-      <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-        {title}
-      </div>
-      {children}
+      <div className="space-y-4 p-5">{children}</div>
     </div>
   );
 }
 
 function Field({
-  label, hint, children,
-}: { label: string; hint?: string; children: React.ReactNode }) {
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <label className="block space-y-1.5">
+    <label className="block">
       <div className="text-sm font-medium">{label}</div>
-      {children}
-      {hint && <div className="text-xs text-muted-foreground">{hint}</div>}
+      {hint && <div className="mt-0.5 text-xs text-muted-foreground">{hint}</div>}
+      <div className="mt-2">{children}</div>
     </label>
   );
 }
 
+function RolePicker({
+  roles,
+  selected,
+  onToggle,
+}: {
+  roles: { id: string; name: string; color: number }[];
+  selected: string[];
+  onToggle: (id: string) => void;
+}) {
+  if (!roles.length) {
+    return <div className="text-xs text-muted-foreground">No roles available.</div>;
+  }
+
+  return (
+    <div className="flex max-h-44 flex-wrap gap-2 overflow-y-auto rounded-xl border border-white/10 bg-black/20 p-3">
+      {roles.map((role) => {
+        const active = selected.includes(role.id);
+        return (
+          <button
+            key={role.id}
+            type="button"
+            onClick={() => onToggle(role.id)}
+            className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
+              active
+                ? "border-white/30 bg-white/[0.1] text-white"
+                : "border-white/10 bg-white/[0.02] text-muted-foreground hover:text-white"
+            }`}
+          >
+            @{role.name}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function ChannelPicker({
+  label,
+  selectedName,
+  search,
+  open,
+  onSearch,
+  onOpen,
+  channels,
+  disabled,
+  onSelect,
+  allowClear,
+  onClear,
+}: {
+  label: string;
+  value: string;
+  selectedName?: string;
+  search: string;
+  open: boolean;
+  onSearch: (value: string) => void;
+  onOpen: (open: boolean) => void;
+  channels: { id: string; name: string; parent_id: string | null }[];
+  disabled?: boolean;
+  onSelect: (id: string) => void;
+  allowClear?: boolean;
+  onClear?: () => void;
+}) {
+  return (
+    <Field label={label}>
+      <div className="relative">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Hash className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              className={`${inputClass} pl-9`}
+              disabled={disabled}
+              value={open ? search : selectedName ?? search}
+              placeholder={disabled ? "Invite Ware first" : "Search channels…"}
+              onFocus={() => {
+                onSearch("");
+                onOpen(true);
+              }}
+              onChange={(event) => {
+                onSearch(event.target.value);
+                onOpen(true);
+              }}
+              onBlur={() => setTimeout(() => onOpen(false), 120)}
+            />
+
+            {open && !disabled && (
+              <div className="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-white/10 bg-[#111] p-1 shadow-2xl">
+                {channels.length ? (
+                  channels.map((channel) => (
+                    <button
+                      key={channel.id}
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
+                        onSelect(channel.id);
+                        onSearch("");
+                        onOpen(false);
+                      }}
+                      className="block w-full rounded-lg px-3 py-2 text-left text-sm text-muted-foreground hover:bg-white/[0.06] hover:text-white"
+                    >
+                      #{channel.name}
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-xs text-muted-foreground">
+                    No channels found.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {allowClear && selectedName && (
+            <button
+              type="button"
+              onClick={onClear}
+              className="rounded-xl border border-white/10 px-3 text-xs text-muted-foreground hover:bg-white/[0.05] hover:text-white"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
+    </Field>
+  );
+}
+
+function ButtonFields({
+  heading,
+  label,
+  emoji,
+  style,
+  onLabel,
+  onEmoji,
+  onStyle,
+}: {
+  heading?: string;
+  label: string;
+  emoji: string;
+  style: string;
+  onLabel: (value: string) => void;
+  onEmoji: (value: string) => void;
+  onStyle: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      {heading && <div className="text-sm font-semibold">{heading}</div>}
+
+      <div className="grid grid-cols-[1fr,90px] gap-2">
+        <Field label="Label">
+          <input
+            className={inputClass}
+            value={label}
+            maxLength={80}
+            onChange={(event) => onLabel(event.target.value)}
+          />
+        </Field>
+        <Field label="Emoji">
+          <input
+            className={inputClass}
+            value={emoji}
+            onChange={(event) => onEmoji(event.target.value)}
+          />
+        </Field>
+      </div>
+
+      <Field label="Style">
+        <div className="grid grid-cols-4 gap-2">
+          {BUTTON_STYLES.map((buttonStyle) => (
+            <button
+              key={buttonStyle.value}
+              type="button"
+              onClick={() => onStyle(buttonStyle.value)}
+              className={`rounded-lg border px-2 py-2 text-xs ${
+                style === buttonStyle.value
+                  ? "border-white/35 bg-white/[0.09]"
+                  : "border-white/10 bg-black/20 text-muted-foreground hover:text-white"
+              }`}
+            >
+              {buttonStyle.label}
+            </button>
+          ))}
+        </div>
+      </Field>
+    </div>
+  );
+}
+
+function PreviewButton({
+  label,
+  emoji,
+  style,
+}: {
+  label: string;
+  emoji: string;
+  style: string;
+}) {
+  const buttonStyle =
+    BUTTON_STYLES.find((item) => item.value === style) ?? BUTTON_STYLES[0];
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium ${buttonStyle.className}`}
+    >
+      <span>{emoji}</span>
+      {label}
+    </span>
+  );
+}
+
+function CommandChip({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+      <div className="text-white">{value}</div>
+      <div className="mt-0.5 font-sans text-[10px] uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+    </div>
+  );
+}
+
 function OptionEditor({
-  index,
   option,
+  index,
   categories,
   roles,
   onChange,
   onRemove,
 }: {
-  index: number;
   option: PanelOptionForm;
+  index: number;
   categories: { id: string; name: string }[];
   roles: { id: string; name: string; color: number }[];
   onChange: (patch: Partial<PanelOptionForm>) => void;
   onRemove?: () => void;
 }) {
   const [open, setOpen] = useState(index === 0);
+
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02]">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left"
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-base">{option.emoji}</span>
-          <span className="text-sm font-semibold">{option.label || `Option ${index + 1}`}</span>
-          {option.description && (
-            <span className="text-xs text-muted-foreground">— {option.description}</span>
-          )}
-        </div>
-        <div className="flex items-center gap-1">
-          {onRemove && (
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove();
-              }}
-              className="rounded p-1.5 text-muted-foreground hover:bg-white/10 hover:text-red-400"
-            >
-              <Trash2 className="h-4 w-4" />
-            </span>
-          )}
-          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
-        </div>
-      </button>
+    <div className="rounded-xl border border-white/10 bg-black/20">
+      <div className="flex items-center justify-between gap-2 px-3 py-3">
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          className="flex min-w-0 flex-1 items-center gap-2 text-left"
+        >
+          <span>{option.emoji}</span>
+          <span className="truncate text-sm font-medium">
+            {option.label || `Category ${index + 1}`}
+          </span>
+          <ChevronDown
+            className={`ml-auto h-4 w-4 text-muted-foreground transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            className="rounded-lg p-2 text-muted-foreground hover:bg-red-500/10 hover:text-red-400"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
       {open && (
-        <div className="space-y-4 border-t border-white/10 p-4">
-          <div className="grid gap-4 sm:grid-cols-[1fr,120px]">
+        <div className="space-y-3 border-t border-white/10 p-3">
+          <div className="grid grid-cols-[1fr,90px] gap-2">
             <Field label="Label">
               <input
-                type="text"
+                className={inputClass}
                 value={option.label}
-                maxLength={100}
-                onChange={(e) => onChange({ label: e.target.value })}
-                className="input"
+                onChange={(event) => onChange({ label: event.target.value })}
               />
             </Field>
             <Field label="Emoji">
               <input
-                type="text"
+                className={inputClass}
                 value={option.emoji}
-                onChange={(e) => onChange({ emoji: e.target.value })}
-                className="input"
+                onChange={(event) => onChange({ emoji: event.target.value })}
               />
             </Field>
           </div>
-          <Field label="Description" hint="Shown under the label in the dropdown.">
+
+          <Field label="Description">
             <input
-              type="text"
+              className={inputClass}
               value={option.description}
-              maxLength={100}
-              onChange={(e) => onChange({ description: e.target.value })}
-              className="input"
+              onChange={(event) =>
+                onChange({ description: event.target.value })
+              }
             />
           </Field>
-          <Field label="Discord category" hint="Tickets for this option get created inside this category.">
+
+          <Field label="Discord Category">
             <select
+              className={inputClass}
               value={option.category_id ?? ""}
-              onChange={(e) => onChange({ category_id: e.target.value || null })}
-              className="input"
+              onChange={(event) =>
+                onChange({ category_id: event.target.value || null })
+              }
             >
-              <option value="">— none (create in guild root) —</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
+              <option value="">Server root / no category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Support roles" hint="These roles are pinged and can see tickets from this option.">
-            <div className="flex flex-wrap gap-2">
-              {roles.length === 0 && (
-                <span className="text-xs text-muted-foreground">No roles found.</span>
-              )}
-              {roles.map((r) => {
-                const active = option.support_role_ids.includes(r.id);
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() =>
-                      onChange({
-                        support_role_ids: active
-                          ? option.support_role_ids.filter((x) => x !== r.id)
-                          : [...option.support_role_ids, r.id],
-                      })
-                    }
-                    className={`rounded-full px-3 py-1 text-xs ring-1 transition-colors ${
-                      active
-                        ? "bg-white/15 ring-white/40"
-                        : "bg-white/[0.03] ring-white/10 hover:bg-white/10"
-                    }`}
-                    style={
-                      r.color
-                        ? { color: `#${r.color.toString(16).padStart(6, "0")}` }
-                        : undefined
-                    }
-                  >
-                    @{r.name}
-                  </button>
-                );
-              })}
-            </div>
-          </Field>
-          <Field label="Ticket channel name" hint="Use {number} for the sequential ID and {user} for the opener's name.">
-            <input
-              type="text"
-              value={option.ticket_name_format}
-              maxLength={90}
-              onChange={(e) => onChange({ ticket_name_format: e.target.value })}
-              className="input font-mono"
+
+          <Field label="Support Roles">
+            <RolePicker
+              roles={roles}
+              selected={option.support_role_ids}
+              onToggle={(roleId) => {
+                const active = option.support_role_ids.includes(roleId);
+                onChange({
+                  support_role_ids: active
+                    ? option.support_role_ids.filter((id) => id !== roleId)
+                    : [...option.support_role_ids, roleId],
+                });
+              }}
             />
           </Field>
-          <Field label="Opening message" hint="First message posted in a new ticket from this option.">
+
+          <Field label="Ticket Name Format">
+            <input
+              className={`${inputClass} font-mono`}
+              value={option.ticket_name_format}
+              onChange={(event) =>
+                onChange({ ticket_name_format: event.target.value })
+              }
+            />
+          </Field>
+
+          <Field label="Opening Message">
             <textarea
+              className={`${inputClass} min-h-24 resize-y`}
               value={option.welcome_message}
-              maxLength={2000}
-              rows={3}
-              onChange={(e) => onChange({ welcome_message: e.target.value })}
-              className="input resize-none"
+              onChange={(event) =>
+                onChange({ welcome_message: event.target.value })
+              }
             />
           </Field>
         </div>
@@ -904,4 +1131,3 @@ function OptionEditor({
     </div>
   );
 }
-
