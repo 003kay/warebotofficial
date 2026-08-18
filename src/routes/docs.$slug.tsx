@@ -25,48 +25,48 @@ function CommandList({ commands }: { commands: CommandDef[] }) {
           <article
             key={command.name}
             id={commandAnchor(command.name)}
-            className="group scroll-mt-28 rounded-2xl border border-white/[0.08] bg-white/[0.022] p-4 [content-visibility:auto] [contain-intrinsic-size:160px] transition-colors duration-150 hover:border-white/[0.14] hover:bg-white/[0.035]"
+            className="group scroll-mt-28 rounded-2xl border border-white/[0.09] bg-white/[0.025] p-5 [content-visibility:auto] [contain-intrinsic-size:190px] transition-colors duration-150 hover:border-white/[0.16] hover:bg-white/[0.04]"
           >
             <div className="flex items-start justify-between gap-3">
-              <code className="max-w-full truncate rounded-lg border border-white/10 bg-white/[0.07] px-2.5 py-1 font-mono text-[12px] font-medium text-white">
+              <code className="max-w-full truncate rounded-lg border border-white/[0.12] bg-white/[0.08] px-3 py-1.5 font-mono text-[14px] font-semibold tracking-[-0.01em] text-white">
                 ,{command.name}
               </code>
               {command.aliases && command.aliases.length > 0 && (
-                <span className="shrink-0 text-[10px] text-white/30">
+                <span className="shrink-0 pt-1 text-[11px] font-medium text-white/40">
                   +{command.aliases.length}
                 </span>
               )}
             </div>
 
-            <code className="mt-3 block break-words font-mono text-[10px] leading-4 text-white/40">
+            <code className="mt-3 block break-words font-mono text-[12px] leading-[1.55] tracking-normal text-white/55">
               ,{usage}
             </code>
 
-            <p className="mt-3 text-[12px] leading-5 text-white/55">
+            <p className="mt-3 text-[14px] leading-[1.6] tracking-[-0.005em] text-white/70">
               {command.description}
             </p>
 
-            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3">
-              <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/25">
+            <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t border-white/[0.07] pt-3.5">
+              <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-white/35">
                 Example
               </span>
-              <code className="min-w-0 flex-1 break-words rounded-md bg-white/[0.045] px-2 py-1.5 font-mono text-[10px] leading-4 text-white/70">
+              <code className="min-w-0 flex-1 break-words rounded-lg bg-white/[0.055] px-2.5 py-1.5 font-mono text-[12px] leading-5 tracking-normal text-white/80">
                 {example}
               </code>
             </div>
 
             {command.aliases && command.aliases.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1">
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
                 {command.aliases.slice(0, 3).map((alias) => (
                   <span
                     key={alias}
-                    className="rounded-md border border-white/[0.06] bg-white/[0.02] px-1.5 py-0.5 font-mono text-[9px] text-white/40"
+                    className="rounded-md border border-white/[0.07] bg-white/[0.025] px-2 py-0.5 font-mono text-[10px] leading-4 text-white/50"
                   >
                     ,{alias}
                   </span>
                 ))}
                 {command.aliases.length > 3 && (
-                  <span className="rounded-md border border-white/[0.06] bg-white/[0.02] px-1.5 py-0.5 font-mono text-[9px] text-white/30">
+                  <span className="rounded-md border border-white/[0.07] bg-white/[0.025] px-2 py-0.5 font-mono text-[10px] leading-4 text-white/40">
                     +{command.aliases.length - 3}
                   </span>
                 )}
