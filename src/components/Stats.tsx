@@ -1,7 +1,7 @@
 const stats = [
   { value: "14,534+", label: "users" },
   { value: "243", label: "communities" },
-  { value: "1000+", label: "commands" },
+  { value: "821", label: "commands" },
   { value: "99.99%", label: "uptime" },
 ];
 
