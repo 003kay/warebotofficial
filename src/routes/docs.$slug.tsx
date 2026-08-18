@@ -16,18 +16,18 @@ function renderCommandText(value: string) {
 
 function CommandList({ commands }: { commands: CommandDef[] }) {
   return (
-    <div className="mt-7 grid gap-3">
+    <div className="mt-7 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
       {commands.map((command) => (
         <article
           key={command.name}
           id={commandAnchor(command.name)}
-          className="group scroll-mt-28 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-white/[0.04]"
+          className="group scroll-mt-28 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 [content-visibility:auto] [contain-intrinsic-size:180px] transition-colors duration-150 hover:border-white/[0.14] hover:bg-white/[0.04] md:p-5"
         >
           <div className="flex flex-wrap items-center gap-2">
             <code className="rounded-lg border border-white/10 bg-white/[0.07] px-2.5 py-1 font-mono text-sm text-white">
               ,{command.name}
             </code>
-            <code className="font-mono text-xs text-muted-foreground">
+            <code className="break-words font-mono text-xs text-muted-foreground">
               {renderCommandText(command.usage)}
             </code>
           </div>
@@ -36,21 +36,21 @@ function CommandList({ commands }: { commands: CommandDef[] }) {
             {command.description}
           </p>
 
-          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
-            <span>
+          <div className="mt-4 space-y-2 text-xs text-muted-foreground">
+            <div>
               Example:{" "}
-              <code className="rounded-md bg-white/[0.06] px-1.5 py-1 font-mono text-white/80">
+              <code className="break-words rounded-md bg-white/[0.06] px-1.5 py-1 font-mono text-white/80">
                 {renderCommandText(command.example)}
               </code>
-            </span>
+            </div>
 
             {command.aliases && command.aliases.length > 0 && (
-              <span>
+              <div>
                 Aliases:{" "}
-                <span className="font-mono text-white/65">
+                <span className="break-words font-mono text-white/65">
                   {command.aliases.map((alias) => `,${alias}`).join(", ")}
                 </span>
-              </span>
+              </div>
             )}
           </div>
         </article>
@@ -211,7 +211,7 @@ function DocPageComponent() {
               </h2>
             </div>
             <span className="rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 font-mono text-xs text-muted-foreground">
-              {category.commands.length} commands
+              {category.commands.length} documented commands
             </span>
           </div>
 
