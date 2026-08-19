@@ -76,7 +76,7 @@ export function Navbar() {
                 <span className="text-xs uppercase tracking-[0.16em] text-white/25">821+</span>
               </Link>
 
-              <Link to="/docs/$slug" params={{ slug: "status" }} onClick={() => setMenuOpen(false)} className={itemClass}>
+              <Link to="/status" onClick={() => setMenuOpen(false)} className={itemClass}>
                 <span>Status</span>
                 <span className="inline-flex items-center gap-2 text-xs text-emerald-300/80"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Online</span>
               </Link>
