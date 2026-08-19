@@ -1,0 +1,191 @@
+/* Global Ware visual polish. Loaded after styles.css. */
+
+body {
+  background:
+    radial-gradient(900px 620px at 8% -10%, rgba(110,130,255,.07), transparent 62%),
+    radial-gradient(760px 520px at 100% 10%, rgba(115,75,255,.055), transparent 60%),
+    #050505;
+}
+
+/* Homepage sections */
+.page-ambient {
+  background:
+    radial-gradient(circle at 14% 8%, rgb(255 255 255 / 0.035), transparent 25rem),
+    radial-gradient(circle at 82% 26%, rgb(114 124 255 / 0.035), transparent 27rem),
+    linear-gradient(180deg, #050505 0%, #070708 48%, #050505 100%) !important;
+}
+
+.site-grid {
+  opacity: .65;
+  background-size: 64px 64px !important;
+}
+
+.hero-console {
+  box-shadow:
+    0 34px 120px -58px rgba(117,130,255,.22),
+    0 28px 80px -45px rgba(0,0,0,.95),
+    inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+
+.modern-feature-card,
+.stats-panel {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012)) !important;
+  border-color: rgba(255,255,255,.085) !important;
+}
+
+.modern-feature-card::after,
+.stats-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(125,145,255,.07), transparent 62%);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .modern-feature-card:hover::after,
+  .stats-panel:hover::after { opacity: 1; }
+}
+
+.premium-button,
+.glass-button {
+  isolation: isolate;
+}
+
+.premium-button::after,
+.glass-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background: radial-gradient(160px circle at 50% 50%, rgba(255,255,255,.16), transparent 70%);
+  transition: opacity .2s ease;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .premium-button:hover::after,
+  .glass-button:hover::after { opacity: 1; }
+}
+
+/* Docs shell */
+body:has(main article[id^="command-"]) {
+  background: #050506;
+}
+
+body:has(main article[id^="command-"]) main > div {
+  background:
+    radial-gradient(540px 280px at 85% 0%, rgba(110,126,255,.055), transparent 62%),
+    linear-gradient(145deg, rgba(255,255,255,.026), rgba(255,255,255,.012)) !important;
+  border-color: rgba(255,255,255,.09) !important;
+  box-shadow:
+    0 38px 120px -70px rgba(118,132,255,.24),
+    inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+
+/* Command cards */
+article[id^="command-"] {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px !important;
+  border-color: rgba(255,255,255,.085) !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012)),
+    rgba(7,7,9,.82) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025),
+    0 24px 60px -48px rgba(0,0,0,.95);
+  transform: translateZ(0);
+  transition:
+    transform .22s cubic-bezier(.2,.8,.2,1),
+    border-color .22s ease,
+    background .22s ease,
+    box-shadow .22s ease !important;
+}
+
+article[id^="command-"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(360px circle at 10% 0%, rgba(118,138,255,.075), transparent 58%);
+  opacity: .65;
+}
+
+article[id^="command-"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -45%;
+  width: 38%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.055), transparent);
+  transform: skewX(-18deg);
+  transition: left .55s cubic-bezier(.2,.8,.2,1);
+}
+
+@media (hover:hover) and (pointer:fine) {
+  article[id^="command-"]:hover {
+    transform: translateY(-5px);
+    border-color: rgba(155,170,255,.18) !important;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.05), rgba(255,255,255,.017)),
+      rgba(7,7,9,.88) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.04),
+      0 34px 75px -48px rgba(99,117,255,.22) !important;
+  }
+  article[id^="command-"]:hover::after { left: 125%; }
+}
+
+article[id^="command-"] code {
+  border: 1px solid rgba(255,255,255,.045);
+  background: rgba(0,0,0,.26) !important;
+}
+
+article[id^="command-"] > div:first-child span:first-child {
+  background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.045)) !important;
+  border-color: rgba(255,255,255,.13) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+/* Sidebar and search */
+body:has(main article[id^="command-"]) aside nav a {
+  transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease !important;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  body:has(main article[id^="command-"]) aside nav a:hover {
+    transform: translateX(3px);
+  }
+}
+
+/* Better mobile density */
+@media (max-width: 767px) {
+  .site-grid { background-size: 48px 48px !important; }
+
+  article[id^="command-"] {
+    padding: 16px !important;
+    border-radius: 17px !important;
+  }
+
+  body:has(main article[id^="command-"]) main > div {
+    padding: 18px !important;
+    border-radius: 22px !important;
+  }
+
+  .premium-button,
+  .glass-button {
+    min-height: 46px;
+  }
+}
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(14px) scale(.985); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
