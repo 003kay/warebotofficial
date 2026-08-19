@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ExternalLink, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const WARE_AVATAR = "/__l5e/assets-v1/a967ae9f-54b6-40e9-b595-2438475389d1/ware-avatar.jpg";
+const WARE_AVATAR = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
 const DISCORD_URL = "https://discord.gg/wept";
 
 const itemClass =
@@ -26,14 +26,14 @@ export function Navbar() {
         <Link
           to="/"
           aria-label="Ware home"
-          className="group relative h-14 w-14 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] shadow-[0_12px_40px_-24px_rgba(255,255,255,.32),inset_0_1px_0_rgba(255,255,255,.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.05]"
+          className="group relative h-12 w-12 overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.025] shadow-[0_12px_40px_-24px_rgba(255,255,255,.32),inset_0_1px_0_rgba(255,255,255,.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.05] md:h-13 md:w-13"
         >
           <img
             src={WARE_AVATAR}
             alt="Ware bot"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
         </Link>
 
         <button
@@ -41,9 +41,9 @@ export function Navbar() {
           aria-label="Open menu"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen(true)}
-          className="group grid h-11 w-11 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.018] text-white/62 shadow-[inset_0_1px_0_rgba(255,255,255,.025)] backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white md:h-12 md:w-12"
+          className="group grid h-10 w-10 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.018] text-white/62 shadow-[inset_0_1px_0_rgba(255,255,255,.025)] backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white md:h-11 md:w-11"
         >
-          <Menu className="h-5.5 w-5.5 stroke-[1.8] transition-transform duration-200 group-hover:scale-105 md:h-6 md:w-6" />
+          <Menu className="h-5 w-5 stroke-[1.8] transition-transform duration-200 group-hover:scale-105" />
         </button>
       </header>
 
