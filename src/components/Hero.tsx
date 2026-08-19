@@ -1,13 +1,19 @@
 import {
   ArrowRight,
+  Bot,
   Check,
-  Command,
+  Gavel,
+  Gift,
+  Headphones,
+  MessageSquare,
   ShieldCheck,
-  Sparkles,
   Terminal,
+  Users,
   Zap,
 } from "lucide-react";
 import { INVITE_URL } from "@/lib/links";
+
+const WARE_AVATAR = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
 
 function DiscordLogo() {
   return (
@@ -21,18 +27,42 @@ function DiscordLogo() {
   );
 }
 
-const commandRows = [
-  { command: ",antinuke", result: "Protection enabled", icon: ShieldCheck },
-  { command: ",setup", result: "Server configured", icon: Check },
-  { command: ",ticket setup", result: "Panel created", icon: Terminal },
-];
+const categories = [
+  {
+    title: "Protection",
+    description: "Anti-nuke, anti-raid, logging & security",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Moderation",
+    description: "Warns, bans, filters, roles & staff tools",
+    icon: Gavel,
+  },
+  {
+    title: "Tickets",
+    description: "Panels, support flows, embeds & transcripts",
+    icon: MessageSquare,
+  },
+  {
+    title: "Community",
+    description: "Giveaways, economy, voice, levels & utility",
+    icon: Users,
+  },
+] as const;
+
+const miniFeatures = [
+  { icon: ShieldCheck, label: "Protection" },
+  { icon: Headphones, label: "Voice" },
+  { icon: Gift, label: "Giveaways" },
+  { icon: Bot, label: "Automation" },
+] as const;
 
 export function Hero() {
   return (
-    <section className="relative z-10 mx-auto max-w-7xl px-6 pb-24 pt-14 md:px-10 md:pb-32 md:pt-20">
-      <div className="pointer-events-none absolute left-1/2 top-24 h-[520px] w-[780px] -translate-x-1/2 rounded-full bg-white/[0.035] blur-[110px]" />
+    <section className="relative z-10 mx-auto max-w-7xl px-6 pb-24 pt-12 md:px-10 md:pb-32 md:pt-16">
+      <div className="pointer-events-none absolute left-1/2 top-14 h-[560px] w-[900px] -translate-x-1/2 rounded-full bg-white/[0.035] blur-[120px]" />
 
-      <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[1.05fr,0.95fr] lg:gap-20">
+      <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-[1.02fr,0.98fr] lg:gap-16 xl:gap-24">
         <div className="animate-hero-in">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-xs text-muted-foreground backdrop-blur-xl">
             <span className="relative flex h-2 w-2">
@@ -44,20 +74,20 @@ export function Hero() {
             <span className="text-white/80">821 commands</span>
           </div>
 
-          <h1 className="max-w-3xl text-5xl font-bold leading-[0.98] tracking-[-0.055em] text-foreground sm:text-6xl md:text-7xl xl:text-[82px]">
-            Run your entire
+          <h1 className="max-w-3xl text-5xl font-bold leading-[0.96] tracking-[-0.06em] text-foreground sm:text-6xl md:text-7xl xl:text-[84px]">
+            Your server.
             <br />
-            server from{" "}
+            One bot.{" "}
             <span className="relative whitespace-nowrap text-gradient-accent">
-              one bot.
+              Total control.
               <span className="absolute -bottom-2 left-0 h-px w-full bg-gradient-to-r from-transparent via-white/40 to-transparent" />
             </span>
           </h1>
 
           <p className="mt-7 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
-            Protection, moderation, tickets, economy, voice tools, custom embeds,
-            and utilities — built into one fast Discord bot with a dashboard
-            designed to stay out of your way.
+            Replace the clutter with one serious Discord toolkit. Protection,
+            moderation, tickets, economy, voice, giveaways, embeds, automation,
+            and everyday utilities — all built into Ware.
           </p>
 
           <div className="mt-9 flex flex-wrap gap-3">
@@ -69,7 +99,7 @@ export function Hero() {
             >
               <DiscordLogo />
               Invite to Discord
-              <span className="ml-1 grid h-5 w-5 place-items-center rounded-full bg-black/10 transition-transform duration-300 group-hover:translate-x-0.5">
+              <span className="ml-1 grid h-5 w-5 place-items-center rounded-full bg-white/[0.08] transition-transform duration-300 group-hover:translate-x-0.5">
                 <ArrowRight className="h-3 w-3" />
               </span>
             </a>
@@ -78,34 +108,32 @@ export function Hero() {
               href="/docs/commands"
               className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium"
             >
-              <Command className="h-4 w-4" />
               View commands
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-x-7 gap-y-3 text-xs text-muted-foreground">
-            {["Fast setup", "Built-in protection", "One clean toolkit"].map(
-              (item) => (
-                <span key={item} className="inline-flex items-center gap-2">
-                  <span className="grid h-4 w-4 place-items-center rounded-full border border-white/10 bg-white/[0.04]">
-                    <Check className="h-2.5 w-2.5 text-white" />
-                  </span>
-                  {item}
-                </span>
-              ),
-            )}
+          <div className="mt-10 grid max-w-xl grid-cols-2 gap-2 sm:grid-cols-4">
+            {miniFeatures.map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.025] px-3 py-2.5 text-xs text-white/65 backdrop-blur"
+              >
+                <item.icon className="h-3.5 w-3.5 text-white/75" />
+                {item.label}
+              </div>
+            ))}
           </div>
         </div>
 
         <div className="relative animate-hero-card-in">
           <div className="absolute -inset-12 -z-10 rounded-full bg-white/[0.04] blur-[80px]" />
 
-          <div className="hero-console relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0b0c]/85 p-2 shadow-2xl backdrop-blur-2xl">
+          <div className="hero-console relative overflow-hidden rounded-[30px] border border-white/10 bg-[#0b0b0c]/88 p-2 shadow-2xl backdrop-blur-2xl">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
             <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-white/[0.04] blur-3xl" />
 
-            <div className="rounded-[22px] border border-white/[0.07] bg-[#080809]/90">
+            <div className="rounded-[23px] border border-white/[0.07] bg-[#080809]/94">
               <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-4">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1.5">
@@ -123,57 +151,76 @@ export function Hero() {
                 </div>
               </div>
 
-              <div className="space-y-3 p-4 sm:p-5">
-                <div className="mb-5 rounded-xl border border-white/[0.07] bg-white/[0.025] p-4">
+              <div className="p-4 sm:p-5">
+                <div className="mb-4 rounded-2xl border border-white/[0.08] bg-gradient-to-r from-white/[0.045] to-white/[0.018] p-4">
                   <div className="flex items-center gap-3">
-                    <div className="relative grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.05]">
-                      <Sparkles className="h-4 w-4" />
-                      <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-[#0b0b0c] bg-emerald-400" />
+                    <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+                      <img
+                        src={WARE_AVATAR}
+                        alt="Ware"
+                        className="h-full w-full object-cover"
+                      />
+                      <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#0b0b0c] bg-emerald-400" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="text-sm font-semibold">ware is online</div>
                       <div className="mt-0.5 text-xs text-muted-foreground">
                         Ready to manage your server.
                       </div>
                     </div>
-                    <div className="ml-auto">
-                      <Zap className="h-4 w-4 text-white/50" />
-                    </div>
+                    <Zap className="ml-auto h-4 w-4 shrink-0 text-white/45" />
                   </div>
                 </div>
 
-                {commandRows.map((row, index) => (
-                  <div
-                    key={row.command}
-                    className="console-row group flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3.5"
-                    style={{ animationDelay: `${0.45 + index * 0.14}s` }}
+                <div className="mb-3 flex items-center justify-between px-1">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-white/35">
+                    Command categories
+                  </div>
+                  <a
+                    href="/docs/commands"
+                    className="group inline-flex items-center gap-1 text-[10px] text-white/45 transition-colors hover:text-white/80"
                   >
-                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.035]">
-                      <row.icon className="h-3.5 w-3.5 text-white/70" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="font-mono text-xs text-white/90">
-                        {row.command}
-                      </div>
-                      <div className="mt-1 text-[11px] text-muted-foreground">
-                        {row.result}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 text-[10px] text-emerald-300">
-                      <Check className="h-3 w-3" />
-                      done
-                    </div>
-                  </div>
-                ))}
-
-                <div className="relative mt-4 overflow-hidden rounded-xl border border-white/[0.07] bg-black/40 px-4 py-3">
-                  <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white/[0.035] to-transparent" />
-                  <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
-                    <span className="text-white/60">&gt;</span>
-                    <span className="type-command">Type a command...</span>
-                    <span className="h-4 w-px animate-cursor bg-white/70" />
-                  </div>
+                    Browse all
+                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                  </a>
                 </div>
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {categories.map((category, index) => (
+                    <a
+                      key={category.title}
+                      href="/docs/commands"
+                      className="console-row group relative flex min-h-[118px] flex-col rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.16] hover:bg-white/[0.055]"
+                      style={{ animationDelay: `${0.35 + index * 0.1}s` }}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] transition-colors group-hover:bg-white/[0.08]">
+                          <category.icon className="h-4 w-4 text-white/75" />
+                        </div>
+                        <ArrowRight className="h-3.5 w-3.5 text-white/25 transition-all group-hover:translate-x-0.5 group-hover:text-white/70" />
+                      </div>
+                      <div className="mt-auto pt-4">
+                        <div className="text-sm font-medium text-white/90">
+                          {category.title}
+                        </div>
+                        <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                          {category.description}
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+
+                <a
+                  href="/docs/commands"
+                  className="group relative mt-3 flex items-center gap-3 overflow-hidden rounded-2xl border border-white/[0.07] bg-black/40 px-4 py-3.5 transition-all hover:border-white/[0.14] hover:bg-white/[0.03]"
+                >
+                  <Terminal className="h-4 w-4 text-white/55" />
+                  <span className="font-mono text-xs text-muted-foreground">
+                    Explore all 821 commands
+                  </span>
+                  <ArrowRight className="ml-auto h-3.5 w-3.5 text-white/35 transition-transform group-hover:translate-x-1 group-hover:text-white/70" />
+                </a>
               </div>
 
               <div className="grid grid-cols-3 divide-x divide-white/[0.07] border-t border-white/[0.07]">
@@ -195,12 +242,12 @@ export function Hero() {
 
           <div className="floating-chip absolute -left-5 top-20 hidden items-center gap-2 rounded-full border border-white/10 bg-black/75 px-3 py-2 text-xs shadow-xl backdrop-blur-xl sm:flex">
             <ShieldCheck className="h-3.5 w-3.5" />
-            anti-nuke
+            anti-nuke ready
           </div>
 
           <div className="floating-chip-delayed absolute -bottom-5 right-8 hidden items-center gap-2 rounded-full border border-white/10 bg-black/75 px-3 py-2 text-xs shadow-xl backdrop-blur-xl sm:flex">
-            <Terminal className="h-3.5 w-3.5" />
-            one prefix
+            <Check className="h-3.5 w-3.5" />
+            one clean toolkit
           </div>
         </div>
       </div>
