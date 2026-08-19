@@ -51,8 +51,34 @@ body {
   .stats-panel:hover::after { opacity: 1; }
 }
 
+/* Keep the homepage CTA exactly in the requested dark style. */
+.premium-button {
+  isolation: isolate;
+  background: #080808 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 16px 42px -28px rgba(0,0,0,.98) !important;
+}
+
+.premium-button:hover {
+  background: #101010 !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,.24) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.075),
+    0 20px 50px -28px rgba(0,0,0,1) !important;
+}
+
+.premium-button > span {
+  background: rgba(255,255,255,.09) !important;
+  color: #fff !important;
+}
+
 .premium-button,
 .glass-button {
+  position: relative;
   isolation: isolate;
 }
 
@@ -70,6 +96,24 @@ body {
 @media (hover:hover) and (pointer:fine) {
   .premium-button:hover::after,
   .glass-button:hover::after { opacity: 1; }
+}
+
+/* Replace the command-key glyph with a cleaner three-line command/list mark. */
+.glass-button > svg:first-child {
+  display: none !important;
+}
+
+.glass-button::before {
+  content: "";
+  width: 15px;
+  height: 12px;
+  flex: 0 0 15px;
+  opacity: .82;
+  background:
+    linear-gradient(currentColor,currentColor) 0 0 / 15px 1.5px no-repeat,
+    linear-gradient(currentColor,currentColor) 0 5px / 11px 1.5px no-repeat,
+    linear-gradient(currentColor,currentColor) 0 10px / 13px 1.5px no-repeat;
+  border-radius: 2px;
 }
 
 /* Docs shell */
