@@ -56,8 +56,6 @@ const categories = mergeCategories(
   referenceCommandCategories as unknown as CategoryEntry[],
 );
 
-// Recounted from the current generated bot.py after adding the visible integration pack.
-// This is the set of unique registered command/group paths, not aliases.
 const WARE_COMMAND_TOTAL = 1008;
 
 const iconBySlug: Record<string, typeof Layers3> = {
@@ -125,6 +123,8 @@ function CommandsPage() {
     categories.some(group => group.slug === search.category) ? search.category! : "all"
   );
   const [copied, setCopied] = useState<string | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const all = useMemo(
     () => categories.flatMap(group => group.commands.map(command => ({
@@ -155,6 +155,11 @@ function CommandsPage() {
     const rail = railRef.current;
     if (!rail) return;
 
+    const updateScrollState = () => {
+      setCanScrollLeft(rail.scrollLeft > 8);
+      setCanScrollRight(rail.scrollLeft + rail.clientWidth < rail.scrollWidth - 8);
+    };
+
     const onWheel = (event: WheelEvent) => {
       if (rail.scrollWidth <= rail.clientWidth) return;
       const amount = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
@@ -163,15 +168,23 @@ function CommandsPage() {
       rail.scrollLeft += amount;
     };
 
+    updateScrollState();
     rail.addEventListener("wheel", onWheel, { passive: false });
-    return () => rail.removeEventListener("wheel", onWheel);
+    rail.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      rail.removeEventListener("wheel", onWheel);
+      rail.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
   }, []);
 
   const moveRail = (direction: "left" | "right") => {
     const rail = railRef.current;
     if (!rail) return;
     rail.scrollBy({
-      left: direction === "left" ? -Math.max(360, rail.clientWidth * 0.72) : Math.max(360, rail.clientWidth * 0.72),
+      left: direction === "left" ? -Math.max(420, rail.clientWidth * 0.78) : Math.max(420, rail.clientWidth * 0.78),
       behavior: "smooth",
     });
   };
@@ -187,8 +200,9 @@ function CommandsPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#080909] text-white">
+    <div className="relative min-h-screen overflow-hidden bg-[#070808] text-white">
       <Starfield />
+      <div className="pointer-events-none fixed inset-x-0 top-0 h-[560px] bg-[radial-gradient(circle_at_50%_-10%,rgba(255,255,255,.06),transparent_58%)]" />
       <Navbar />
 
       <main className="relative z-10 mx-auto max-w-[1480px] px-5 pb-24 pt-8 md:px-9">
@@ -201,97 +215,126 @@ function CommandsPage() {
           </div>
         </div>
 
-        <section className="mt-8 rounded-[30px] border border-white/[0.075] bg-[#0c0d0d]/88 p-5 shadow-[0_30px_100px_-65px_rgba(255,255,255,.2)] backdrop-blur-xl md:p-7">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <section className="mt-8 overflow-hidden rounded-[32px] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012))] p-5 shadow-[0_40px_120px_-75px_rgba(255,255,255,.18)] backdrop-blur-xl md:p-8">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/28">
-                <CommandIcon className="h-3.5 w-3.5" /> ware command library
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 text-[10px] uppercase tracking-[0.19em] text-white/32">
+                <CommandIcon className="h-3.5 w-3.5" /> command library
               </div>
-              <h1 className="mt-3 text-4xl font-bold tracking-[-0.055em] md:text-6xl">Commands</h1>
-              <p className="mt-3 text-sm text-white/38">Browse by category or search command names, aliases, and usage.</p>
+              <h1 className="mt-4 text-5xl font-bold tracking-[-0.065em] md:text-7xl">Commands</h1>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-white/38">Find what you need fast. Browse the full Ware command system by category, alias, or usage.</p>
             </div>
 
-            <div className="flex items-center gap-3 rounded-2xl border border-white/[0.075] bg-black/25 px-4 py-3">
-              <div className="grid h-9 w-9 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.035] text-white/60">
+            <div className="flex min-w-[210px] items-center gap-3 rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-3.5 shadow-inner">
+              <div className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/65">
                 <ActiveIcon className="h-4 w-4" />
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-[0.12em] text-white/25">Browsing</div>
-                <div className="mt-0.5 text-sm font-medium">{activeCategory?.name ?? "All Commands"} <span className="text-white/25">· {displayedCount.toLocaleString()}</span></div>
+                <div className="text-[9px] uppercase tracking-[0.15em] text-white/25">Browsing</div>
+                <div className="mt-1 text-sm font-medium">{activeCategory?.name ?? "All Commands"}</div>
+                <div className="mt-0.5 font-mono text-[10px] text-white/28">{displayedCount.toLocaleString()} commands</div>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-white/[0.075] bg-black/20 px-4 py-3.5 focus-within:border-white/[0.16]">
+          <div className="mt-7 flex items-center gap-3 rounded-[18px] border border-white/[0.08] bg-black/25 px-4 py-4 transition focus-within:border-white/[0.18] focus-within:bg-black/35">
             <Search className="h-4 w-4 text-white/30" />
             <input
               value={query}
               onChange={event => setQuery(event.target.value)}
-              placeholder="Search commands..."
+              placeholder="Search commands, aliases, or usage..."
               className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-white/20"
             />
-            {query ? <span className="text-[10px] text-white/28">{shown.length} results</span> : null}
+            {query ? <span className="rounded-lg bg-white/[0.05] px-2 py-1 font-mono text-[9px] text-white/35">{shown.length} results</span> : null}
           </div>
         </section>
 
-        <section className="sticky top-2 z-20 mt-5 rounded-2xl border border-white/[0.075] bg-[#0b0c0c]/95 p-1.5 shadow-2xl backdrop-blur-xl">
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => moveRail("left")}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-white/48 transition hover:bg-white/[0.06] hover:text-white"
-              aria-label="Scroll categories left"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
+        <section className="sticky top-3 z-30 mt-5">
+          <div className="relative overflow-hidden rounded-[24px] border border-white/[0.09] bg-[#0a0b0b]/92 p-2 shadow-[0_24px_70px_-42px_rgba(0,0,0,.9)] backdrop-blur-2xl">
+            <div className={`pointer-events-none absolute inset-y-0 left-14 z-10 w-16 bg-gradient-to-r from-[#0a0b0b] to-transparent transition-opacity ${canScrollLeft ? "opacity-100" : "opacity-0"}`} />
+            <div className={`pointer-events-none absolute inset-y-0 right-14 z-10 w-16 bg-gradient-to-l from-[#0a0b0b] to-transparent transition-opacity ${canScrollRight ? "opacity-100" : "opacity-0"}`} />
 
-            <div ref={railRef} className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <div className="flex w-max min-w-full items-center">
-                <button
-                  type="button"
-                  onClick={() => setCategory("all")}
-                  className={`flex h-10 items-center gap-2 border-r border-white/[0.055] px-4 text-xs transition ${category === "all" ? "bg-white/[0.08] text-white" : "text-white/48 hover:bg-white/[0.04] hover:text-white/75"}`}
-                >
-                  <Layers3 className="h-3.5 w-3.5" /> All <span className="rounded-md bg-white/[0.06] px-1.5 py-0.5 font-mono text-[9px] text-white/38">{WARE_COMMAND_TOTAL.toLocaleString()}</span>
-                </button>
-                {categories.map(group => {
-                  const Icon = iconBySlug[group.slug] ?? Layers3;
-                  const selected = category === group.slug;
-                  return (
-                    <button
-                      key={group.slug}
-                      type="button"
-                      onClick={() => setCategory(group.slug)}
-                      className={`flex h-10 items-center gap-2 border-r border-white/[0.055] px-4 text-xs transition ${selected ? "bg-white/[0.08] text-white" : "text-white/48 hover:bg-white/[0.04] hover:text-white/75"}`}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      <span className="whitespace-nowrap">{group.name}</span>
-                      <span className="rounded-md bg-white/[0.06] px-1.5 py-0.5 font-mono text-[9px] text-white/38">{group.commands.length}</span>
-                    </button>
-                  );
-                })}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => moveRail("left")}
+                disabled={!canScrollLeft}
+                className="relative z-20 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-white/[0.035] text-white/55 transition hover:border-white/[0.16] hover:bg-white/[0.07] hover:text-white disabled:cursor-default disabled:opacity-25"
+                aria-label="Scroll categories left"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              <div
+                ref={railRef}
+                className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                <div className="flex w-max min-w-full items-center gap-2 py-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setCategory("all")}
+                    className={`group relative flex min-w-[112px] items-center gap-3 rounded-[17px] border px-3.5 py-2.5 text-left transition-all duration-200 ${category === "all" ? "border-white/[0.22] bg-white text-black shadow-[0_10px_30px_-18px_rgba(255,255,255,.65)]" : "border-white/[0.07] bg-white/[0.022] text-white/55 hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-white/[0.055] hover:text-white"}`}
+                  >
+                    <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl border ${category === "all" ? "border-black/10 bg-black/[0.07]" : "border-white/[0.08] bg-white/[0.035]"}`}>
+                      <Layers3 className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[11px] font-semibold">All</span>
+                      <span className={`mt-0.5 block font-mono text-[9px] ${category === "all" ? "text-black/45" : "text-white/28"}`}>{WARE_COMMAND_TOTAL.toLocaleString()}</span>
+                    </span>
+                  </button>
+
+                  {categories.map(group => {
+                    const Icon = iconBySlug[group.slug] ?? Layers3;
+                    const selected = category === group.slug;
+                    return (
+                      <button
+                        key={group.slug}
+                        type="button"
+                        onClick={() => setCategory(group.slug)}
+                        className={`group relative flex min-w-[126px] items-center gap-3 rounded-[17px] border px-3.5 py-2.5 text-left transition-all duration-200 ${selected ? "border-white/[0.18] bg-white/[0.10] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06),0_12px_30px_-24px_rgba(255,255,255,.35)]" : "border-white/[0.065] bg-white/[0.018] text-white/48 hover:-translate-y-0.5 hover:border-white/[0.13] hover:bg-white/[0.05] hover:text-white/82"}`}
+                      >
+                        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl border transition ${selected ? "border-white/[0.13] bg-white/[0.08] text-white" : "border-white/[0.07] bg-white/[0.025] text-white/45 group-hover:text-white/75"}`}>
+                          <Icon className="h-3.5 w-3.5" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block max-w-[110px] truncate text-[11px] font-semibold">{group.name}</span>
+                          <span className="mt-0.5 block font-mono text-[9px] text-white/28">{group.commands.length} cmds</span>
+                        </span>
+                        {selected ? <span className="absolute inset-x-5 -bottom-[9px] h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" /> : null}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => moveRail("right")}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-white/48 transition hover:bg-white/[0.06] hover:text-white"
-              aria-label="Scroll categories right"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
+              <button
+                type="button"
+                onClick={() => moveRail("right")}
+                disabled={!canScrollRight}
+                className="relative z-20 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-white/[0.035] text-white/55 transition hover:border-white/[0.16] hover:bg-white/[0.07] hover:text-white disabled:cursor-default disabled:opacity-25"
+                aria-label="Scroll categories right"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </section>
 
         {activeCategory ? (
-          <div className="mt-5 flex items-center gap-3 px-1">
-            <div className="grid h-9 w-9 place-items-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-white/55"><ActiveIcon className="h-4 w-4" /></div>
-            <div><div className="text-sm font-medium">{activeCategory.name}</div><div className="mt-0.5 text-xs text-white/30">{activeCategory.description}</div></div>
+          <div className="mt-6 flex items-center justify-between gap-4 rounded-[20px] border border-white/[0.06] bg-white/[0.018] px-4 py-3.5">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[0.075] bg-white/[0.025] text-white/55"><ActiveIcon className="h-4 w-4" /></div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium">{activeCategory.name}</div>
+                <div className="mt-0.5 truncate text-xs text-white/30">{activeCategory.description}</div>
+              </div>
+            </div>
+            <div className="shrink-0 rounded-lg bg-white/[0.04] px-2.5 py-1 font-mono text-[9px] text-white/30">{shown.length} commands</div>
           </div>
         ) : null}
 
-        <section className="mt-5">
+        <section className="mt-6">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {shown.map((command, index) => {
               const args = getArguments(command.usage);
