@@ -1,5 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Search } from "lucide-react";
+import {
+  ArrowLeft, Search, Layers3, ShieldCheck, Gavel, Info, Heart, Music2, Paperclip,
+  Ticket, Bot, Sparkles, Gamepad2, Wrench, Gift, Crown, User, Server, Image, Mic2,
+  ScrollText, WalletCards, Settings2, Radio, Volume2, Command as CommandIcon, ChevronRight,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -95,6 +99,32 @@ const lastFmCategory = {
 
 const categories = [...commandCategories, lastFmCategory];
 
+const iconBySlug: Record<string, typeof Layers3> = {
+  home: Layers3,
+  moderation: Gavel,
+  "channels-roles": Settings2,
+  voicemaster: Volume2,
+  "config-logs": ScrollText,
+  antinuke: ShieldCheck,
+  economy: WalletCards,
+  fun: Sparkles,
+  games: Gamepad2,
+  utility: Wrench,
+  tickets: Ticket,
+  ai: Bot,
+  giveaways: Gift,
+  premium: Crown,
+  leveling: Radio,
+  user: User,
+  server: Server,
+  images: Image,
+  roleplay: Heart,
+  security: ShieldCheck,
+  welcome: Info,
+  roblox: Gamepad2,
+  lastfm: Music2,
+};
+
 export const Route = createFileRoute("/commands")({
   validateSearch: (search: Record<string, unknown>) => ({ category: typeof search.category === "string" ? search.category : undefined }),
   head: () => ({ meta: [{ title: "Commands — ware" }, { name: "description", content: "Browse Ware's complete command library." }] }),
@@ -111,5 +141,102 @@ function CommandsPage() {
     return all.filter(c => (category === "all" || c.categorySlug === category) && (!q || c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q) || c.usage.toLowerCase().includes(q) || (c.aliases ?? []).some(a => a.toLowerCase().includes(q))));
   }, [all, query, category]);
 
-  return <div className="relative min-h-screen overflow-hidden bg-[#050505]"><Starfield/><Navbar/><main className="relative z-10 mx-auto max-w-7xl px-5 pb-24 pt-8 md:px-8"><Link to="/" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white"><ArrowLeft className="h-4 w-4"/>Home</Link><section className="mt-8 rounded-[32px] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012))] p-6 shadow-[0_40px_120px_-70px_rgba(255,255,255,.2)] md:p-10"><p className="text-[10px] uppercase tracking-[0.22em] text-white/30">ware command center</p><h1 className="mt-3 text-5xl font-bold tracking-[-0.055em] md:text-7xl">Commands</h1><p className="mt-4 max-w-2xl text-base leading-7 text-white/45">Search every Ware command, alias, and category from one clean command library.</p><div className="mt-10 rounded-[24px] border border-white/10 bg-black/30 p-3"><label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 focus-within:border-white/25"><Search className="h-4 w-4 text-white/35"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search commands..." className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/25"/></label></div><div className="mt-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"><div className="flex min-w-max gap-2"><button onClick={()=>setCategory("all")} className={`rounded-2xl border px-4 py-2.5 text-xs font-semibold ${category==="all"?"border-white bg-white text-black":"border-white/10 bg-white/[0.025] text-white/55"}`}>All Commands</button>{categories.map(g=><button key={g.slug} onClick={()=>setCategory(g.slug)} className={`rounded-2xl border px-4 py-2.5 text-xs ${category===g.slug?(g.slug==="lastfm"?"border-[#ff3a45] bg-[#d9232e] text-white":"border-white bg-white text-black"):"border-white/10 bg-white/[0.025] text-white/55"}`}>{g.name}</button>)}</div></div></section><section className="mt-8"><div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{shown.map((c,i)=><article key={`${c.name}-${i}`} className={`group rounded-[22px] border p-5 transition-all duration-200 hover:-translate-y-1 ${c.categorySlug==="lastfm"?"border-[#d9232e]/20 bg-[#d9232e]/[0.035] hover:border-[#ff3a45]/40":"border-white/[0.08] bg-white/[0.022] hover:border-white/[0.17] hover:bg-white/[0.045]"}`}><div className="flex items-start justify-between gap-3"><span className="rounded-lg border border-white/10 bg-white/[0.07] px-2.5 py-1.5 text-sm font-semibold">,{c.name}</span><span className={`text-[9px] uppercase tracking-[0.14em] ${c.categorySlug==="lastfm"?"text-[#ff5a64]":"text-white/25"}`}>{c.category}</span></div><p className="mt-4 text-sm leading-6 text-white/60">{c.description}</p><div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-3"><span className="font-mono text-[11px] text-white/35">{c.usage}</span>{c.categorySlug==="lastfm" && "permission" in c && c.permission && c.permission!=="None" ? <span className="rounded-full border border-[#d9232e]/25 bg-[#d9232e]/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#ff7a82]">{c.permission}</span> : null}</div></article>)}</div></section></main><Footer/></div>;
+  const activeCategory = category === "all" ? null : categories.find(g => g.slug === category);
+  const ActiveIcon = activeCategory ? (iconBySlug[activeCategory.slug] ?? Layers3) : CommandIcon;
+
+  return (
+    <div className="commands-page relative min-h-screen overflow-hidden bg-[#050505]">
+      <Starfield />
+      <div className="pointer-events-none fixed inset-x-0 top-0 h-[520px] bg-[radial-gradient(ellipse_at_top,rgba(110,126,255,.08),transparent_65%)]" />
+      <Navbar />
+      <main className="relative z-10 mx-auto max-w-7xl px-5 pb-24 pt-8 md:px-8">
+        <Link to="/" className="command-back group inline-flex items-center gap-2 text-sm text-white/40 transition hover:text-white">
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" /> Home
+        </Link>
+
+        <section className="command-hero mt-8 overflow-hidden rounded-[34px] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.012))] p-6 shadow-[0_40px_120px_-70px_rgba(110,126,255,.28)] md:p-10">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-white/40">
+                <CommandIcon className="h-3.5 w-3.5" /> ware command center
+              </div>
+              <h1 className="mt-5 text-5xl font-black tracking-[-0.06em] md:text-7xl">Commands</h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-white/45">Search Ware's full command system or jump straight into a category.</p>
+            </div>
+            <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-3">
+              <div className={`grid h-10 w-10 place-items-center rounded-xl border ${category === "lastfm" ? "border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff5a64]" : "border-white/10 bg-white/[0.04] text-white/65"}`}>
+                <ActiveIcon className="h-4.5 w-4.5" />
+              </div>
+              <div>
+                <div className="text-xs text-white/35">Currently browsing</div>
+                <div className="mt-0.5 text-sm font-semibold">{activeCategory?.name ?? "All commands"} <span className="ml-1 text-white/30">· {shown.length}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-9 rounded-[24px] border border-white/10 bg-black/30 p-2.5 transition focus-within:border-white/20 focus-within:bg-black/40">
+            <label className="group flex items-center gap-3 rounded-2xl px-3 py-3.5">
+              <Search className="h-4 w-4 text-white/35 transition group-focus-within:scale-110 group-focus-within:text-white/70" />
+              <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search commands, aliases, or usage..." className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/25" />
+              {query ? <span className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] text-white/35">{shown.length} results</span> : null}
+            </label>
+          </div>
+
+          <div className="command-category-strip mt-5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex min-w-max gap-2">
+              <button onClick={() => setCategory("all")} className={`command-category-button group ${category === "all" ? "is-active" : ""}`}>
+                <span className="command-category-icon"><Layers3 className="h-4 w-4" /></span>
+                <span>All</span><span className="command-count">{all.length}</span>
+              </button>
+              {categories.map(g => {
+                const Icon = iconBySlug[g.slug] ?? Layers3;
+                const selected = category === g.slug;
+                return (
+                  <button key={g.slug} onClick={() => setCategory(g.slug)} className={`command-category-button group ${selected ? "is-active" : ""} ${g.slug === "lastfm" ? "is-lastfm" : ""}`}>
+                    <span className="command-category-icon"><Icon className="h-4 w-4" /></span>
+                    <span>{g.name}</span><span className="command-count">{g.commands.length}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {activeCategory ? (
+          <div className={`command-category-intro mt-6 flex items-center gap-4 rounded-[22px] border px-5 py-4 ${category === "lastfm" ? "border-[#d9232e]/20 bg-[#d9232e]/[0.045]" : "border-white/[0.07] bg-white/[0.02]"}`}>
+            <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl border ${category === "lastfm" ? "border-[#d9232e]/25 bg-[#d9232e]/10 text-[#ff5a64]" : "border-white/10 bg-white/[0.04] text-white/65"}`}><ActiveIcon className="h-5 w-5" /></div>
+            <div className="min-w-0"><div className="font-semibold">{activeCategory.name}</div><div className="mt-1 text-sm text-white/38">{activeCategory.description}</div></div>
+          </div>
+        ) : null}
+
+        <section className="mt-7">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {shown.map((c, i) => {
+              const Icon = iconBySlug[c.categorySlug] ?? CommandIcon;
+              const isLastFm = c.categorySlug === "lastfm";
+              return (
+                <article key={`${c.name}-${i}`} className={`command-card group ${isLastFm ? "is-lastfm" : ""}`}>
+                  <div className="command-card-glow" />
+                  <div className="relative flex items-start justify-between gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border transition duration-300 group-hover:-rotate-3 group-hover:scale-105 ${isLastFm ? "border-[#d9232e]/25 bg-[#d9232e]/10 text-[#ff5a64]" : "border-white/10 bg-white/[0.04] text-white/55"}`}><Icon className="h-4.5 w-4.5" /></div>
+                      <div className="min-w-0"><div className="truncate font-mono text-[13px] font-semibold text-white/90">,{c.name}</div><div className={`mt-1 text-[9px] uppercase tracking-[0.15em] ${isLastFm ? "text-[#ff5a64]/80" : "text-white/25"}`}>{c.category}</div></div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 translate-x-1 text-white/15 opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:text-white/45 group-hover:opacity-100" />
+                  </div>
+                  <p className="relative mt-5 min-h-[48px] text-sm leading-6 text-white/55">{c.description}</p>
+                  <div className="relative mt-5 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-4">
+                    <span className="rounded-lg border border-white/[0.07] bg-black/20 px-2.5 py-1.5 font-mono text-[10px] text-white/38">{c.usage}</span>
+                    {isLastFm && "permission" in c && c.permission && c.permission !== "None" ? <span className="rounded-full border border-[#d9232e]/25 bg-[#d9232e]/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#ff7a82]">{c.permission}</span> : null}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+          {!shown.length ? <div className="mt-10 rounded-[28px] border border-white/[0.08] bg-white/[0.02] px-6 py-16 text-center"><Search className="mx-auto h-7 w-7 text-white/20"/><div className="mt-4 font-semibold text-white/70">No commands found</div><div className="mt-1 text-sm text-white/35">Try another search or category.</div></div> : null}
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
 }
