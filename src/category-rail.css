@@ -1,0 +1,103 @@
+.category-rail-shell {
+  position: relative;
+  margin-top: 1.25rem;
+  padding-inline: 3rem;
+}
+
+.category-rail-enhanced {
+  margin-top: 0 !important;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.category-rail-enhanced::-webkit-scrollbar {
+  display: none;
+}
+
+.category-rail-control-host {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  transform: translateY(-50%);
+}
+
+.category-rail-control-left { left: 0; }
+.category-rail-control-right { right: 0; }
+
+.category-rail-jump {
+  display: grid;
+  height: 2.5rem;
+  width: 2.5rem;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  background: rgba(10,10,11,.94);
+  color: rgba(255,255,255,.74);
+  box-shadow: 0 12px 36px -20px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.045);
+  backdrop-filter: blur(14px);
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease, opacity .18s ease;
+}
+
+.category-rail-jump:hover {
+  transform: scale(1.07);
+  border-color: rgba(255,255,255,.24);
+  background: rgba(20,20,22,.98);
+  color: #fff;
+}
+
+.category-rail-jump:active {
+  transform: scale(.94);
+}
+
+.category-rail-shell[data-at-start="true"] .category-rail-control-left,
+.category-rail-shell[data-at-end="true"] .category-rail-control-right {
+  opacity: .25;
+  pointer-events: none;
+}
+
+.category-rail-shell::before,
+.category-rail-shell::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 10;
+  width: 4.5rem;
+  pointer-events: none;
+}
+
+.category-rail-shell::before {
+  left: 2.35rem;
+  background: linear-gradient(90deg, #09090a 0%, rgba(9,9,10,.78) 38%, transparent 100%);
+}
+
+.category-rail-shell::after {
+  right: 2.35rem;
+  background: linear-gradient(270deg, #09090a 0%, rgba(9,9,10,.78) 38%, transparent 100%);
+}
+
+.category-rail-shell[data-at-start="true"]::before,
+.category-rail-shell[data-at-end="true"]::after {
+  opacity: 0;
+}
+
+@media (max-width: 640px) {
+  .category-rail-shell {
+    padding-inline: 2.7rem;
+  }
+
+  .category-rail-jump {
+    height: 2.25rem;
+    width: 2.25rem;
+  }
+
+  .category-rail-shell::before { left: 2.05rem; }
+  .category-rail-shell::after { right: 2.05rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-rail-enhanced { scroll-behavior: auto; }
+  .category-rail-jump { transition: none; }
+}
