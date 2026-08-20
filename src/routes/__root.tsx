@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import polishCss from "../site-polish.css?url";
+import interactionsCss from "../interactions.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const WARE_LOGO = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
@@ -104,14 +105,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
       },
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      {
-        rel: "stylesheet",
-        href: polishCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: polishCss },
+      { rel: "stylesheet", href: interactionsCss },
     ],
   }),
   shellComponent: RootShell,
