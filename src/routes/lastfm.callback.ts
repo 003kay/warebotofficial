@@ -90,7 +90,6 @@ export const Route = createFileRoute("/lastfm/callback")({
                 discord_user_id: discordId,
                 lastfm_username: payload.session.name,
                 session_key: payload.session.key,
-                subscriber: Boolean(payload.session.subscriber),
                 connected_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
               },
