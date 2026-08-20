@@ -35,13 +35,13 @@ export const Route = createFileRoute("/api/public/lastfm/account")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data, error } = await (supabaseAdmin as any)
           .from("lastfm_connections")
-          .select("discord_user_id,lastfm_username,session_key,subscriber,connected_at,updated_at")
+          .select("discord_user_id,lastfm_username,session_key,connected_at,updated_at")
           .eq("discord_user_id", discordId)
           .maybeSingle();
 
         if (error) {
           console.error("Last.fm account lookup failed", error);
-          return Response.json({ error: "Database error" }, { status: 500 });
+          return Response.json({ error: "Database error", detail: error.message || error.code }, { status: 500 });
         }
         if (!data) return Response.json({ connected: false }, { status: 404 });
         return Response.json({ connected: true, ...data });
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/api/public/lastfm/account")({
           .eq("discord_user_id", discordId);
         if (error) {
           console.error("Last.fm account delete failed", error);
-          return Response.json({ error: "Database error" }, { status: 500 });
+          return Response.json({ error: "Database error", detail: error.message || error.code }, { status: 500 });
         }
         return Response.json({ disconnected: true });
       },
