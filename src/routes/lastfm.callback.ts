@@ -107,10 +107,7 @@ export const Route = createFileRoute("/lastfm/callback")({
             throw new Error(`Supabase: ${error.message || error.code || "database write failed"}`);
           }
 
-          return html(
-            "Last.fm connected",
-            `Your Last.fm account <strong>${escapeHtml(payload.session.name)}</strong> is now connected to Ware. You can close this page and return to Discord.`,
-          );
+          return Response.redirect(new URL("/authorized", request.url), 302);
         } catch (error) {
           console.error("Last.fm callback error", error);
           const detail = error instanceof Error ? error.message : "Unknown callback error";
