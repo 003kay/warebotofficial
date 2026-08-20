@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  ArrowLeft, Search, Layers3, ShieldCheck, Gavel, Info, Heart, Music2, Paperclip,
-  Ticket, Bot, Sparkles, Gamepad2, Wrench, Gift, Crown, User, Server, Image, Mic2,
-  ScrollText, WalletCards, Settings2, Radio, Volume2, Command as CommandIcon, ChevronRight,
+  ArrowLeft, Search, Layers3, ShieldCheck, Gavel, Info, Heart, Music2,
+  Ticket, Bot, Sparkles, Gamepad2, Wrench, Gift, Crown, User, Server, Image,
+  ScrollText, WalletCards, Settings2, Radio, Volume2, Command as CommandIcon,
+  Copy, Check, ChevronLeft, ChevronRight,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type WheelEvent } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
@@ -19,13 +20,9 @@ type LastFmCommand = {
   permission?: string;
 };
 
-const lfm = (
-  name: string,
-  description: string,
-  usage: string,
-  permission = "None",
-  aliases?: string[],
-): LastFmCommand => ({ name, description, usage, example: usage, permission, aliases });
+const lfm = (name: string, description: string, usage: string, permission = "None", aliases?: string[]): LastFmCommand => ({
+  name, description, usage, example: usage, permission, aliases,
+});
 
 const lastFmCategory = {
   slug: "lastfm",
@@ -98,32 +95,20 @@ const lastFmCategory = {
 };
 
 const categories = [...commandCategories, lastFmCategory];
+const WARE_COMMAND_TOTAL = 517;
 
 const iconBySlug: Record<string, typeof Layers3> = {
-  home: Layers3,
-  moderation: Gavel,
-  "channels-roles": Settings2,
-  voicemaster: Volume2,
-  "config-logs": ScrollText,
-  antinuke: ShieldCheck,
-  economy: WalletCards,
-  fun: Sparkles,
-  games: Gamepad2,
-  utility: Wrench,
-  tickets: Ticket,
-  ai: Bot,
-  giveaways: Gift,
-  premium: Crown,
-  leveling: Radio,
-  user: User,
-  server: Server,
-  images: Image,
-  roleplay: Heart,
-  security: ShieldCheck,
-  welcome: Info,
-  roblox: Gamepad2,
-  lastfm: Music2,
+  home: Layers3, moderation: Gavel, "channels-roles": Settings2, voicemaster: Volume2,
+  "config-logs": ScrollText, antinuke: ShieldCheck, economy: WalletCards, fun: Sparkles,
+  games: Gamepad2, utility: Wrench, tickets: Ticket, ai: Bot, giveaways: Gift, premium: Crown,
+  leveling: Radio, user: User, server: Server, images: Image, roleplay: Heart, security: ShieldCheck,
+  welcome: Info, roblox: Gamepad2, lastfm: Music2,
 };
+
+function getArguments(usage: string) {
+  const matches = usage.match(/[([][^\])]+[\])]/g) ?? [];
+  return matches.map(value => value.slice(1, -1).trim()).filter(Boolean);
+}
 
 export const Route = createFileRoute("/commands")({
   validateSearch: (search: Record<string, unknown>) => ({ category: typeof search.category === "string" ? search.category : undefined }),
@@ -133,16 +118,43 @@ export const Route = createFileRoute("/commands")({
 
 function CommandsPage() {
   const search = Route.useSearch();
+  const stripRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(() => categories.some(g => g.slug === search.category) ? search.category! : "all");
+  const [copied, setCopied] = useState<string | null>(null);
+
   const all = useMemo(() => categories.flatMap(g => g.commands.map(c => ({ ...c, category: g.name, categorySlug: g.slug }))), []);
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
     return all.filter(c => (category === "all" || c.categorySlug === category) && (!q || c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q) || c.usage.toLowerCase().includes(q) || (c.aliases ?? []).some(a => a.toLowerCase().includes(q))));
   }, [all, query, category]);
 
+  const totalCount = Math.max(WARE_COMMAND_TOTAL, all.length);
   const activeCategory = category === "all" ? null : categories.find(g => g.slug === category);
   const ActiveIcon = activeCategory ? (iconBySlug[activeCategory.slug] ?? Layers3) : CommandIcon;
+  const displayedCount = query ? shown.length : category === "all" ? totalCount : shown.length;
+
+  const onCategoryWheel = (event: WheelEvent<HTMLDivElement>) => {
+    const el = stripRef.current;
+    if (!el || Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+    if (el.scrollWidth <= el.clientWidth) return;
+    event.preventDefault();
+    el.scrollLeft += event.deltaY;
+  };
+
+  const scrollCategories = (edge: "start" | "end") => {
+    stripRef.current?.scrollTo({ left: edge === "start" ? 0 : stripRef.current.scrollWidth, behavior: "smooth" });
+  };
+
+  const copyCommand = async (usage: string, key: string) => {
+    try {
+      await navigator.clipboard.writeText(usage);
+      setCopied(key);
+      window.setTimeout(() => setCopied(current => current === key ? null : current), 1400);
+    } catch {
+      setCopied(null);
+    }
+  };
 
   return (
     <div className="commands-page relative min-h-screen overflow-hidden bg-[#050505]">
@@ -165,11 +177,11 @@ function CommandsPage() {
             </div>
             <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-3">
               <div className={`grid h-10 w-10 place-items-center rounded-xl border ${category === "lastfm" ? "border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff5a64]" : "border-white/10 bg-white/[0.04] text-white/65"}`}>
-                <ActiveIcon className="h-4.5 w-4.5" />
+                <ActiveIcon className="h-4 w-4" />
               </div>
               <div>
                 <div className="text-xs text-white/35">Currently browsing</div>
-                <div className="mt-0.5 text-sm font-semibold">{activeCategory?.name ?? "All commands"} <span className="ml-1 text-white/30">· {shown.length}</span></div>
+                <div className="mt-0.5 text-sm font-semibold">{activeCategory?.name ?? "All commands"} <span className="ml-1 text-white/30">· {displayedCount}</span></div>
               </div>
             </div>
           </div>
@@ -182,23 +194,31 @@ function CommandsPage() {
             </label>
           </div>
 
-          <div className="command-category-strip mt-5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <div className="flex min-w-max gap-2">
-              <button onClick={() => setCategory("all")} className={`command-category-button group ${category === "all" ? "is-active" : ""}`}>
-                <span className="command-category-icon"><Layers3 className="h-4 w-4" /></span>
-                <span>All</span><span className="command-count">{all.length}</span>
-              </button>
-              {categories.map(g => {
-                const Icon = iconBySlug[g.slug] ?? Layers3;
-                const selected = category === g.slug;
-                return (
-                  <button key={g.slug} onClick={() => setCategory(g.slug)} className={`command-category-button group ${selected ? "is-active" : ""} ${g.slug === "lastfm" ? "is-lastfm" : ""}`}>
-                    <span className="command-category-icon"><Icon className="h-4 w-4" /></span>
-                    <span>{g.name}</span><span className="command-count">{g.commands.length}</span>
-                  </button>
-                );
-              })}
+          <div className="relative mt-5 flex items-center gap-2">
+            <button type="button" onClick={() => scrollCategories("start")} aria-label="Scroll categories to start" className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.035] text-white/55 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white active:scale-95">
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <div ref={stripRef} onWheel={onCategoryWheel} className="command-category-strip min-w-0 flex-1 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex min-w-max gap-2">
+                <button onClick={() => setCategory("all")} className={`command-category-button group ${category === "all" ? "is-active" : ""}`}>
+                  <span className="command-category-icon"><Layers3 className="h-4 w-4" /></span>
+                  <span>All</span><span className="command-count">{totalCount}</span>
+                </button>
+                {categories.map(g => {
+                  const Icon = iconBySlug[g.slug] ?? Layers3;
+                  const selected = category === g.slug;
+                  return (
+                    <button key={g.slug} onClick={() => setCategory(g.slug)} className={`command-category-button group ${selected ? "is-active" : ""} ${g.slug === "lastfm" ? "is-lastfm" : ""}`}>
+                      <span className="command-category-icon"><Icon className="h-4 w-4" /></span>
+                      <span>{g.name}</span><span className="command-count">{g.commands.length}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+            <button type="button" onClick={() => scrollCategories("end")} aria-label="Scroll categories to end" className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.035] text-white/55 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white active:scale-95">
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
         </section>
 
@@ -210,24 +230,47 @@ function CommandsPage() {
         ) : null}
 
         <section className="mt-7">
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2">
             {shown.map((c, i) => {
               const Icon = iconBySlug[c.categorySlug] ?? CommandIcon;
               const isLastFm = c.categorySlug === "lastfm";
+              const args = getArguments(c.usage);
+              const permission = isLastFm && "permission" in c ? (c.permission || "None") : "See command help";
+              const key = `${c.categorySlug}:${c.name}:${i}`;
+              const isCopied = copied === key;
               return (
-                <article key={`${c.name}-${i}`} className={`command-card group ${isLastFm ? "is-lastfm" : ""}`}>
-                  <div className="command-card-glow" />
-                  <div className="relative flex items-start justify-between gap-4">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border transition duration-300 group-hover:-rotate-3 group-hover:scale-105 ${isLastFm ? "border-[#d9232e]/25 bg-[#d9232e]/10 text-[#ff5a64]" : "border-white/10 bg-white/[0.04] text-white/55"}`}><Icon className="h-4.5 w-4.5" /></div>
-                      <div className="min-w-0"><div className="truncate font-mono text-[13px] font-semibold text-white/90">,{c.name}</div><div className={`mt-1 text-[9px] uppercase tracking-[0.15em] ${isLastFm ? "text-[#ff5a64]/80" : "text-white/25"}`}>{c.category}</div></div>
+                <article key={key} className={`command-detail-card group ${isLastFm ? "is-lastfm" : ""}`}>
+                  <div className="command-detail-top">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <div className={`mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-xl border ${isLastFm ? "border-[#d9232e]/25 bg-[#d9232e]/10 text-[#ff5a64]" : "border-white/10 bg-white/[0.04] text-white/55"}`}><Icon className="h-4 w-4" /></div>
+                      <div className="min-w-0">
+                        <div className="font-mono text-[15px] font-semibold tracking-[-0.02em] text-white">{c.name}</div>
+                        <p className="mt-2 text-sm leading-6 text-white/48">{c.description}</p>
+                      </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 translate-x-1 text-white/15 opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:text-white/45 group-hover:opacity-100" />
+                    <button type="button" onClick={() => copyCommand(c.usage, key)} aria-label={`Copy ${c.name} command`} title={isCopied ? "Copied" : "Copy command"} className="command-copy-button">
+                      {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </button>
                   </div>
-                  <p className="relative mt-5 min-h-[48px] text-sm leading-6 text-white/55">{c.description}</p>
-                  <div className="relative mt-5 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-4">
-                    <span className="rounded-lg border border-white/[0.07] bg-black/20 px-2.5 py-1.5 font-mono text-[10px] text-white/38">{c.usage}</span>
-                    {isLastFm && "permission" in c && c.permission && c.permission !== "None" ? <span className="rounded-full border border-[#d9232e]/25 bg-[#d9232e]/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#ff7a82]">{c.permission}</span> : null}
+
+                  <div className="command-detail-divider" />
+
+                  <div className="command-detail-meta">
+                    <div>
+                      <div className="command-detail-label">Arguments</div>
+                      <div className="mt-3 flex min-h-7 flex-wrap gap-2">
+                        {args.length ? args.map((arg, index) => <span key={`${arg}-${index}`} className="command-argument-chip">{arg}</span>) : <span className="text-xs text-white/38">none</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="command-detail-label">Permissions</div>
+                      <div className="mt-3"><span className={`command-permission-chip ${permission === "None" ? "is-none" : ""}`}>{permission}</span></div>
+                    </div>
+                  </div>
+
+                  <div className="command-usage-row">
+                    <span className="font-mono text-[11px] text-white/36">{c.usage}</span>
+                    <span className={`text-[9px] uppercase tracking-[0.14em] ${isLastFm ? "text-[#ff5a64]/75" : "text-white/22"}`}>{c.category}</span>
                   </div>
                 </article>
               );
