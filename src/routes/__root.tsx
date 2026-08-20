@@ -12,7 +12,9 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import polishCss from "../site-polish.css?url";
 import interactionsCss from "../interactions.css?url";
+import categoryRailCss from "../category-rail.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { CategoryRailEnhancer } from "../components/CategoryRailEnhancer";
 
 const WARE_LOGO = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
 
@@ -108,6 +110,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "stylesheet", href: polishCss },
       { rel: "stylesheet", href: interactionsCss },
+      { rel: "stylesheet", href: categoryRailCss },
     ],
   }),
   shellComponent: RootShell,
@@ -135,6 +138,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <CategoryRailEnhancer />
       <Outlet />
     </QueryClientProvider>
   );
