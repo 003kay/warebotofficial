@@ -26,6 +26,7 @@ export function Footer() {
             <div className="mt-6 flex flex-col gap-4 text-lg text-white/45">
               <Link to="/terms" className="transition-colors hover:text-white">Terms of Service</Link>
               <Link to="/privacy" className="transition-colors hover:text-white">Privacy Policy</Link>
+              <Link to="/refunds" className="transition-colors hover:text-white">Refund Policy</Link>
             </div>
           </div>
         </div>
