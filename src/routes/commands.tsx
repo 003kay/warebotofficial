@@ -39,7 +39,7 @@ import {
   ChevronRight,
   SlidersHorizontal,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
@@ -480,7 +480,7 @@ function CategoryButton({
   );
 }
 
-function MetaBlock({ label, children }: { label: string; children: React.ReactNode }) {
+function MetaBlock({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
       <div className="mb-2 text-[9px] font-medium uppercase tracking-[0.12em] text-white/22">{label}</div>
