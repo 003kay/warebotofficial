@@ -70,19 +70,6 @@ export const referenceCommandCategories = [
     ],
   },
   {
-    slug: "soundcloud",
-    name: "SoundCloud",
-    description: "Search SoundCloud and publish new-upload feeds.",
-    commands: [
-      cmd("soundcloud", "Search a query on SoundCloud", ["query"]),
-      cmd("soundcloud remove", "Remove feed for new SoundCloud posts", ["channel", "username"], "Manage Channels"),
-      cmd("soundcloud message", "Set a message for SoundCloud posts", ["username", "message"], "Manage Channels"),
-      cmd("soundcloud message view", "View SoundCloud message for new posts", ["username"], "Manage Channels"),
-      cmd("soundcloud list", "List all SoundCloud feeds", [], "Manage Channels"),
-      cmd("soundcloud add", "Add a feed for new SoundCloud posts", ["channel", "username"], "Manage Channels"),
-    ],
-  },
-  {
     slug: "twitch",
     name: "Twitch",
     description: "Profile lookups and live-stream notifications.",
@@ -132,19 +119,6 @@ export const referenceCommandCategories = [
       cmd("twitter message", "Set a message for new tweets", ["handle", "message"], "Manage Channels"),
       cmd("twitter message view", "View Twitter message for new tweets", ["handle"], "Manage Channels"),
       cmd("twitter list", "View a list of every Twitter feed", [], "Manage Channels"),
-    ],
-  },
-  {
-    slug: "reddit",
-    name: "Reddit",
-    description: "Subreddit lookups and new-post streams.",
-    commands: [
-      cmd("subreddit", "Check a subreddit or set up a subreddit stream", ["name"]),
-      cmd("subreddit remove", "Remove a stream for a subreddit from a channel", ["channel", "name"], "Manage Guild"),
-      cmd("subreddit message", "Set a message when subreddit posts are sent", ["name", "message"], "Manage Guild"),
-      cmd("subreddit message view", "View current subreddit message", ["name"], "Manage Guild"),
-      cmd("subreddit add", "Stream a subreddit's posts into a channel", ["channel", "name"], "Manage Guild"),
-      cmd("subreddit list", "View a list of every existing subreddit stream", [], "Manage Guild"),
     ],
   },
   {
