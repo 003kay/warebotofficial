@@ -1,16 +1,123 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Music2, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, Check, ShieldCheck, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
 
 export const Route = createFileRoute("/authorized")({
-  head: () => ({ meta: [{ title: "Last.fm Connected — ware" }, { name: "description", content: "Your Last.fm account is now connected to Ware." }] }),
+  head: () => ({
+    meta: [
+      { title: "Authorized — ware" },
+      { name: "description", content: "Your account has been securely connected to Ware." },
+    ],
+  }),
   component: AuthorizedPage,
 });
 
-function LastFmMark() { return <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-[24px] border border-[#ff3a45]/30 bg-[#d9232e] shadow-[0_0_60px_-12px_rgba(217,35,46,.9)]"><div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.25),transparent_42%)]"/><span className="relative -translate-y-[1px] text-[20px] font-black tracking-[-0.08em] text-white">last.fm</span></div> }
+function WareMark() {
+  return (
+    <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.045] shadow-[0_0_70px_-18px_rgba(255,255,255,.28)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.16),transparent_44%)]" />
+      <span className="relative text-2xl font-black tracking-[-0.08em] text-white">W</span>
+    </div>
+  );
+}
 
 function AuthorizedPage() {
-  return <div className="relative min-h-screen overflow-hidden bg-[#050505] text-white"><Starfield/><div className="pointer-events-none absolute left-1/2 top-24 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-[#d9232e]/[0.08] blur-[140px]"/><Navbar/><main className="relative z-10 mx-auto flex min-h-[78vh] max-w-6xl items-center px-5 py-14 md:px-8 md:py-20"><section className="relative w-full overflow-hidden rounded-[36px] border border-white/[0.09] bg-[#0a0a0c]/90 shadow-[0_50px_160px_-70px_rgba(0,0,0,.95)] backdrop-blur-xl"><div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#ff3a45]/70 to-transparent"/><div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#d9232e]/10 blur-3xl"/><div className="grid lg:grid-cols-[1.15fr_.85fr]"><div className="relative p-8 md:p-12 lg:p-14"><div className="flex items-center gap-4"><LastFmMark/><div><div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.26em] text-white/35"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.9)]"/>Authorization complete</div><p className="mt-2 text-sm text-white/45">Last.fm × Ware</p></div></div><h1 className="mt-10 max-w-3xl text-5xl font-black tracking-[-0.065em] md:text-7xl">Your music is<span className="block bg-gradient-to-r from-white via-white to-white/45 bg-clip-text text-transparent">connected.</span></h1><p className="mt-6 max-w-2xl text-base leading-7 text-white/48 md:text-lg md:leading-8">Your Last.fm account is linked to Ware. Now Playing, recent tracks, listener boards, and your listening statistics are ready to use in Discord.</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><Link to="/commands" search={{category:"lastfm"}} className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-bold text-black transition hover:-translate-y-0.5 hover:bg-white/90">Explore Last.fm commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5"/></Link><Link to="/" className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.035] px-6 py-3.5 text-sm font-semibold text-white/68 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.055] hover:text-white">Return to Ware</Link></div><p className="mt-6 text-xs text-white/28">You can close this tab and return to Discord at any time.</p></div><div className="relative border-t border-white/[0.07] bg-white/[0.018] p-8 md:p-10 lg:border-l lg:border-t-0 lg:p-12"><div className="rounded-[28px] border border-white/[0.08] bg-black/30 p-6 md:p-7"><div className="flex items-center justify-between gap-4"><div><p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/28">Connection status</p><p className="mt-2 text-xl font-bold tracking-[-0.03em]">Ready in Discord</p></div><div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10"><Check className="h-6 w-6 text-emerald-300"/></div></div><div className="mt-7 space-y-3"><div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#d9232e]/15 text-[#ff5a64]"><Music2 className="h-4 w-4"/></div><div><p className="text-sm font-semibold">Live scrobbles</p><p className="mt-0.5 text-xs text-white/35">Use <span className="font-mono text-white/55">,lastfm now</span> for your current track.</p></div></div><div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-white/70"><Sparkles className="h-4 w-4"/></div><div><p className="text-sm font-semibold">Listening statistics</p><p className="mt-0.5 text-xs text-white/35">Top artists, albums, tracks, streaks, and more.</p></div></div><div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-white/70"><ShieldCheck className="h-4 w-4"/></div><div><p className="text-sm font-semibold">Secure connection</p><p className="mt-0.5 text-xs text-white/35">Disconnect whenever you want with <span className="font-mono text-white/55">,lastfm logout</span>.</p></div></div></div></div><div className="mt-5 flex items-center justify-between rounded-2xl border border-[#d9232e]/15 bg-[#d9232e]/[0.055] px-5 py-4"><div><p className="text-xs font-semibold text-white/75">Last.fm connected</p><p className="mt-1 text-[11px] text-white/32">Ware will sync your account automatically.</p></div><div className="h-2.5 w-2.5 rounded-full bg-[#ff3a45] shadow-[0_0_18px_rgba(255,58,69,.9)]"/></div></div></div></section></main><Footer/></div>;
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
+      <Starfield />
+      <div className="pointer-events-none absolute left-1/2 top-20 h-[560px] w-[940px] -translate-x-1/2 rounded-full bg-white/[0.035] blur-[150px]" />
+      <Navbar />
+
+      <main className="relative z-10 mx-auto flex min-h-[78vh] max-w-6xl items-center px-5 py-14 md:px-8 md:py-20">
+        <section className="relative w-full overflow-hidden rounded-[36px] border border-white/[0.09] bg-[#0a0a0c]/90 shadow-[0_50px_160px_-70px_rgba(0,0,0,.95)] backdrop-blur-xl">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+          <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/[0.04] blur-3xl" />
+
+          <div className="grid lg:grid-cols-[1.15fr_.85fr]">
+            <div className="relative p-8 md:p-12 lg:p-14">
+              <div className="flex items-center gap-4">
+                <WareMark />
+                <div>
+                  <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.26em] text-white/35">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.9)]" />
+                    Authorization complete
+                  </div>
+                  <p className="mt-2 text-sm text-white/45">Connected with Ware</p>
+                </div>
+              </div>
+
+              <h1 className="mt-10 max-w-3xl text-5xl font-black tracking-[-0.065em] md:text-7xl">
+                You&apos;re
+                <span className="block bg-gradient-to-r from-white via-white to-white/45 bg-clip-text text-transparent">authorized.</span>
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-base leading-7 text-white/48 md:text-lg md:leading-8">
+                Your authorization was completed successfully. Ware can now use the connection you just approved without tying this page to any one service.
+              </p>
+
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <Link to="/commands" className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-bold text-black transition hover:-translate-y-0.5 hover:bg-white/90">
+                  Explore commands
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link to="/" className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.035] px-6 py-3.5 text-sm font-semibold text-white/68 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.055] hover:text-white">
+                  Return to Ware
+                </Link>
+              </div>
+
+              <p className="mt-6 text-xs text-white/28">You can close this tab and return to Discord at any time.</p>
+            </div>
+
+            <div className="relative border-t border-white/[0.07] bg-white/[0.018] p-8 md:p-10 lg:border-l lg:border-t-0 lg:p-12">
+              <div className="rounded-[28px] border border-white/[0.08] bg-black/30 p-6 md:p-7">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/28">Authorization status</p>
+                    <p className="mt-2 text-xl font-bold tracking-[-0.03em]">Ready in Discord</p>
+                  </div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10">
+                    <Check className="h-6 w-6 text-emerald-300" />
+                  </div>
+                </div>
+
+                <div className="mt-7 space-y-3">
+                  <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-white/70">
+                      <Sparkles className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">Connection active</p>
+                      <p className="mt-0.5 text-xs text-white/35">The service you approved is now available to Ware.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-white/70">
+                      <ShieldCheck className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">Secure authorization</p>
+                      <p className="mt-0.5 text-xs text-white/35">Only permissions approved during authorization are available.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 flex items-center justify-between rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.045] px-5 py-4">
+                <div>
+                  <p className="text-xs font-semibold text-white/75">Authorization successful</p>
+                  <p className="mt-1 text-[11px] text-white/32">Return to Discord and continue using Ware.</p>
+                </div>
+                <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,.8)]" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
 }
