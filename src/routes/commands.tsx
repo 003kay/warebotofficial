@@ -343,46 +343,37 @@ function CommandsPage() {
               const isCopied = copied === key;
 
               return (
-                <article key={key} className="group flex min-h-[278px] flex-col overflow-hidden rounded-[22px] border border-white/[0.075] bg-[#0d0f0f]/92 transition duration-200 hover:-translate-y-1 hover:border-white/[0.14] hover:bg-[#101212]">
-                  <div className="flex min-h-[118px] items-start justify-between gap-4 p-5">
+                <article key={key} className="group overflow-hidden rounded-[18px] border border-white/[0.095] bg-[#0d0f0f]/96 transition duration-200 hover:border-white/[0.16] hover:bg-[#101212]">
+                  <div className="flex min-h-[92px] items-start justify-between gap-4 px-5 py-5">
                     <div className="min-w-0">
-                      <div className="text-[17px] font-semibold tracking-[-0.025em] text-white/92">{command.name}</div>
-                      <p className="mt-3 text-xs leading-5 text-white/42">{command.description}</p>
+                      <div className="text-[16px] font-semibold tracking-[-0.02em] text-white/95">{command.name}</div>
+                      <p className="mt-2 text-[12px] leading-[1.55] text-white/45">{command.description}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => copyCommand(command.usage, key)}
                       title={isCopied ? "Copied" : "Copy command"}
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-white/32 transition hover:bg-white/[0.055] hover:text-white"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-white/38 transition hover:bg-white/[0.055] hover:text-white"
                     >
                       {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </button>
                   </div>
 
-                  <div className="border-t border-white/[0.055] px-5 py-4">
-                    <div className="text-[10px] lowercase tracking-[0.05em] text-white/48">arguments</div>
-                    <div className="mt-3 flex min-h-7 flex-wrap gap-2">
+                  <div className="border-t border-white/[0.07] px-5 py-4">
+                    <div className="text-[11px] font-medium lowercase text-white/48">arguments</div>
+                    <div className="mt-2.5 flex min-h-6 flex-wrap gap-2">
                       {args.length ? args.map((arg, argIndex) => (
-                        <span key={`${arg}-${argIndex}`} className="rounded-lg bg-white/[0.065] px-2.5 py-1.5 text-[10px] italic text-white/62">{arg}</span>
-                      )) : <span className="text-[10px] text-white/36">none</span>}
+                        <span key={`${arg}-${argIndex}`} className="rounded-md bg-white/[0.065] px-2.5 py-1 text-[10px] italic text-white/68">{arg}</span>
+                      )) : <span className="text-[10px] text-white/42">none</span>}
                     </div>
 
-                    <div className="mt-4 text-[10px] lowercase tracking-[0.05em] text-white/48">permissions</div>
-                    <div className="mt-3">
+                    <div className="mt-4 text-[11px] font-medium lowercase text-white/48">permissions</div>
+                    <div className="mt-2.5 min-h-6">
                       {permission === "None" || permission === "none"
-                        ? <span className="text-[10px] text-white/36">none</span>
-                        : <span className="rounded-lg bg-white/[0.065] px-2.5 py-1.5 text-[10px] text-white/68">{permission}</span>}
+                        ? <span className="text-[10px] text-white/42">none</span>
+                        : <span className="inline-flex rounded-md bg-white/[0.065] px-2.5 py-1 text-[10px] text-white/70">{permission}</span>}
                     </div>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={() => copyCommand(command.usage, key)}
-                    className="mt-auto flex items-center justify-between border-t border-white/[0.055] px-5 py-3 font-mono text-[10px] text-white/28 transition hover:bg-white/[0.025] hover:text-white/55"
-                  >
-                    <span className="truncate">{command.usage}</span>
-                    <span className="ml-3 shrink-0">{isCopied ? "copied" : "copy"}</span>
-                  </button>
                 </article>
               );
             })}
