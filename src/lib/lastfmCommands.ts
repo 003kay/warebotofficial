@@ -1,3 +1,5 @@
+import { referenceCommandCategories } from "./referenceCommands";
+
 export type WareCommandDoc = {
   name: string;
   description: string;
@@ -84,3 +86,33 @@ export const lastFmCategory = {
     lfm("spotifytrack", "Finds track results from the Spotify API", ",spotifytrack (track)", "None"),
   ],
 };
+
+const spotifyCategory = {
+  slug: "spotify",
+  name: "Spotify",
+  description: "Connect your Spotify account, control playback, switch devices, and view listening stats.",
+  commands: [
+    lfm("spotify", "Control your music on Spotify through commands or search for a track. Get started with spotify login to connect your account.", ",spotify (track)", "None"),
+    lfm("spotify unlike", "Unlike your current playing song on Spotify", ",spotify unlike", "None"),
+    lfm("spotify device", "Change the device that you're listening to Spotify with", ",spotify device", "None"),
+    lfm("spotify device list", "List all current devices connected to your Spotify account", ",spotify device list", "None"),
+    lfm("spotify repeat", "Repeat the current song", ",spotify repeat (mode)", "None"),
+    lfm("spotify seek", "Seek to position in current song", ",spotify seek (seconds)", "None"),
+    lfm("spotify queue", "Queue a song", ",spotify queue (query)", "None"),
+    lfm("spotify play", "Immediately skip to the requested song", ",spotify play (query)", "None"),
+    lfm("spotify previous", "Skip to the previous song", ",spotify previous", "None"),
+    lfm("spotify resume", "Resume the current song", ",spotify resume", "None"),
+    lfm("spotify pause", "Pause the current song", ",spotify pause", "None"),
+    lfm("spotify shuffle", "Toggle playback shuffle", ",spotify shuffle (option)", "None"),
+    lfm("spotify login", "Grant Ware access to your Spotify account", ",spotify login", "None"),
+    lfm("spotify next", "Skip to the next song", ",spotify next", "None"),
+    lfm("spotify like", "Like your current playing song on Spotify", ",spotify like", "None"),
+    lfm("spotify vc", "Play your current track in a voice channel", ",spotify vc", "None"),
+    lfm("spotify logout", "Disconnect your Spotify from our servers", ",spotify logout", "None"),
+    lfm("spotify toptracks", "Show top tracks for the specified time frame", ",spotify toptracks (duration)", "None"),
+    lfm("spotify topartists", "Show top artists for the specified time frame", ",spotify topartists (duration)", "None"),
+    lfm("spotify volume", "Adjust current player volume", ",spotify volume (percent)", "None"),
+  ],
+};
+
+(referenceCommandCategories as unknown as Array<unknown>).push(spotifyCategory);
