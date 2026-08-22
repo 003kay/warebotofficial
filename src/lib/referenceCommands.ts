@@ -171,4 +171,23 @@ export const referenceCommandCategories = [
       cmd("steal-sticker", "Copy a Discord sticker into the current server from a Discord message link", ["message link"], "Manage Expressions"),
     ],
   },
+  {
+    slug: "miscellaneous",
+    name: "Miscellaneous",
+    description: "Embed creation, management, and related message tools.",
+    commands: [
+      cmd("embed", "Manage and create new embeds easily"),
+      cmd("embed list", "List all available embeds"),
+      cmd("embed copy", "Copy an existing embed's code for creating an embed", ["embed"]),
+      cmd("embed delete", "Delete a stored embed", ["embed"]),
+      cmd("embed preview", "Send an existing embed", ["embed"]),
+      cmd("embed create", "Start customization for an embed"),
+      cmd("editembed", "Edit an embed you created", ["embed"]),
+      cmd("createembed", "Create your own embed"),
+      cmd("embedcode", "Copy an existing embed's code for creating an embed", ["embed"]),
+      cmd("purge embeds", "Purge embeds from chat", ["amount"], "Manage Messages"),
+      cmd("pinterest embeds", "Enable or disable embeds for new pins", ["setting"], "Manage Guild"),
+      cmd("reposter embed", "Enable or disable embed attached to media", ["setting"], "Manage Guild"),
+    ],
+  },
 ] as const;
