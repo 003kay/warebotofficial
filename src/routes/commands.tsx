@@ -4,7 +4,7 @@ import {
   Ticket, Bot, Sparkles, Gamepad2, Wrench, Gift, Crown, User, Server, Image,
   ScrollText, WalletCards, Settings2, Radio, Volume2, Command as CommandIcon,
   Copy, Check, ChevronLeft, ChevronRight, Bitcoin, ListChecks, Timer, Youtube,
-  Twitch, Hash, MessageCircle, Gamepad, BellRing,
+  Twitch, Cloud, Hash, MessageCircle, Gamepad, BellRing,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
@@ -87,10 +87,12 @@ const iconBySlug: Record<string, typeof Layers3> = {
   snipe: MessageCircle,
   counters: ListChecks,
   timers: Timer,
+  soundcloud: Cloud,
   twitch: Twitch,
   youtube: Youtube,
   logs: Hash,
   twitter: Hash,
+  reddit: MessageCircle,
   fortnite: Gamepad,
   "bump-reminder": BellRing,
 };
@@ -153,27 +155,28 @@ function CommandsPage() {
     const rail = railRef.current;
     if (!rail) return;
 
-    const update = () => {
-      setCanScrollLeft(rail.scrollLeft > 6);
-      setCanScrollRight(rail.scrollLeft + rail.clientWidth < rail.scrollWidth - 6);
+    const updateScrollState = () => {
+      setCanScrollLeft(rail.scrollLeft > 8);
+      setCanScrollRight(rail.scrollLeft + rail.clientWidth < rail.scrollWidth - 8);
     };
 
     const onWheel = (event: WheelEvent) => {
       if (rail.scrollWidth <= rail.clientWidth) return;
-      const amount = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+      const amount = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
       if (!amount) return;
       event.preventDefault();
-      rail.scrollBy({ left: amount * 1.2, behavior: "auto" });
+      rail.scrollLeft += amount;
     };
 
-    update();
+    updateScrollState();
     rail.addEventListener("wheel", onWheel, { passive: false });
-    rail.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    rail.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
     return () => {
       rail.removeEventListener("wheel", onWheel);
-      rail.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      rail.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
     };
   }, []);
 
@@ -181,7 +184,7 @@ function CommandsPage() {
     const rail = railRef.current;
     if (!rail) return;
     rail.scrollBy({
-      left: direction === "left" ? -rail.clientWidth * 0.82 : rail.clientWidth * 0.82,
+      left: direction === "left" ? -Math.max(420, rail.clientWidth * 0.78) : Math.max(420, rail.clientWidth * 0.78),
       behavior: "smooth",
     });
   };
@@ -197,85 +200,88 @@ function CommandsPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#060707] text-white">
+    <div className="relative min-h-screen overflow-hidden bg-[#070808] text-white">
       <Starfield />
-      <div className="pointer-events-none fixed inset-x-0 top-0 h-[560px] bg-[radial-gradient(circle_at_50%_-15%,rgba(255,255,255,.07),transparent_58%)]" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 h-[560px] bg-[radial-gradient(circle_at_50%_-10%,rgba(255,255,255,.06),transparent_58%)]" />
       <Navbar />
 
-      <main className="relative z-10 mx-auto max-w-[1500px] px-4 pb-28 pt-7 sm:px-6 lg:px-9">
+      <main className="relative z-10 mx-auto max-w-[1480px] px-5 pb-24 pt-8 md:px-9">
         <div className="flex items-center justify-between gap-4">
-          <Link to="/" className="group inline-flex items-center gap-2 text-xs font-medium text-white/35 transition hover:text-white/85">
-            <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" /> Back to Ware
+          <Link to="/" className="group inline-flex items-center gap-2 text-sm text-white/38 transition hover:text-white">
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" /> Home
           </Link>
-          <div className="hidden items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/25 sm:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80 shadow-[0_0_12px_rgba(52,211,153,.7)]" />
+          <div className="rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 font-mono text-[10px] text-white/35">
             {WARE_COMMAND_TOTAL.toLocaleString()} command paths
           </div>
         </div>
 
-        <section className="mt-9 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-end">
-          <div>
-            <div className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.23em] text-white/30">
-              <CommandIcon className="h-3.5 w-3.5" /> Ware command center
+        <section className="mt-8 overflow-hidden rounded-[32px] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012))] p-5 shadow-[0_40px_120px_-75px_rgba(255,255,255,.18)] backdrop-blur-xl md:p-8">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 text-[10px] uppercase tracking-[0.19em] text-white/32">
+                <CommandIcon className="h-3.5 w-3.5" /> command library
+              </div>
+              <h1 className="mt-4 text-5xl font-bold tracking-[-0.065em] md:text-7xl">Commands</h1>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-white/38">Find what you need fast. Browse the full Ware command system by category, alias, or usage.</p>
             </div>
-            <h1 className="mt-4 text-[clamp(3.6rem,8vw,7.4rem)] font-black leading-[.83] tracking-[-0.075em]">Commands</h1>
-            <p className="mt-6 max-w-2xl text-sm leading-7 text-white/38 md:text-base">
-              Search the full Ware command system, browse by category, and copy any command in one click.
-            </p>
+
+            <div className="flex min-w-[210px] items-center gap-3 rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-3.5 shadow-inner">
+              <div className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/65">
+                <ActiveIcon className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="text-[9px] uppercase tracking-[0.15em] text-white/25">Browsing</div>
+                <div className="mt-1 text-sm font-medium">{activeCategory?.name ?? "All Commands"}</div>
+                <div className="mt-0.5 font-mono text-[10px] text-white/28">{displayedCount.toLocaleString()} commands</div>
+              </div>
+            </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[26px] border border-white/[0.08] bg-white/[0.025] p-5 backdrop-blur-xl">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-            <div className="flex items-center gap-4">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-white/[0.09] bg-white/[0.04] text-white/75">
-                <ActiveIcon className="h-[18px] w-[18px]" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/25">Currently browsing</p>
-                <p className="mt-1 truncate text-base font-semibold tracking-[-0.02em]">{activeCategory?.name ?? "All commands"}</p>
-              </div>
-              <div className="ml-auto rounded-full border border-white/[0.08] bg-black/25 px-3 py-1.5 font-mono text-[10px] text-white/35">
-                {displayedCount.toLocaleString()}
-              </div>
-            </div>
+          <div className="mt-7 flex items-center gap-3 rounded-[18px] border border-white/[0.08] bg-black/25 px-4 py-4 transition focus-within:border-white/[0.18] focus-within:bg-black/35">
+            <Search className="h-4 w-4 text-white/30" />
+            <input
+              value={query}
+              onChange={event => setQuery(event.target.value)}
+              placeholder="Search commands, aliases, or usage..."
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-white/20"
+            />
+            {query ? <span className="rounded-lg bg-white/[0.05] px-2 py-1 font-mono text-[9px] text-white/35">{shown.length} results</span> : null}
           </div>
         </section>
 
-        <div className="mt-10 flex items-center gap-3 rounded-[22px] border border-white/[0.09] bg-black/30 px-5 py-4 shadow-[0_18px_55px_-42px_rgba(0,0,0,.95)] backdrop-blur-xl transition focus-within:border-white/[0.18] focus-within:bg-black/45">
-          <Search className="h-4 w-4 shrink-0 text-white/26" />
-          <input
-            value={query}
-            onChange={event => setQuery(event.target.value)}
-            placeholder="Search commands, aliases, or usage..."
-            className="min-w-0 flex-1 bg-transparent text-sm text-white/90 outline-none placeholder:text-white/20"
-          />
-          {query ? <span className="rounded-full border border-white/[0.07] bg-white/[0.035] px-2.5 py-1 font-mono text-[9px] text-white/35">{shown.length} results</span> : null}
-        </div>
-
         <section className="sticky top-3 z-30 mt-5">
-          <div className="relative rounded-[22px] border border-white/[0.08] bg-[#090a0a]/94 px-2 py-2 shadow-[0_24px_80px_-45px_rgba(0,0,0,.95)] backdrop-blur-2xl">
-            <div className="flex items-center gap-1.5">
+          <div className="relative overflow-hidden rounded-[24px] border border-white/[0.09] bg-[#0a0b0b]/92 p-2 shadow-[0_24px_70px_-42px_rgba(0,0,0,.9)] backdrop-blur-2xl">
+            <div className={`pointer-events-none absolute inset-y-0 left-14 z-10 w-16 bg-gradient-to-r from-[#0a0b0b] to-transparent transition-opacity ${canScrollLeft ? "opacity-100" : "opacity-0"}`} />
+            <div className={`pointer-events-none absolute inset-y-0 right-14 z-10 w-16 bg-gradient-to-l from-[#0a0b0b] to-transparent transition-opacity ${canScrollRight ? "opacity-100" : "opacity-0"}`} />
+
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => moveRail("left")}
                 disabled={!canScrollLeft}
+                className="relative z-20 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-white/[0.035] text-white/55 transition hover:border-white/[0.16] hover:bg-white/[0.07] hover:text-white disabled:cursor-default disabled:opacity-25"
                 aria-label="Scroll categories left"
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white/40 transition hover:bg-white/[0.06] hover:text-white disabled:opacity-20"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
 
-              <div ref={railRef} className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div className="flex w-max min-w-full items-center">
+              <div
+                ref={railRef}
+                className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                <div className="flex w-max min-w-full items-center gap-2 py-0.5">
                   <button
                     type="button"
                     onClick={() => setCategory("all")}
-                    className={`group relative flex h-12 items-center gap-2.5 px-4 text-[11px] font-semibold transition ${category === "all" ? "text-white" : "text-white/38 hover:text-white/80"}`}
+                    className={`group relative flex min-w-[112px] items-center gap-3 rounded-[17px] border px-3.5 py-2.5 text-left transition-all duration-200 ${category === "all" ? "border-white/[0.22] bg-white text-black shadow-[0_10px_30px_-18px_rgba(255,255,255,.65)]" : "border-white/[0.07] bg-white/[0.022] text-white/55 hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-white/[0.055] hover:text-white"}`}
                   >
-                    <Layers3 className="h-3.5 w-3.5" />
-                    <span>All</span>
-                    <span className={`rounded-full px-2 py-0.5 font-mono text-[8px] ${category === "all" ? "bg-white text-black" : "bg-white/[0.045] text-white/30"}`}>{WARE_COMMAND_TOTAL.toLocaleString()}</span>
-                    {category === "all" ? <span className="absolute inset-x-3 bottom-0 h-[2px] rounded-full bg-white" /> : null}
+                    <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl border ${category === "all" ? "border-black/10 bg-black/[0.07]" : "border-white/[0.08] bg-white/[0.035]"}`}>
+                      <Layers3 className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[11px] font-semibold">All</span>
+                      <span className={`mt-0.5 block font-mono text-[9px] ${category === "all" ? "text-black/45" : "text-white/28"}`}>{WARE_COMMAND_TOTAL.toLocaleString()}</span>
+                    </span>
                   </button>
 
                   {categories.map(group => {
@@ -286,12 +292,16 @@ function CommandsPage() {
                         key={group.slug}
                         type="button"
                         onClick={() => setCategory(group.slug)}
-                        className={`group relative flex h-12 items-center gap-2.5 px-4 text-[11px] font-semibold transition ${selected ? "text-white" : "text-white/38 hover:bg-white/[0.02] hover:text-white/80"}`}
+                        className={`group relative flex min-w-[126px] items-center gap-3 rounded-[17px] border px-3.5 py-2.5 text-left transition-all duration-200 ${selected ? "border-white/[0.18] bg-white/[0.10] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06),0_12px_30px_-24px_rgba(255,255,255,.35)]" : "border-white/[0.065] bg-white/[0.018] text-white/48 hover:-translate-y-0.5 hover:border-white/[0.13] hover:bg-white/[0.05] hover:text-white/82"}`}
                       >
-                        <Icon className="h-3.5 w-3.5" />
-                        <span className="whitespace-nowrap">{group.name}</span>
-                        <span className={`rounded-full px-2 py-0.5 font-mono text-[8px] ${selected ? "bg-white text-black" : "bg-white/[0.045] text-white/28"}`}>{group.commands.length}</span>
-                        {selected ? <span className="absolute inset-x-3 bottom-0 h-[2px] rounded-full bg-white" /> : null}
+                        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl border transition ${selected ? "border-white/[0.13] bg-white/[0.08] text-white" : "border-white/[0.07] bg-white/[0.025] text-white/45 group-hover:text-white/75"}`}>
+                          <Icon className="h-3.5 w-3.5" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block max-w-[110px] truncate text-[11px] font-semibold">{group.name}</span>
+                          <span className="mt-0.5 block font-mono text-[9px] text-white/28">{group.commands.length} cmds</span>
+                        </span>
+                        {selected ? <span className="absolute inset-x-5 -bottom-[9px] h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" /> : null}
                       </button>
                     );
                   })}
@@ -302,8 +312,8 @@ function CommandsPage() {
                 type="button"
                 onClick={() => moveRail("right")}
                 disabled={!canScrollRight}
+                className="relative z-20 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/[0.08] bg-white/[0.035] text-white/55 transition hover:border-white/[0.16] hover:bg-white/[0.07] hover:text-white disabled:cursor-default disabled:opacity-25"
                 aria-label="Scroll categories right"
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white/40 transition hover:bg-white/[0.06] hover:text-white disabled:opacity-20"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -311,18 +321,21 @@ function CommandsPage() {
           </div>
         </section>
 
-        <section className="mt-8">
-          <div className="mb-5 flex items-end justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 text-sm font-semibold tracking-[-0.02em]">
-                <ActiveIcon className="h-4 w-4 text-white/50" /> {activeCategory?.name ?? "All commands"}
+        {activeCategory ? (
+          <div className="mt-6 flex items-center justify-between gap-4 rounded-[20px] border border-white/[0.06] bg-white/[0.018] px-4 py-3.5">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[0.075] bg-white/[0.025] text-white/55"><ActiveIcon className="h-4 w-4" /></div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium">{activeCategory.name}</div>
+                <div className="mt-0.5 truncate text-xs text-white/30">{activeCategory.description}</div>
               </div>
-              <p className="mt-1.5 text-xs text-white/28">{activeCategory?.description ?? "Every command currently available across Ware."}</p>
             </div>
-            <div className="hidden font-mono text-[10px] text-white/25 sm:block">{shown.length.toLocaleString()} visible</div>
+            <div className="shrink-0 rounded-lg bg-white/[0.04] px-2.5 py-1 font-mono text-[9px] text-white/30">{shown.length} commands</div>
           </div>
+        ) : null}
 
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <section className="mt-6">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {shown.map((command, index) => {
               const args = getArguments(command.usage);
               const permission = command.permission || "None";
@@ -330,76 +343,56 @@ function CommandsPage() {
               const isCopied = copied === key;
 
               return (
-                <article
-                  key={key}
-                  className="group relative overflow-hidden rounded-[22px] border border-white/[0.07] bg-[linear-gradient(150deg,rgba(255,255,255,.032),rgba(255,255,255,.012))] transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.14] hover:bg-[linear-gradient(150deg,rgba(255,255,255,.055),rgba(255,255,255,.018))] hover:shadow-[0_24px_80px_-46px_rgba(0,0,0,.95)]"
-                >
-                  <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition group-hover:opacity-100" />
-
-                  <div className="p-5 pb-4">
-                    <div className="flex items-start gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-[17px] font-semibold tracking-[-0.035em] text-white/94">{command.name}</h3>
-                          <span className="rounded-full border border-white/[0.06] bg-white/[0.025] px-2 py-0.5 text-[8px] uppercase tracking-[0.12em] text-white/25">{command.category}</span>
-                        </div>
-                        <p className="mt-2.5 min-h-10 text-[11px] leading-5 text-white/36">{command.description}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => copyCommand(command.usage, key)}
-                        title={isCopied ? "Copied" : "Copy command"}
-                        className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.025] text-white/28 transition hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-white"
-                      >
-                        {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                      </button>
+                <article key={key} className="group flex min-h-[278px] flex-col overflow-hidden rounded-[22px] border border-white/[0.075] bg-[#0d0f0f]/92 transition duration-200 hover:-translate-y-1 hover:border-white/[0.14] hover:bg-[#101212]">
+                  <div className="flex min-h-[118px] items-start justify-between gap-4 p-5">
+                    <div className="min-w-0">
+                      <div className="text-[17px] font-semibold tracking-[-0.025em] text-white/92">{command.name}</div>
+                      <p className="mt-3 text-xs leading-5 text-white/42">{command.description}</p>
                     </div>
-
                     <button
                       type="button"
                       onClick={() => copyCommand(command.usage, key)}
-                      className="mt-4 flex w-full items-center justify-between gap-3 rounded-[14px] border border-white/[0.065] bg-black/30 px-3.5 py-3 text-left transition hover:border-white/[0.12] hover:bg-black/45"
+                      title={isCopied ? "Copied" : "Copy command"}
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-white/32 transition hover:bg-white/[0.055] hover:text-white"
                     >
-                      <code className="min-w-0 truncate font-mono text-[11px] text-white/62">{command.usage}</code>
-                      <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.12em] text-white/22">{isCopied ? "copied" : "copy"}</span>
+                      {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 border-t border-white/[0.055]">
-                    <div className="min-w-0 border-r border-white/[0.055] p-4">
-                      <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/23">Arguments</div>
-                      <div className="mt-2.5 flex min-h-6 flex-wrap gap-1.5">
-                        {args.length ? args.map((arg, argIndex) => (
-                          <span key={`${arg}-${argIndex}`} className="rounded-lg border border-white/[0.055] bg-white/[0.035] px-2 py-1 text-[9px] italic text-white/48">{arg}</span>
-                        )) : <span className="text-[9px] text-white/27">none</span>}
-                      </div>
+                  <div className="border-t border-white/[0.055] px-5 py-4">
+                    <div className="text-[10px] lowercase tracking-[0.05em] text-white/48">arguments</div>
+                    <div className="mt-3 flex min-h-7 flex-wrap gap-2">
+                      {args.length ? args.map((arg, argIndex) => (
+                        <span key={`${arg}-${argIndex}`} className="rounded-lg bg-white/[0.065] px-2.5 py-1.5 text-[10px] italic text-white/62">{arg}</span>
+                      )) : <span className="text-[10px] text-white/36">none</span>}
                     </div>
 
-                    <div className="min-w-0 p-4">
-                      <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/23">Permissions</div>
-                      <div className="mt-2.5 min-h-6">
-                        {permission === "None" || permission === "none"
-                          ? <span className="text-[9px] text-white/27">none</span>
-                          : <span className="inline-flex max-w-full truncate rounded-lg border border-white/[0.055] bg-white/[0.035] px-2 py-1 text-[9px] text-white/48">{permission}</span>}
-                      </div>
+                    <div className="mt-4 text-[10px] lowercase tracking-[0.05em] text-white/48">permissions</div>
+                    <div className="mt-3">
+                      {permission === "None" || permission === "none"
+                        ? <span className="text-[10px] text-white/36">none</span>
+                        : <span className="rounded-lg bg-white/[0.065] px-2.5 py-1.5 text-[10px] text-white/68">{permission}</span>}
                     </div>
                   </div>
 
-                  {command.example ? (
-                    <div className="border-t border-white/[0.05] px-4 py-3 text-[9px] text-white/22">
-                      <span className="block truncate font-mono">example: {command.example}</span>
-                    </div>
-                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => copyCommand(command.usage, key)}
+                    className="mt-auto flex items-center justify-between border-t border-white/[0.055] px-5 py-3 font-mono text-[10px] text-white/28 transition hover:bg-white/[0.025] hover:text-white/55"
+                  >
+                    <span className="truncate">{command.usage}</span>
+                    <span className="ml-3 shrink-0">{isCopied ? "copied" : "copy"}</span>
+                  </button>
                 </article>
               );
             })}
           </div>
 
           {!shown.length ? (
-            <div className="mt-8 rounded-[26px] border border-white/[0.075] bg-white/[0.018] px-6 py-20 text-center">
-              <Search className="mx-auto h-6 w-6 text-white/18" />
+            <div className="mt-8 rounded-[24px] border border-white/[0.075] bg-white/[0.02] px-6 py-16 text-center">
+              <Search className="mx-auto h-6 w-6 text-white/20" />
               <div className="mt-4 text-sm font-medium text-white/65">No commands found</div>
-              <div className="mt-1.5 text-xs text-white/25">Try another search or category.</div>
+              <div className="mt-1 text-xs text-white/28">Try another search or category.</div>
             </div>
           ) : null}
         </section>
