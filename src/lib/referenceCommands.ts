@@ -162,4 +162,13 @@ export const referenceCommandCategories = [
       cmd("bumpreminder message view", "View the current remind message", [], "Manage Channels"),
     ],
   },
+  {
+    slug: "utility",
+    name: "Utility",
+    description: "Useful server tools, expression copying, and general utilities.",
+    commands: [
+      cmd("steal", "Copy custom Discord emojis from other servers into the current server", ["emojis"], "Manage Expressions"),
+      cmd("steal-sticker", "Copy a Discord sticker into the current server from a reply or channel", ["channel"], "Manage Expressions"),
+    ],
+  },
 ] as const;
