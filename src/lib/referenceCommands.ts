@@ -70,6 +70,18 @@ export const referenceCommandCategories = [
     ],
   },
   {
+    slug: "kick",
+    name: "Kick",
+    description: "Kick.com livestream notifications and custom stream alert messages.",
+    commands: [
+      cmd("kick message", "Set a message for Kick stream notifications", ["username", "message"], "Manage Guild"),
+      cmd("kick message view", "View the configured message for a Kick streamer", ["username"], "Manage Guild"),
+      cmd("kick add", "Add Kick stream notifications to a Discord channel", ["channel", "username"], "Manage Guild"),
+      cmd("kick remove", "Remove Kick stream notifications from a Discord channel", ["channel", "username"], "Manage Guild"),
+      cmd("kick list", "View all Kick stream notifications configured in this server", [], "Manage Channels"),
+    ],
+  },
+  {
     slug: "twitch",
     name: "Twitch",
     description: "Profile lookups and live-stream notifications.",
@@ -248,7 +260,7 @@ export const referenceCommandCategories = [
   {
     slug: "miscellaneous",
     name: "Miscellaneous",
-    description: "Embed creation, management, and related message tools.",
+    description: "Embed creation, management, honeypot security, and related tools.",
     commands: [
       cmd("embed", "Manage and create new embeds easily"),
       cmd("embed list", "List all available embeds"),
@@ -262,6 +274,10 @@ export const referenceCommandCategories = [
       cmd("purge embeds", "Purge embeds from chat", ["amount"], "Manage Messages"),
       cmd("pinterest embeds", "Enable or disable embeds for new pins", ["setting"], "Manage Guild"),
       cmd("reposter embed", "Enable or disable embed attached to media", ["setting"], "Manage Guild"),
+      cmd("honeypot", "Set up a bait channel to catch spammers", [], "Administrator"),
+      cmd("honeypot list", "List all honeypot channels", [], "Administrator"),
+      cmd("honeypot remove", "Remove a honeypot channel", ["channel"], "Administrator"),
+      cmd("honeypot add", "Add a honeypot channel and choose the punishment", ["channel", "punishment"], "Administrator"),
     ],
   },
 ] as const;
