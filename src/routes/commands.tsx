@@ -4,7 +4,7 @@ import {
   Ticket, Bot, Sparkles, Gamepad2, Wrench, Gift, Crown, User, Server, Image,
   ScrollText, WalletCards, Settings2, Radio, Volume2, Command as CommandIcon,
   Copy, Check, ChevronLeft, ChevronRight, Bitcoin, ListChecks, Timer, Youtube,
-  Twitch, Hash, MessageCircle, Gamepad, BellRing, ArrowUpRight,
+  Twitch, Hash, MessageCircle, Gamepad, BellRing,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
@@ -386,9 +386,8 @@ function CommandsPage() {
                   </div>
 
                   {command.example ? (
-                    <div className="flex items-center justify-between border-t border-white/[0.05] px-4 py-3 text-[9px] text-white/22">
-                      <span className="truncate font-mono">example: {command.example}</span>
-                      <ArrowUpRight className="ml-3 h-3 w-3 shrink-0 opacity-0 transition group-hover:opacity-60" />
+                    <div className="border-t border-white/[0.05] px-4 py-3 text-[9px] text-white/22">
+                      <span className="block truncate font-mono">example: {command.example}</span>
                     </div>
                   ) : null}
                 </article>
