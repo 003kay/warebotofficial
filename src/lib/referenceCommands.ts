@@ -92,7 +92,7 @@ export const referenceCommandCategories = [
       cmd("youtube remove", "Disable post notifications for a channel", ["channel", "channelurl"], "Manage Guild"),
       cmd("youtube message", "Customize the message for YouTube notifications", ["channelurl", "message"], "Manage Guild"),
       cmd("youtube message view", "View YouTube message for new posts", ["channelurl"], "Manage Guild"),
-      cmd("youtube add", "Enable post notifications for a channel", ["channel", "channelurl"], "Manage Guild"),
+      cmd("youtube add", "Enable post notifications to a channel", ["channel", "channelurl"], "Manage Guild"),
     ],
   },
   {
@@ -168,7 +168,7 @@ export const referenceCommandCategories = [
     description: "Useful server tools, expression copying, and general utilities.",
     commands: [
       cmd("steal", "Copy custom Discord emojis from other servers into the current server", ["emojis"], "Manage Expressions"),
-      cmd("steal-sticker", "Copy a Discord sticker into the current server from a reply or channel", ["channel"], "Manage Expressions"),
+      cmd("steal-sticker", "Copy a Discord sticker into the current server from a Discord message link", ["message link"], "Manage Expressions"),
     ],
   },
 ] as const;
