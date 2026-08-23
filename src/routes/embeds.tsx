@@ -6,6 +6,11 @@ import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
 
 const WARE_AVATAR = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
+const DARK_PALETTE = [
+  "#f5f5f5", "#b85f86", "#a95f42", "#419c7d", "#6675aa", "#6854ad",
+  "#d8d8d8", "#b27691", "#4e57cf", "#9f3658", "#714050", "#65473b",
+  "#346e5d", "#404c78", "#493977", "#91415c", "#2d3138", "#15171b",
+];
 
 export const Route = createFileRoute("/embeds")({
   head: () => ({
@@ -35,12 +40,45 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (val
   );
 }
 
+function normalizedHex(value: string, fallback: string) {
+  const raw = value.trim();
+  const candidate = raw.startsWith("#") ? raw : `#${raw}`;
+  return /^#[0-9a-fA-F]{6}$/.test(candidate) ? candidate : fallback;
+}
+
+function ColorControl({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  const safe = normalizedHex(value, "#2a2d31");
+  return (
+    <div>
+      <label className="mb-2 block text-xs text-white/50">{label}</label>
+      <div className="rounded-2xl border border-white/[0.07] bg-white/[0.018] p-3.5">
+        <div className="flex items-center gap-3">
+          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-white/10" style={{ backgroundColor: safe }}>
+            <input aria-label={`${label} picker`} type="color" value={safe} onChange={e => onChange(e.target.value)} className="absolute inset-[-8px] h-16 w-16 cursor-pointer opacity-0" />
+          </div>
+          <div className="flex flex-1 items-center rounded-xl border border-white/[0.08] bg-[#111] px-3.5">
+            <span className="mr-1 text-sm text-white/35">#</span>
+            <input value={value.replace(/^#/, "")} maxLength={6} onChange={e => onChange(`#${e.target.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 6)}`)} className="w-full bg-transparent py-3 font-mono text-sm text-white outline-none" placeholder="2a2d31" />
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-9 gap-2 sm:grid-cols-12">
+          {DARK_PALETTE.map(swatch => (
+            <button key={swatch} type="button" onClick={() => onChange(swatch)} title={swatch} className={`aspect-square min-h-6 rounded-lg border transition hover:scale-105 ${safe.toLowerCase() === swatch.toLowerCase() ? "border-white/80 ring-2 ring-white/15" : "border-white/[0.07]"}`} style={{ backgroundColor: swatch }} />
+          ))}
+        </div>
+        <p className="mt-3 text-[11px] text-white/28">Click the large color square for the full color picker, use a preset, or enter an exact HEX value.</p>
+      </div>
+    </div>
+  );
+}
+
 function EmbedBuilderPage() {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
   const [color, setColor] = useState("#2a2d31");
+  const [color2, setColor2] = useState("#15171b");
   const [author, setAuthor] = useState("");
   const [authorIcon, setAuthorIcon] = useState("");
   const [thumbnail, setThumbnail] = useState("");
@@ -52,6 +90,8 @@ function EmbedBuilderPage() {
   const [buttons, setButtons] = useState<EmbedButton[]>([]);
   const [copied, setCopied] = useState(false);
 
+  const primary = normalizedHex(color, "#2a2d31");
+  const secondary = normalizedHex(color2, "#15171b");
   const isEmpty = !content && !title && !description && !url && !author && !authorIcon && !thumbnail && !image && !footer && !footerIcon && !timestamp && fields.length === 0 && buttons.length === 0;
 
   const generated = useMemo(() => {
@@ -60,7 +100,7 @@ function EmbedBuilderPage() {
     if (title) pieces.push(`$v{title: ${title}}`);
     if (description) pieces.push(`$v{description: ${description}}`);
     if (url) pieces.push(`$v{url: ${url}}`);
-    if (color) pieces.push(`$v{color: ${color}}`);
+    if (color) pieces.push(`$v{color: ${normalizedHex(color, "#2a2d31")}}`);
     if (author) pieces.push(`$v{author: ${author}}`);
     if (authorIcon) pieces.push(`$v{author_icon: ${authorIcon}}`);
     if (thumbnail) pieces.push(`$v{thumbnail: ${thumbnail}}`);
@@ -74,7 +114,7 @@ function EmbedBuilderPage() {
   }, [content, title, description, url, color, author, authorIcon, thumbnail, image, footer, footerIcon, timestamp, fields, buttons]);
 
   const clear = () => {
-    setContent(""); setTitle(""); setDescription(""); setUrl(""); setColor("#2a2d31");
+    setContent(""); setTitle(""); setDescription(""); setUrl(""); setColor("#2a2d31"); setColor2("#15171b");
     setAuthor(""); setAuthorIcon(""); setThumbnail(""); setImage(""); setFooter(""); setFooterIcon(""); setTimestamp(false);
     setFields([]); setButtons([]);
   };
@@ -94,9 +134,7 @@ function EmbedBuilderPage() {
       <Navbar />
       <main className="relative z-10 mx-auto max-w-[1500px] px-5 pb-24 pt-2 md:px-9">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-4xl font-black tracking-[-0.05em] md:text-5xl">Embed Builder</h1>
-          </div>
+          <h1 className="text-4xl font-black tracking-[-0.05em] md:text-5xl">Embed Builder</h1>
           <button onClick={clear} className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-400/30 bg-red-400/[0.06] px-4 py-2.5 text-sm text-red-100/85 transition hover:bg-red-400/[0.10]"><RotateCcw className="h-4 w-4"/>Clear</button>
         </div>
 
@@ -114,9 +152,20 @@ function EmbedBuilderPage() {
                   <div><label className="mb-2 block text-xs text-white/50">Title</label><input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Title" className={inputClass}/></div>
                   <div><label className="mb-2 block text-xs text-white/50">Description</label><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Description" rows={5} className={inputClass}/></div>
                   <div><label className="mb-2 block text-xs text-white/50">URL</label><input value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://example.com" className={inputClass}/></div>
-                  <div><label className="mb-2 block text-xs text-white/50">Color</label><div className="flex gap-3"><input type="color" value={color} onChange={e=>setColor(e.target.value)} className="h-11 w-14 rounded-lg border border-white/10 bg-transparent"/><input value={color} onChange={e=>setColor(e.target.value)} className={inputClass}/></div></div>
                 </div>
               </div>
+
+              <details open className={sectionClass}>
+                <summary className="cursor-pointer list-none text-base font-bold">Appearance</summary>
+                <div className="mt-4 space-y-4">
+                  <ColorControl label="Primary shade" value={color} onChange={setColor} />
+                  <ColorControl label="Secondary shade" value={color2} onChange={setColor2} />
+                  <div className="rounded-xl border border-white/[0.07] p-3.5" style={{background:`linear-gradient(135deg, ${primary}, ${secondary})`}}>
+                    <div className="rounded-lg border border-white/10 bg-black/45 px-3 py-2 text-xs text-white/75">Shade preview · {primary} → {secondary}</div>
+                  </div>
+                  <p className="text-[11px] leading-5 text-white/30">Discord embeds support one accent color, so the primary shade is used for the generated embed. The second shade is available for Ware&apos;s builder styling and Components V2 designs.</p>
+                </div>
+              </details>
 
               <details open className={sectionClass}>
                 <summary className="cursor-pointer list-none text-base font-bold">Author</summary>
@@ -195,7 +244,7 @@ function EmbedBuilderPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 text-sm"><span className="font-semibold text-white">ware</span><span className="inline-flex items-center gap-1 rounded-[3px] bg-[#5865f2] px-1.5 py-[1px] text-[10px] font-bold text-white"><span>✓</span> APP</span><span className="text-xs text-[#949ba4]">Today at 6:49 AM</span></div>
                       {content ? <div className="mt-1 whitespace-pre-wrap text-sm">{content}</div> : null}
-                      <div className="mt-2 max-w-[560px] overflow-hidden rounded-[4px] border-l-4 p-3" style={{borderLeftColor: color, backgroundColor:"#2b2d31"}}>
+                      <div className="mt-2 max-w-[560px] overflow-hidden rounded-[4px] border-l-4 p-3" style={{borderLeftColor: primary, background:`linear-gradient(135deg, #2b2d31 0%, #2b2d31 72%, ${secondary}55 140%)`}}>
                         {author ? <div className="mb-2 flex items-center gap-2 text-xs font-semibold">{authorIcon ? <img src={authorIcon} className="h-5 w-5 rounded-full"/> : null}{author}</div> : null}
                         {title ? <div className="font-semibold text-white">{title}</div> : null}
                         {description ? <div className="mt-1 whitespace-pre-wrap text-sm">{description}</div> : null}
