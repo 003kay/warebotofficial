@@ -54,6 +54,23 @@ function EmbedBuilderPage() {
     return pieces.join("");
   }, [content, title, description, url, color, author, thumbnail, image, footer, fieldName, fieldValue, buttonLabel, buttonUrl]);
 
+  const hasPreviewContent = Boolean(
+    content.trim() ||
+    title.trim() ||
+    description.trim() ||
+    url.trim() ||
+    author.trim() ||
+    authorIcon.trim() ||
+    thumbnail.trim() ||
+    image.trim() ||
+    footer.trim() ||
+    footerIcon.trim() ||
+    fieldName.trim() ||
+    fieldValue.trim() ||
+    buttonLabel.trim() ||
+    buttonUrl.trim()
+  );
+
   const clear = () => {
     setContent(""); setTitle(""); setDescription(""); setUrl(""); setColor("#2a2d31");
     setAuthor(""); setAuthorIcon(""); setThumbnail(""); setImage(""); setFooter(""); setFooterIcon("");
@@ -102,25 +119,31 @@ function EmbedBuilderPage() {
           <div className="space-y-5 xl:sticky xl:top-5 xl:self-start">
             <section className={panelClass}>
               <h2 className="text-xl font-bold">Preview</h2>
-              <div className="mt-4 rounded-xl bg-[#313338] p-4 text-[#dbdee1] shadow-inner">
-                <div className="flex gap-3">
-                  <img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 rounded-full object-cover"/>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 text-sm"><span className="font-semibold text-white">ware</span><span className="inline-flex items-center gap-1 rounded-[3px] bg-[#5865f2] px-1.5 py-[1px] text-[10px] font-bold text-white"><span>✓</span> APP</span><span className="text-xs text-[#949ba4]">Today at 6:49 AM</span></div>
-                    {content ? <div className="mt-1 whitespace-pre-wrap text-sm">{content}</div> : null}
-                    <div className="mt-2 max-w-[560px] overflow-hidden rounded-[4px] border-l-4 p-3" style={{borderLeftColor: color, backgroundColor:"#2b2d31"}}>
-                      {author ? <div className="mb-2 flex items-center gap-2 text-xs font-semibold">{authorIcon ? <img src={authorIcon} className="h-5 w-5 rounded-full"/> : null}{author}</div> : null}
-                      {title ? <div className="font-semibold text-white">{title}</div> : null}
-                      {description ? <div className="mt-1 whitespace-pre-wrap text-sm">{description}</div> : null}
-                      {(fieldName || fieldValue) ? <div className="mt-3"><div className="text-xs font-semibold text-white">{fieldName || "Field"}</div><div className="mt-1 text-sm">{fieldValue}</div></div> : null}
-                      {thumbnail ? <img src={thumbnail} className="float-right ml-4 mt-1 h-20 w-20 rounded object-cover"/> : null}
-                      {image ? <img src={image} className="mt-3 max-h-72 max-w-full rounded object-cover"/> : null}
-                      {footer ? <div className="mt-3 flex items-center gap-2 text-[11px] text-[#b5bac1]">{footerIcon ? <img src={footerIcon} className="h-4 w-4 rounded-full"/> : null}{footer}</div> : null}
+              {!hasPreviewContent ? (
+                <div className="mt-4 flex min-h-[330px] items-center justify-center rounded-xl bg-[#313338] p-6 text-center shadow-inner">
+                  <span className="text-sm text-[#949ba4]">Your embed will appear here</span>
+                </div>
+              ) : (
+                <div className="mt-4 rounded-xl bg-[#313338] p-4 text-[#dbdee1] shadow-inner">
+                  <div className="flex gap-3">
+                    <img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 rounded-full object-cover"/>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 text-sm"><span className="font-semibold text-white">ware</span><span className="inline-flex items-center gap-1 rounded-[3px] bg-[#5865f2] px-1.5 py-[1px] text-[10px] font-bold text-white"><span>✓</span> APP</span><span className="text-xs text-[#949ba4]">Today at 6:49 AM</span></div>
+                      {content ? <div className="mt-1 whitespace-pre-wrap text-sm">{content}</div> : null}
+                      <div className="mt-2 max-w-[560px] overflow-hidden rounded-[4px] border-l-4 p-3" style={{borderLeftColor: color, backgroundColor:"#2b2d31"}}>
+                        {author ? <div className="mb-2 flex items-center gap-2 text-xs font-semibold">{authorIcon ? <img src={authorIcon} className="h-5 w-5 rounded-full"/> : null}{author}</div> : null}
+                        {title ? <div className="font-semibold text-white">{title}</div> : null}
+                        {description ? <div className="mt-1 whitespace-pre-wrap text-sm">{description}</div> : null}
+                        {(fieldName || fieldValue) ? <div className="mt-3"><div className="text-xs font-semibold text-white">{fieldName || "Field"}</div><div className="mt-1 text-sm">{fieldValue}</div></div> : null}
+                        {thumbnail ? <img src={thumbnail} className="float-right ml-4 mt-1 h-20 w-20 rounded object-cover"/> : null}
+                        {image ? <img src={image} className="mt-3 max-h-72 max-w-full rounded object-cover"/> : null}
+                        {footer ? <div className="mt-3 flex items-center gap-2 text-[11px] text-[#b5bac1]">{footerIcon ? <img src={footerIcon} className="h-4 w-4 rounded-full"/> : null}{footer}</div> : null}
+                      </div>
+                      {(buttonLabel || buttonUrl) ? <button className="mt-2 rounded bg-[#4e5058] px-3 py-2 text-sm font-medium text-white">{buttonLabel || "Button"}</button> : null}
                     </div>
-                    {(buttonLabel || buttonUrl) ? <button className="mt-2 rounded bg-[#4e5058] px-3 py-2 text-sm font-medium text-white">{buttonLabel || "Button"}</button> : null}
                   </div>
                 </div>
-              </div>
+              )}
             </section>
 
             <section className={panelClass}>
