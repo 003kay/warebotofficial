@@ -1,17 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 
-async function requireGuildManager(guildId: string) {
-  const { readSessionFromCookie } = await import("@/lib/session.server");
-  const { getValidAccessToken, userManagesGuild } = await import("@/lib/discord.server");
+async function getDashboardSession() {
+  const { readSessionDataFromCookie } = await import("@/lib/session.server");
   const req = getRequest();
-  const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
-  if (!userId) throw new Error("Not signed in");
-  const session = await getValidAccessToken(userId);
-  if (!session) throw new Error("Session expired");
+  return readSessionDataFromCookie(req?.headers.get("cookie") ?? null);
+}
+
+async function requireGuildManager(guildId: string) {
+  const { userManagesGuild } = await import("@/lib/discord.server");
+  const session = await getDashboardSession();
+  if (!session) throw new Error("Not signed in");
   const guild = await userManagesGuild(session.accessToken, guildId);
   if (!guild) throw new Error("You don't manage this server");
-  return { userId, guild };
+  return { userId: session.discordUserId, guild, session };
 }
 
 async function assertGuildChannel(guildId: string, channelId: string | null, allowedTypes: number[]) {
@@ -37,41 +39,38 @@ async function assertGuildRoleIds(guildId: string, roleIds: string[]) {
 }
 
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
-  const { readSessionFromCookie } = await import("@/lib/session.server");
-  const { getValidAccessToken } = await import("@/lib/discord.server");
-  const req = getRequest();
-  const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
-  if (!userId) return null;
-  const session = await getValidAccessToken(userId);
+  const session = await getDashboardSession();
   if (!session) return null;
   return {
-    id: userId,
+    id: session.discordUserId,
     username: session.username,
     avatar: session.avatar,
     avatarUrl: session.avatar
-      ? `https://cdn.discordapp.com/avatars/${userId}/${session.avatar}.png?size=128`
+      ? `https://cdn.discordapp.com/avatars/${session.discordUserId}/${session.avatar}.png?size=128`
       : null,
   };
 });
 
 export const getManagedGuildsFn = createServerFn({ method: "GET" }).handler(async () => {
-  const { readSessionFromCookie } = await import("@/lib/session.server");
-  const { getValidAccessToken, getManagedGuilds } = await import("@/lib/discord.server");
-  const req = getRequest();
-  const userId = readSessionFromCookie(req?.headers.get("cookie") ?? null);
-  if (!userId) return { authenticated: false as const, guilds: [] };
-  const session = await getValidAccessToken(userId);
+  const { getManagedGuilds } = await import("@/lib/discord.server");
+  const session = await getDashboardSession();
   if (!session) return { authenticated: false as const, guilds: [] };
-  const guilds = await getManagedGuilds(session.accessToken);
-  return {
-    authenticated: true as const,
-    guilds: guilds.map((g) => ({
-      id: g.id,
-      name: g.name,
-      iconUrl: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=128` : null,
-      owner: g.owner,
-    })),
-  };
+
+  try {
+    const guilds = await getManagedGuilds(session.accessToken);
+    return {
+      authenticated: true as const,
+      guilds: guilds.map((g) => ({
+        id: g.id,
+        name: g.name,
+        iconUrl: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=128` : null,
+        owner: g.owner,
+      })),
+    };
+  } catch (error) {
+    console.error("Failed to load managed Discord guilds", error);
+    return { authenticated: false as const, guilds: [] };
+  }
 });
 
 export const getTicketPanel = createServerFn({ method: "GET" })
