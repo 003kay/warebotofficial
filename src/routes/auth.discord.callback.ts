@@ -55,7 +55,11 @@ export const Route = createFileRoute("/auth/discord/callback")({
           return new Response(null, { status: 302, headers });
         } catch (err) {
           console.error("Discord OAuth callback error", err);
-          return new Response("OAuth error. Check the Ware deployment logs.", { status: 500 });
+          const message = err instanceof Error ? err.message : "Unknown OAuth error";
+          const safeMessage = message
+            .replace(/client_secret=[^&\s]+/gi, "client_secret=[redacted]")
+            .replace(/[A-Za-z0-9_-]{50,}/g, "[redacted]");
+          return new Response(`OAuth error: ${safeMessage}`, { status: 500 });
         }
       },
     },
