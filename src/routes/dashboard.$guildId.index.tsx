@@ -1,22 +1,22 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import {
   Activity,
-  ArrowUpRight,
-  Check,
-  CircleDot,
+  Command,
+  Heart,
   Hash,
-  LayoutPanelTop,
-  PanelsTopLeft,
-  ShieldCheck,
-  Sparkles,
-  Ticket,
+  MessageSquare,
+  Mic2,
+  Radio,
+  UserMinus,
+  UserPlus,
   UsersRound,
 } from "lucide-react";
 import {
-  Area,
-  AreaChart,
   CartesianGrid,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -25,383 +25,285 @@ import {
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getTicketPanel } from "@/lib/dashboard.functions";
+import { getGuildAnalytics } from "@/lib/analytics.functions";
 
 export const Route = createFileRoute("/dashboard/$guildId/")({
   head: () => ({ meta: [{ title: "Overview — Ware Dashboard" }] }),
   loader: async ({ context, params }) => {
-    await context.queryClient.ensureQueryData({
-      queryKey: ["ticketPanel", params.guildId],
-      queryFn: () => getTicketPanel({ data: { guildId: params.guildId } }),
-    });
+    await Promise.all([
+      context.queryClient.ensureQueryData({
+        queryKey: ["ticketPanel", params.guildId],
+        queryFn: () => getTicketPanel({ data: { guildId: params.guildId } }),
+      }),
+      context.queryClient.ensureQueryData({
+        queryKey: ["guildAnalytics", params.guildId],
+        queryFn: () => getGuildAnalytics({ data: { guildId: params.guildId } }),
+      }),
+    ]);
     return null;
   },
   component: GuildDashboardHome,
 });
 
-function formatNumber(value: number) {
-  return new Intl.NumberFormat("en-US").format(value);
+function number(value: number) {
+  return new Intl.NumberFormat("en-US").format(Math.max(0, Math.round(value || 0)));
 }
 
-function StatCard({
+function hours(seconds: number) {
+  const value = Math.max(0, Number(seconds || 0)) / 3600;
+  return value >= 100 ? `${number(value)} hrs` : `${value.toFixed(value >= 10 ? 1 : 2)} hrs`;
+}
+
+function shortDate(value: string) {
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return Number.isNaN(parsed.getTime())
+    ? value
+    : parsed.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
+function MetricCard({
   label,
   value,
   detail,
   icon: Icon,
-  good,
 }: {
   label: string;
-  value: string | number;
+  value: string;
   detail: string;
-  icon: typeof Hash;
-  good?: boolean;
+  icon: typeof Activity;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-[15px] border border-white/[0.06] bg-[#111313] p-4 shadow-[0_18px_55px_rgba(0,0,0,0.15)] transition-colors hover:border-white/[0.095]">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+    <div className="rounded-[15px] border border-white/[0.055] bg-[#111313] p-4 shadow-[0_18px_55px_rgba(0,0,0,.14)]">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-[10px] font-medium text-white/34">{label}</div>
-          <div className="mt-2 text-[25px] font-semibold tracking-[-0.04em] text-white/93">
-            {value}
-          </div>
+        <div>
+          <div className="text-[9px] font-medium text-white/28">{label}</div>
+          <div className="mt-2 text-[24px] font-semibold tracking-[-0.04em] text-white/92">{value}</div>
         </div>
-        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] border border-white/[0.065] bg-white/[0.025]">
-          <Icon className="h-3.5 w-3.5 text-[#a9bdc8]" strokeWidth={1.8} />
+        <div className="grid h-8 w-8 place-items-center rounded-[9px] border border-white/[0.06] bg-white/[0.025]">
+          <Icon className="h-3.5 w-3.5 text-[#a8bdc7]" strokeWidth={1.7} />
         </div>
       </div>
-      <div className={`mt-2.5 text-[9px] ${good ? "text-emerald-400/75" : "text-white/25"}`}>
-        {detail}
-      </div>
-      <div className="pointer-events-none absolute -bottom-6 -right-5 h-20 w-20 rounded-full bg-[#9cb8c6]/[0.025] blur-2xl transition-colors group-hover:bg-[#9cb8c6]/[0.05]" />
+      <div className="mt-2 text-[9px] text-white/23">{detail}</div>
     </div>
   );
 }
 
-function HealthRow({ label, ok, optional }: { label: string; ok: boolean; optional?: boolean }) {
-  return (
-    <div className="flex items-center justify-between gap-4 border-b border-white/[0.045] py-3 last:border-b-0">
-      <div className="flex min-w-0 items-center gap-2.5">
-        <span
-          className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border ${
-            ok
-              ? "border-emerald-400/15 bg-emerald-400/[0.07] text-emerald-300"
-              : "border-white/[0.065] bg-white/[0.02] text-white/22"
-          }`}
-        >
-          {ok ? <Check className="h-3 w-3" strokeWidth={2.1} /> : <CircleDot className="h-2.5 w-2.5" />}
-        </span>
-        <span className="truncate text-[11px] text-white/58">{label}</span>
-      </div>
-      <span className={`text-[9px] font-medium ${ok ? "text-emerald-300/70" : "text-white/23"}`}>
-        {ok ? "Ready" : optional ? "Optional" : "Needs setup"}
-      </span>
-    </div>
-  );
-}
-
-function QuickAction({
+function Ranking({
   title,
-  description,
-  href,
-  icon: Icon,
+  subtitle,
+  rows,
+  suffix,
 }: {
   title: string;
-  description: string;
-  href: string;
-  icon: typeof PanelsTopLeft;
+  subtitle: string;
+  rows: { id?: string; name: string; value: number }[];
+  suffix: (value: number) => string;
 }) {
+  const max = Math.max(1, ...rows.map((row) => Number(row.value || 0)));
   return (
-    <a
-      href={href}
-      className="group flex items-center gap-3 rounded-xl border border-white/[0.055] bg-white/[0.018] p-3.5 transition-all hover:border-white/[0.095] hover:bg-white/[0.035]"
-    >
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-[#171a1b] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.055)]">
-        <Icon className="h-4 w-4 text-[#aec1cb]" strokeWidth={1.7} />
+    <section className="overflow-hidden rounded-[16px] border border-white/[0.055] bg-[#101212]">
+      <div className="border-b border-white/[0.05] px-5 py-4">
+        <h2 className="text-[11px] font-semibold text-white/75">{title}</h2>
+        <p className="mt-1 text-[9px] text-white/22">{subtitle}</p>
       </div>
-      <div className="min-w-0 flex-1">
-        <div className="text-[11px] font-medium text-white/78">{title}</div>
-        <div className="mt-1 truncate text-[9px] text-white/25">{description}</div>
+      <div className="p-3">
+        {rows.length ? (
+          <div className="space-y-1.5">
+            {rows.slice(0, 7).map((row, index) => (
+              <div key={`${row.id || row.name}-${index}`} className="rounded-[10px] bg-white/[0.023] px-3 py-2.5">
+                <div className="flex items-center gap-3">
+                  <span className="w-5 text-center text-[9px] text-white/18">{index + 1}.</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="truncate text-[10px] font-medium text-white/60">{row.name}</span>
+                      <span className="shrink-0 text-[9px] text-white/31">{suffix(Number(row.value || 0))}</span>
+                    </div>
+                    <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.04]">
+                      <div className="h-full rounded-full bg-[#9db8c5]/55" style={{ width: `${Math.max(2, (Number(row.value || 0) / max) * 100)}%` }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid min-h-40 place-items-center text-center text-[10px] text-white/20">
+            No activity has been synced yet.
+          </div>
+        )}
       </div>
-      <ArrowUpRight className="h-3.5 w-3.5 text-white/18 transition-colors group-hover:text-white/55" />
-    </a>
+    </section>
   );
 }
 
 function GuildDashboardHome() {
   const { guildId } = Route.useParams();
-  const { data } = useSuspenseQuery({
+  const [period, setPeriod] = useState<1 | 7 | 30>(7);
+
+  const { data: server } = useSuspenseQuery({
     queryKey: ["ticketPanel", guildId],
     queryFn: () => getTicketPanel({ data: { guildId } }),
   });
+  const { data: analytics } = useSuspenseQuery({
+    queryKey: ["guildAnalytics", guildId],
+    queryFn: () => getGuildAnalytics({ data: { guildId } }),
+    refetchInterval: 60_000,
+  });
 
-  const panel = data.panel as Record<string, unknown> | null;
-  const supportRoles = Array.isArray(panel?.support_role_ids) ? panel.support_role_ids.length : 0;
-  const optionCount = data.options.length;
-  const roleCount = data.roles.length;
-  const channelCount = data.textChannels.length;
-  const categoryCount = data.categories.length;
+  const payload = analytics.payload;
+  const allDays = useMemo(
+    () => [...(payload?.days ?? [])].sort((a, b) => a.date.localeCompare(b.date)),
+    [payload?.days],
+  );
+  const days = allDays.slice(-period);
 
-  const configuredChecks = [
-    data.botInGuild,
-    Boolean(panel),
-    Boolean(panel?.channel_id),
-    supportRoles > 0,
-    Boolean(panel?.log_channel_id),
-  ];
-  const healthScore = Math.round((configuredChecks.filter(Boolean).length / configuredChecks.length) * 100);
+  const selectedTotals = useMemo(
+    () =>
+      days.reduce(
+        (acc, day) => ({
+          messages: acc.messages + Number(day.messages || 0),
+          reactions: acc.reactions + Number(day.reactions || 0),
+          voice_seconds: acc.voice_seconds + Number(day.voice_seconds || 0),
+          joins: acc.joins + Number(day.joins || 0),
+          leaves: acc.leaves + Number(day.leaves || 0),
+          commands: acc.commands + Number(day.commands || 0),
+        }),
+        { messages: 0, reactions: 0, voice_seconds: 0, joins: 0, leaves: 0, commands: 0 },
+      ),
+    [days],
+  );
 
-  const footprintData = [
-    { name: "Channels", value: channelCount },
-    { name: "Roles", value: roleCount },
-    { name: "Categories", value: categoryCount },
-    { name: "Options", value: optionCount },
-    { name: "Support", value: supportRoles },
-  ];
+  const totalEngagement = selectedTotals.messages + selectedTotals.reactions + selectedTotals.commands;
+  const syncedAt = analytics.updatedAt ? new Date(analytics.updatedAt) : null;
+  const syncedLabel = syncedAt && !Number.isNaN(syncedAt.getTime())
+    ? syncedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+    : "waiting";
 
-  const totalResources = channelCount + roleCount + categoryCount + optionCount + supportRoles;
+  const chartData = days.map((day) => ({ ...day, label: shortDate(day.date) }));
+  const topMessages = payload?.top_message_channels ?? [];
+  const topVoice = payload?.top_voice_channels ?? [];
+  const topCommands = payload?.top_commands ?? [];
 
   return (
-    <DashboardShell guild={data.guild} guildId={guildId} active="home">
-      <div className="mx-auto max-w-[1420px]">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <DashboardShell guild={server.guild} guildId={guildId} active="home">
+      <div className="mx-auto max-w-[1480px]">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-[10px] text-white/28">
-              <Sparkles className="h-3 w-3 text-[#9db6c3]" />
-              Server intelligence
+            <div className="flex items-center gap-2 text-[9px] text-white/25">
+              <Radio className={`h-3 w-3 ${analytics.connected ? "text-emerald-400/70" : "text-amber-300/60"}`} />
+              {analytics.connected ? `Live bot telemetry • synced ${syncedLabel}` : "Waiting for Ware telemetry"}
             </div>
-            <h1 className="mt-2 text-[24px] font-semibold tracking-[-0.035em] text-white/95 md:text-[28px]">
-              Hello, welcome back.
+            <h1 className="mt-2 text-[24px] font-semibold tracking-[-0.035em] text-white/94 md:text-[28px]">
+              {server.guild.name} overview
             </h1>
-            <p className="mt-1 text-[10px] text-white/27">
-              Here&apos;s a live overview of <span className="font-medium text-white/48">{data.guild.name}</span> and its Ware configuration.
+            <p className="mt-1 text-[10px] text-white/25">
+              Real Discord activity collected by Ware — not estimated dashboard data.
             </p>
           </div>
 
-          <div className="flex items-center rounded-[9px] border border-white/[0.055] bg-[#101212] p-1 text-[9px] text-white/28">
-            <span className="rounded-md px-2.5 py-1">Live</span>
-            <span className="rounded-md bg-white/[0.065] px-2.5 py-1 font-medium text-white/62">Overview</span>
+          <div className="flex rounded-[9px] border border-white/[0.055] bg-[#101212] p-1">
+            {[
+              [1, "Day"],
+              [7, "Week"],
+              [30, "Month"],
+            ].map(([value, label]) => (
+              <button
+                key={String(value)}
+                type="button"
+                onClick={() => setPeriod(value as 1 | 7 | 30)}
+                className={`rounded-md px-3 py-1.5 text-[9px] transition-colors ${period === value ? "bg-white/[0.07] text-white/70" : "text-white/25 hover:text-white/45"}`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {!data.botInGuild ? (
-          <div className="mb-5 rounded-[14px] border border-amber-400/15 bg-amber-400/[0.045] px-4 py-3 text-[10px] text-amber-200/70">
-            Ware is not currently connected to this Discord server. Invite the bot before changing server configuration.
+        {!analytics.connected ? (
+          <div className="mb-4 rounded-[14px] border border-amber-300/15 bg-amber-300/[0.035] px-4 py-3 text-[10px] text-amber-100/55">
+            The dashboard is ready, but it has not received a signed analytics snapshot from the running Ware bot yet.
           </div>
         ) : null}
 
-        <section className="overflow-hidden rounded-[17px] border border-white/[0.06] bg-[#101212] shadow-[0_28px_90px_rgba(0,0,0,0.18)]">
-          <div className="flex flex-wrap items-start justify-between gap-4 px-5 pb-1 pt-5 md:px-6">
+        <section className="overflow-hidden rounded-[17px] border border-white/[0.055] bg-[#101212] shadow-[0_28px_90px_rgba(0,0,0,.17)]">
+          <div className="flex flex-wrap items-start justify-between gap-4 px-5 pb-0 pt-5 md:px-6">
             <div>
-              <div className="text-[9px] font-medium text-white/30">Configuration Footprint</div>
-              <div className="mt-1.5 text-[28px] font-semibold tracking-[-0.045em] text-white/92">
-                {formatNumber(totalResources)}
-              </div>
-              <div className="mt-1 flex items-center gap-1.5 text-[9px] text-emerald-300/65">
-                <Activity className="h-3 w-3" />
-                {healthScore}% configuration health
+              <div className="text-[9px] font-medium text-white/28">Total Engagement</div>
+              <div className="mt-1.5 text-[29px] font-semibold tracking-[-0.05em] text-white/92">{number(totalEngagement)}</div>
+              <div className="mt-1 text-[9px] text-emerald-300/55">
+                Messages + reactions + commands for the selected period
               </div>
             </div>
-
-            <div className="flex items-center gap-4 pt-1 text-[9px] text-white/27">
-              <span className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#a8c0cb]" />
-                Server resources
-              </span>
+            <div className="flex flex-wrap items-center gap-4 pt-1 text-[8px] text-white/27">
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#b4cad4]" />Messages</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/25" />Reactions</span>
             </div>
           </div>
 
-          <div className="h-[285px] w-full px-2 pb-3 pt-1 md:px-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={footprintData} margin={{ top: 24, right: 18, left: -18, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="wareFootprint" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#9eb8c5" stopOpacity={0.16} />
-                    <stop offset="100%" stopColor="#9eb8c5" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.045)" strokeDasharray="2 5" />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.28)", fontSize: 9 }}
-                  dy={8}
-                />
-                <YAxis
-                  allowDecimals={false}
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.20)", fontSize: 8 }}
-                  width={42}
-                />
-                <Tooltip
-                  cursor={{ stroke: "rgba(255,255,255,0.10)", strokeDasharray: "3 3" }}
-                  contentStyle={{
-                    background: "#171919",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: 10,
-                    boxShadow: "0 14px 40px rgba(0,0,0,.35)",
-                    fontSize: 10,
-                    color: "rgba(255,255,255,.8)",
-                  }}
-                  labelStyle={{ color: "rgba(255,255,255,.42)", marginBottom: 4 }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#a6bec9"
-                  strokeWidth={1.7}
-                  fill="url(#wareFootprint)"
-                  activeDot={{ r: 4, fill: "#bed0d8", stroke: "#101212", strokeWidth: 2 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="h-[300px] px-2 pb-3 pt-3 md:px-4">
+            {chartData.length ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 16, right: 18, left: -18, bottom: 0 }}>
+                  <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.045)" strokeDasharray="2 5" />
+                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.25)", fontSize: 8 }} dy={9} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.18)", fontSize: 8 }} width={46} />
+                  <Tooltip
+                    cursor={{ stroke: "rgba(255,255,255,.10)", strokeDasharray: "3 3" }}
+                    contentStyle={{ background: "#171919", border: "1px solid rgba(255,255,255,.08)", borderRadius: 10, fontSize: 10, color: "rgba(255,255,255,.8)" }}
+                    labelStyle={{ color: "rgba(255,255,255,.4)", marginBottom: 5 }}
+                  />
+                  <Line type="monotone" dataKey="messages" name="Messages" stroke="#b3c8d2" strokeWidth={1.8} dot={false} activeDot={{ r: 4, fill: "#d6e2e7", stroke: "#101212", strokeWidth: 2 }} />
+                  <Line type="monotone" dataKey="reactions" name="Reactions" stroke="rgba(255,255,255,.28)" strokeWidth={1.4} strokeDasharray="3 3" dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="grid h-full place-items-center text-[10px] text-white/18">Analytics will appear after the first bot sync.</div>
+            )}
           </div>
         </section>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            label="Text Channels"
-            value={formatNumber(channelCount)}
-            detail={`${categoryCount} categories available`}
-            icon={Hash}
-            good={channelCount > 0}
-          />
-          <StatCard
-            label="Server Roles"
-            value={formatNumber(roleCount)}
-            detail={`${supportRoles} assigned to ticket support`}
-            icon={UsersRound}
-            good={roleCount > 0}
-          />
-          <StatCard
-            label="Ticket Options"
-            value={formatNumber(optionCount)}
-            detail={panel ? "Panel configuration detected" : "Create your first panel"}
-            icon={Ticket}
-            good={Boolean(panel)}
-          />
-          <StatCard
-            label="System Health"
-            value={`${healthScore}%`}
-            detail={healthScore === 100 ? "All recommended items configured" : "Finish optional configuration"}
-            icon={ShieldCheck}
-            good={healthScore >= 80}
-          />
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCard label="Total Messages" value={number(selectedTotals.messages)} detail={`${period === 1 ? "Today" : `Last ${period} days`} of message activity`} icon={MessageSquare} />
+          <MetricCard label="Total Reactions" value={number(selectedTotals.reactions)} detail="Reaction events captured by Ware" icon={Heart} />
+          <MetricCard label="Total Voice Activity" value={hours(selectedTotals.voice_seconds)} detail="Completed voice sessions" icon={Mic2} />
+          <MetricCard label="Server Members" value={number(payload?.member_count ?? 0)} detail="Current Discord member count" icon={UsersRound} />
         </div>
 
-        <div className="mt-4 grid gap-4 xl:grid-cols-[1.45fr_.75fr]">
-          <section className="overflow-hidden rounded-[16px] border border-white/[0.06] bg-[#101212]">
-            <div className="flex items-center justify-between border-b border-white/[0.05] px-5 py-4">
-              <div>
-                <h2 className="text-[12px] font-semibold text-white/78">Resource Inventory</h2>
-                <p className="mt-1 text-[9px] text-white/23">Live Discord resources Ware can currently see.</p>
-              </div>
-              <span className="rounded-md border border-white/[0.055] px-2 py-1 text-[8px] uppercase tracking-[0.14em] text-white/25">
-                Live
-              </span>
-            </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCard label="Commands Used" value={number(selectedTotals.commands)} detail="Successful prefix command invocations" icon={Command} />
+          <MetricCard label="Members Joined" value={number(selectedTotals.joins)} detail="Join events in selected period" icon={UserPlus} />
+          <MetricCard label="Members Left" value={number(selectedTotals.leaves)} detail="Leave events in selected period" icon={UserMinus} />
+          <MetricCard label="Net Growth" value={`${selectedTotals.joins - selectedTotals.leaves >= 0 ? "+" : ""}${number(Math.abs(selectedTotals.joins - selectedTotals.leaves))}`} detail={`${selectedTotals.joins - selectedTotals.leaves >= 0 ? "Positive" : "Negative"} member movement`} icon={Activity} />
+        </div>
 
-            <div className="overflow-x-auto px-3 pb-3 pt-2">
-              <table className="w-full min-w-[620px] border-separate border-spacing-y-1.5 text-left">
-                <thead>
-                  <tr className="text-[8px] uppercase tracking-[0.12em] text-white/22">
-                    <th className="px-3 py-1 font-medium">Resource</th>
-                    <th className="px-3 py-1 font-medium">Count</th>
-                    <th className="px-3 py-1 font-medium">Status</th>
-                    <th className="px-3 py-1 font-medium">Coverage</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ["Text channels", channelCount, channelCount > 0, Math.min(100, channelCount * 5)],
-                    ["Manageable roles", roleCount, roleCount > 0, Math.min(100, roleCount * 4)],
-                    ["Channel categories", categoryCount, categoryCount > 0, Math.min(100, categoryCount * 12)],
-                    ["Ticket support roles", supportRoles, supportRoles > 0, Math.min(100, supportRoles * 30)],
-                    ["Ticket panel options", optionCount, optionCount > 0, Math.min(100, optionCount * 20)],
-                  ].map(([name, count, ok, coverage]) => (
-                    <tr key={String(name)} className="bg-white/[0.024] text-[10px] text-white/48">
-                      <td className="rounded-l-[9px] px-3 py-3 font-medium text-white/65">{String(name)}</td>
-                      <td className="px-3 py-3">{formatNumber(Number(count))}</td>
-                      <td className="px-3 py-3">
-                        <span className={ok ? "text-emerald-300/65" : "text-white/22"}>{ok ? "Detected" : "Not set"}</span>
-                      </td>
-                      <td className="rounded-r-[9px] px-3 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/[0.05]">
-                            <div
-                              className="h-full rounded-full bg-[#a4bcc7]/60"
-                              style={{ width: `${Math.max(5, Number(coverage))}%` }}
-                            />
-                          </div>
-                          <span className="text-[8px] text-white/24">{Number(coverage)}%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <div className="mt-4 grid gap-4 xl:grid-cols-2">
+          <Ranking title="Top Message Channels" subtitle="Channels generating the most messages in the live analytics window." rows={topMessages} suffix={(value) => `${number(value)} messages`} />
+          <Ranking title="Top Voice Channels" subtitle="Voice channels with the most completed session time." rows={topVoice} suffix={(value) => hours(value)} />
+        </div>
+
+        <div className="mt-4 grid gap-4 xl:grid-cols-[1.35fr_.65fr]">
+          <Ranking title="Top Commands" subtitle="Most-used Ware commands since daily command telemetry was enabled." rows={topCommands} suffix={(value) => `${number(value)} uses`} />
+
+          <section className="rounded-[16px] border border-white/[0.055] bg-[#101212] p-5">
+            <div className="flex items-center gap-2">
+              <Hash className="h-3.5 w-3.5 text-[#a9bec8]" />
+              <h2 className="text-[11px] font-semibold text-white/72">Telemetry Status</h2>
+            </div>
+            <div className="mt-4 space-y-2 text-[9px]">
+              {[
+                ["Bot connected", server.botInGuild],
+                ["Analytics feed", analytics.connected],
+                ["Message tracking", Boolean(payload?.days?.length)],
+                ["Voice tracking", Boolean((payload?.totals?.voice_seconds ?? 0) > 0 || payload?.days?.length)],
+                ["Command tracking", Boolean(payload?.top_commands?.length || payload?.days?.length)],
+              ].map(([label, ok]) => (
+                <div key={String(label)} className="flex items-center justify-between rounded-[9px] bg-white/[0.022] px-3 py-2.5">
+                  <span className="text-white/36">{String(label)}</span>
+                  <span className={ok ? "text-emerald-300/65" : "text-white/18"}>{ok ? "Live" : "Waiting"}</span>
+                </div>
+              ))}
             </div>
           </section>
-
-          <div className="space-y-4">
-            <section className="rounded-[16px] border border-white/[0.06] bg-[#101212] p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-[12px] font-semibold text-white/78">Configuration Health</h2>
-                  <p className="mt-1 text-[9px] text-white/23">Recommended setup checks.</p>
-                </div>
-                <div className="grid h-9 w-9 place-items-center rounded-full border border-white/[0.055] text-[9px] font-semibold text-[#b0c4cd]">
-                  {healthScore}
-                </div>
-              </div>
-
-              <div className="mt-3">
-                <HealthRow label="Ware connected" ok={data.botInGuild} />
-                <HealthRow label="Ticket panel saved" ok={Boolean(panel)} />
-                <HealthRow label="Panel channel selected" ok={Boolean(panel?.channel_id)} />
-                <HealthRow label="Support role assigned" ok={supportRoles > 0} optional />
-                <HealthRow label="Log channel selected" ok={Boolean(panel?.log_channel_id)} optional />
-              </div>
-            </section>
-
-            <section className="rounded-[16px] border border-white/[0.06] bg-[#101212] p-4">
-              <h2 className="text-[12px] font-semibold text-white/78">Quick Actions</h2>
-              <p className="mt-1 text-[9px] text-white/23">Jump straight into the tools you use most.</p>
-              <div className="mt-3 space-y-2">
-                <QuickAction
-                  title="Open Panel Designer"
-                  description="Build and publish ticket panels"
-                  href={`/dashboard/${guildId}/tickets`}
-                  icon={LayoutPanelTop}
-                />
-                <QuickAction
-                  title="Manage Panels"
-                  description="Review saved panel configuration"
-                  href={`/dashboard/${guildId}/panels`}
-                  icon={PanelsTopLeft}
-                />
-                <QuickAction
-                  title="Security Center"
-                  description="Manage Ware server protections"
-                  href={`/dashboard/${guildId}/security`}
-                  icon={ShieldCheck}
-                />
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[13px] border border-white/[0.05] bg-white/[0.012] px-4 py-3 text-[9px] text-white/21">
-          <span>Ware dashboard • data shown here is based on the server resources currently available to Ware.</span>
-          <Link
-            to="/dashboard/$guildId/tickets"
-            params={{ guildId }}
-            className="inline-flex items-center gap-1.5 text-white/42 transition-colors hover:text-white/75"
-          >
-            Configure tickets
-            <ArrowUpRight className="h-3 w-3" />
-          </Link>
         </div>
       </div>
     </DashboardShell>
