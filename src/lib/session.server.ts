@@ -1,8 +1,17 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
 const COOKIE_NAME = "ware_session";
-const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 const COOKIE_DOMAIN = ".warebot.xyz";
+
+export type WareSessionData = {
+  discordUserId: string;
+  username: string;
+  avatar: string | null;
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt: number;
+};
 
 function getSecret(): string {
   const s = process.env.SESSION_SECRET || process.env.DISCORD_CLIENT_SECRET;
@@ -18,8 +27,22 @@ function domainPart() {
   return process.env.NODE_ENV === "production" ? `; Domain=${COOKIE_DOMAIN}` : "";
 }
 
-export function createSessionCookie(discordUserId: string): string {
-  const payload = `${discordUserId}.${Date.now()}`;
+function encodePayload(data: WareSessionData): string {
+  return Buffer.from(JSON.stringify(data), "utf8").toString("base64url");
+}
+
+function decodePayload(value: string): WareSessionData | null {
+  try {
+    const parsed = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as WareSessionData;
+    if (!parsed?.discordUserId || !parsed?.accessToken || !parsed?.expiresAt) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function createSessionCookie(data: WareSessionData): string {
+  const payload = encodePayload(data);
   const sig = sign(payload);
   const value = `${payload}.${sig}`;
   return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${MAX_AGE}${domainPart()}`;
@@ -29,7 +52,7 @@ export function clearSessionCookie(): string {
   return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0${domainPart()}`;
 }
 
-export function readSessionFromCookie(cookieHeader: string | null): string | null {
+export function readSessionDataFromCookie(cookieHeader: string | null): WareSessionData | null {
   if (!cookieHeader) return null;
   const match = cookieHeader.split(/;\s*/).find((c) => c.startsWith(`${COOKIE_NAME}=`));
   if (!match) return null;
@@ -42,12 +65,22 @@ export function readSessionFromCookie(cookieHeader: string | null): string | nul
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
-  const [discordUserId] = payload.split(".");
-  return discordUserId || null;
+  const data = decodePayload(payload);
+  if (!data) return null;
+  if (data.expiresAt <= Date.now()) return null;
+  return data;
+}
+
+export function readSessionFromCookie(cookieHeader: string | null): string | null {
+  return readSessionDataFromCookie(cookieHeader)?.discordUserId ?? null;
 }
 
 export function createStateCookie(state: string): string {
   return `ware_oauth_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600${domainPart()}`;
+}
+
+export function clearStateCookie(): string {
+  return `ware_oauth_state=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0${domainPart()}`;
 }
 
 export function readStateFromCookie(cookieHeader: string | null): string | null {
