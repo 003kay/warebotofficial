@@ -12,7 +12,7 @@ export const Route = createFileRoute("/dashboard/")({
       queryFn: () => getManagedGuildsFn(),
     });
     if (!data.authenticated) {
-      throw redirect({ href: "/auth/discord/login" as never });
+      throw redirect({ href: "/api/public/auth/discord/login" as never });
     }
     return null;
   },
