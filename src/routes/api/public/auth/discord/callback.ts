@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/public/auth/discord/callback")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
           const expiresAt = new Date(Date.now() + token.expires_in * 1000).toISOString();
-          await supabaseAdmin
+          const { error } = await supabaseAdmin
             .from("discord_sessions")
             .upsert(
               {
@@ -35,13 +35,16 @@ export const Route = createFileRoute("/api/public/auth/discord/callback")({
               { onConflict: "user_discord_id" },
             );
 
+          if (error) throw error;
+
           const headers = new Headers();
-          headers.append("Location", "/dashboard");
+          headers.append("Location", "https://www.warebot.xyz/dashboard");
           headers.append("Set-Cookie", createSessionCookie(user.id));
           headers.append(
             "Set-Cookie",
-            "ware_oauth_state=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
+            "ware_oauth_state=; Path=/; Domain=.warebot.xyz; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
           );
+          headers.append("Cache-Control", "no-store");
           return new Response(null, { status: 302, headers });
         } catch (err) {
           console.error("Discord OAuth callback error", err);
