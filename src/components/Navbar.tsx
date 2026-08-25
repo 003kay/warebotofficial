@@ -23,20 +23,20 @@ export function Navbar() {
       </Link>
 
       <div className="flex items-center gap-2.5 sm:gap-3">
-        <div
-          aria-disabled="true"
-          title="Dashboard — Coming soon"
-          className="group relative flex min-h-12 min-w-[118px] cursor-not-allowed select-none items-center justify-between overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.025] px-3.5 text-left text-white/40 shadow-[0_8px_30px_-18px_rgba(255,255,255,.18),inset_0_1px_0_rgba(255,255,255,.035)] sm:min-h-14 sm:min-w-[154px] sm:px-4"
+        <Link
+          to="/dashboard"
+          title="Open Ware Dashboard"
+          className="group relative flex min-h-12 min-w-[128px] items-center justify-between overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.032] px-3.5 text-left text-white/75 shadow-[0_8px_30px_-18px_rgba(255,255,255,.18),inset_0_1px_0_rgba(255,255,255,.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white sm:min-h-14 sm:min-w-[162px] sm:px-4"
         >
-          <span className="pointer-events-none absolute -left-12 top-0 h-full w-10 -skew-x-12 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent animate-[dashboard-shimmer_4s_ease-in-out_infinite]" />
+          <span className="pointer-events-none absolute -left-12 top-0 h-full w-10 -skew-x-12 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent animate-[dashboard-shimmer_4s_ease-in-out_infinite]" />
           <span className="relative leading-none">
-            <span className="block text-[12px] font-semibold tracking-[-0.01em] text-white/45 sm:text-[15px]">Dashboard</span>
-            <span className="mt-1.5 block text-[7px] uppercase tracking-[0.16em] text-white/22 sm:text-[9px]">Coming soon</span>
+            <span className="block text-[12px] font-semibold tracking-[-0.01em] text-white/80 transition-colors group-hover:text-white sm:text-[15px]">Dashboard</span>
+            <span className="mt-1.5 block text-[7px] uppercase tracking-[0.16em] text-white/35 sm:text-[9px]">Manage servers</span>
           </span>
-          <span className="relative ml-2 flex h-5 w-5 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.025] sm:h-6 sm:w-6">
-            <span className="h-1.5 w-1.5 rounded-full bg-white/25 animate-pulse" />
+          <span className="relative ml-2 flex h-5 w-5 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] sm:h-6 sm:w-6">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
           </span>
-        </div>
+        </Link>
 
         <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="group grid h-12 w-12 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.018] text-white/62 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white sm:h-14 sm:w-14">
           <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -53,13 +53,13 @@ export function Navbar() {
         <nav className="grid gap-3">
           <Link to="/commands" onClick={() => setMenuOpen(false)} className={itemClass}><span>Commands</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">1,008</span></Link>
           <Link to="/embeds" onClick={() => setMenuOpen(false)} className={itemClass}><span>Embeds</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">Builder</span></Link>
-          <div aria-disabled="true" className="flex min-h-18 cursor-not-allowed items-center justify-between rounded-2xl border border-white/[0.035] bg-gradient-to-r from-white/[0.018] to-white/[0.009] px-5 text-white/30 sm:min-h-20 sm:px-6">
+          <Link to="/dashboard" onClick={() => setMenuOpen(false)} className={itemClass}>
             <span>
-              <span className="block text-lg font-medium text-white/34 sm:text-xl">Dashboard</span>
-              <span className="mt-0.5 block text-[10px] uppercase tracking-[0.16em] text-white/18">Coming soon</span>
+              <span className="block">Dashboard</span>
+              <span className="mt-0.5 block text-[10px] uppercase tracking-[0.16em] text-white/28">Discord login required</span>
             </span>
-            <span className="rounded-full border border-white/[0.055] bg-white/[0.018] px-2.5 py-1 text-[9px] uppercase tracking-[0.14em] text-white/20">Soon</span>
-          </div>
+            <span className="inline-flex items-center gap-2 text-xs text-emerald-300/80"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />Open</span>
+          </Link>
           <div className="flex min-h-18 items-center justify-between rounded-2xl border border-white/[0.04] bg-gradient-to-r from-white/[0.028] to-white/[0.014] px-5 text-lg font-medium text-white/62 sm:min-h-20 sm:px-6 sm:text-xl"><span>Status</span><span className="inline-flex items-center gap-2 text-xs text-emerald-300/80"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Online</span></div>
           <a href={DISCORD_URL} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)} className={itemClass}><span>Discord</span><ExternalLink className="h-5 w-5 text-white/30" /></a>
           <Link to="/documentation" onClick={() => setMenuOpen(false)} className={itemClass}><span>Documentation</span></Link>
