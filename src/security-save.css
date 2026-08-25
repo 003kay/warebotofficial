@@ -1,43 +1,81 @@
-/* Compact Security Center unsaved-changes prompt.
-   The component already owns behavior; this only moves the prompt out of the center. */
+/* Compact Security Center unsaved-changes prompt. */
 @media (min-width: 640px) {
   body .fixed.inset-x-0.bottom-5.z-\[80\] {
     left: auto !important;
-    right: 18px !important;
-    bottom: 18px !important;
+    right: 14px !important;
+    bottom: 14px !important;
     width: auto !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding: 0 !important;
     justify-content: flex-end !important;
   }
 
   body .fixed.inset-x-0.bottom-5.z-\[80\] > div {
-    width: 430px !important;
-    max-width: calc(100vw - 36px) !important;
-    padding: 10px 11px !important;
-    gap: 10px !important;
-    border-radius: 15px !important;
+    width: 356px !important;
+    max-width: calc(100vw - 28px) !important;
+    padding: 9px 10px !important;
+    gap: 8px !important;
+    border-radius: 14px !important;
   }
 
   body .fixed.inset-x-0.bottom-5.z-\[80\] > div > div:first-child {
-    gap: 9px !important;
+    gap: 8px !important;
+    padding-left: 0 !important;
+  }
+
+  body .fixed.inset-x-0.bottom-5.z-\[80\] > div > div:first-child > span {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  body .fixed.inset-x-0.bottom-5.z-\[80\] > div > div:first-child > div > div:first-child {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+
+  body .fixed.inset-x-0.bottom-5.z-\[80\] > div > div:first-child > div > div:nth-child(2) {
+    font-size: 8px !important;
+    line-height: 1.25 !important;
+    white-space: nowrap !important;
+  }
+
+  body .fixed.inset-x-0.bottom-5.z-\[80\] > div > div:first-child > div > div:nth-child(3) {
+    max-width: 190px !important;
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  body .fixed.inset-x-0.bottom-5.z-\[80\] > div > div:last-child {
+    gap: 6px !important;
   }
 
   body .fixed.inset-x-0.bottom-5.z-\[80\] button {
-    height: 34px !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    font-size: 10px !important;
-    border-radius: 10px !important;
+    height: 31px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    font-size: 9px !important;
+    border-radius: 9px !important;
+  }
+
+  body .fixed.inset-x-0.bottom-5.z-\[80\] button svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 }
 
 @media (max-width: 639px) {
   body .fixed.inset-x-0.bottom-5.z-\[80\] {
-    left: 10px !important;
+    left: auto !important;
     right: 10px !important;
     bottom: 10px !important;
-    width: auto !important;
+    width: calc(100vw - 20px) !important;
     padding: 0 !important;
+  }
+
+  body .fixed.inset-x-0.bottom-5.z-\[80\] > div {
+    border-radius: 14px !important;
+    padding: 10px !important;
   }
 }
