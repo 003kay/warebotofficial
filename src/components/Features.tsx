@@ -49,7 +49,7 @@ const features = [
 export function Features() {
   return (
     <section className="relative z-10 mx-auto max-w-7xl px-6 pb-28 pt-8 md:px-10 md:pb-36">
-      <div className="feature-heading-reveal mb-14 flex flex-col justify-between gap-8 md:flex-row md:items-end">
+      <div className="mb-14 flex flex-col justify-between gap-8 md:flex-row md:items-end">
         <div className="max-w-2xl">
           <div className="mb-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
             <span className="h-px w-7 bg-white/20" />
@@ -89,8 +89,7 @@ export function Features() {
             <a
               key={feature.title}
               href="/docs/commands"
-              className={`modern-feature-card group relative min-h-[260px] overflow-hidden rounded-[26px] border border-white/[0.08] bg-white/[0.025] p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/[0.16] ${span}`}
-              style={{ animationDelay: `${index * 0.08}s` }}
+              className={`group relative min-h-[260px] overflow-hidden rounded-[26px] border border-white/[0.08] bg-white/[0.025] p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/[0.16] ${span}`}
             >
               <div className="feature-shine pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/[0.025] blur-3xl transition-all duration-700 group-hover:bg-white/[0.07]" />
