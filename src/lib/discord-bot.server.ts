@@ -40,6 +40,19 @@ export type DiscordRole = {
   managed: boolean;
 };
 
+export type DiscordAutoModRule = {
+  id: string;
+  name: string;
+  enabled: boolean;
+  trigger_type: number;
+  trigger_metadata?: {
+    keyword_filter?: string[];
+    regex_patterns?: string[];
+    presets?: number[];
+    allow_list?: string[];
+  };
+};
+
 export type BotGuildStatus =
   | { connected: true; reason: null }
   | { connected: false; reason: "not_in_guild" | "forbidden" | "token_missing" | "token_invalid" | "discord_error" };
@@ -75,6 +88,19 @@ export async function fetchGuildRoles(guildId: string): Promise<DiscordRole[] | 
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Discord roles fetch failed: ${res.status} ${await res.text()}`);
   return (await res.json()) as DiscordRole[];
+}
+
+export async function fetchGuildAutoModRules(guildId: string): Promise<DiscordAutoModRule[] | null> {
+  const status = await getBotGuildStatus(guildId);
+  if (!status.connected) return null;
+  const res = await fetch(`${DISCORD_API}/guilds/${guildId}/auto-moderation/rules`, {
+    headers: botHeaders(),
+    cache: "no-store",
+  });
+  if (res.status === 404) return [];
+  if (res.status === 403) return null;
+  if (!res.ok) throw new Error(`Discord AutoMod fetch failed: ${res.status} ${await res.text()}`);
+  return (await res.json()) as DiscordAutoModRule[];
 }
 
 const STYLE_MAP: Record<string, number> = { primary: 1, secondary: 2, success: 3, danger: 4 };
