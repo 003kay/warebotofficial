@@ -14,6 +14,7 @@ import polishCss from "../site-polish.css?url";
 import interactionsCss from "../interactions.css?url";
 import categoryRailCss from "../category-rail.css?url";
 import commandPremiumCss from "../command-premium.css?url";
+import securitySaveCss from "../security-save.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CategoryRailEnhancer } from "../components/CategoryRailEnhancer";
 
@@ -113,6 +114,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: interactionsCss },
       { rel: "stylesheet", href: categoryRailCss },
       { rel: "stylesheet", href: commandPremiumCss },
+      { rel: "stylesheet", href: securitySaveCss },
     ],
   }),
   shellComponent: RootShell,
