@@ -16,14 +16,13 @@ export function Stats() {
           {stats.map((stat, index) => (
             <div
               key={stat.label}
-              className={`stat-reveal relative px-5 py-8 text-center md:py-10 ${
+              className={`relative px-5 py-8 text-center md:py-10 ${
                 index % 2 === 0 ? "border-r border-white/[0.07]" : ""
               } ${
                 index < 2 ? "border-b border-white/[0.07] md:border-b-0" : ""
               } ${
                 index > 0 ? "md:border-l md:border-white/[0.07]" : ""
               } md:border-r-0`}
-              style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="text-3xl font-bold tracking-[-0.04em] md:text-4xl">
                 {stat.value}
