@@ -20,9 +20,6 @@ export const Route = createFileRoute("/auth/discord/callback")({
           const user = await fetchDiscordUser(token.access_token);
           const expiresAt = Date.now() + token.expires_in * 1000;
 
-          // Persisting to Supabase is optional. The signed HttpOnly cookie below is
-          // the source of truth for the dashboard session, so a database migration
-          // cannot trap users in an OAuth loop.
           try {
             const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
             const { error } = await supabaseAdmin.from("discord_sessions").upsert(
@@ -42,7 +39,7 @@ export const Route = createFileRoute("/auth/discord/callback")({
           }
 
           const headers = new Headers();
-          headers.set("Location", "https://www.warebot.xyz/dashboard");
+          headers.set("Location", "https://warebot.xyz/dashboard");
           headers.append(
             "Set-Cookie",
             createSessionCookie({
