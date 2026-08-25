@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 const COOKIE_NAME = "ware_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const OAUTH_NEXT_COOKIE = "ware_oauth_next";
 
 export type WareSessionData = {
   discordUserId: string;
@@ -40,8 +41,6 @@ export function createSessionCookie(data: WareSessionData): string {
   const payload = encodePayload(data);
   const sig = sign(payload);
   const value = `${payload}.${sig}`;
-  // OAuth is canonicalized to www.warebot.xyz, so keep the cookie host-only.
-  // This avoids browser/domain edge cases that can cause an authorize loop.
   return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${MAX_AGE}`;
 }
 
@@ -63,8 +62,7 @@ export function readSessionDataFromCookie(cookieHeader: string | null): WareSess
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   const data = decodePayload(payload);
-  if (!data) return null;
-  if (data.expiresAt <= Date.now()) return null;
+  if (!data || data.expiresAt <= Date.now()) return null;
   return data;
 }
 
@@ -84,4 +82,28 @@ export function readStateFromCookie(cookieHeader: string | null): string | null 
   if (!cookieHeader) return null;
   const match = cookieHeader.split(/;\s*/).find((c) => c.startsWith("ware_oauth_state="));
   return match ? match.slice("ware_oauth_state=".length) : null;
+}
+
+function safeNextPath(value: string | null | undefined): string {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/dashboard";
+  return value.slice(0, 1000);
+}
+
+export function createOAuthNextCookie(next: string | null | undefined): string {
+  return `${OAUTH_NEXT_COOKIE}=${encodeURIComponent(safeNextPath(next))}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`;
+}
+
+export function clearOAuthNextCookie(): string {
+  return `${OAUTH_NEXT_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+
+export function readOAuthNextFromCookie(cookieHeader: string | null): string {
+  if (!cookieHeader) return "/dashboard";
+  const match = cookieHeader.split(/;\s*/).find((c) => c.startsWith(`${OAUTH_NEXT_COOKIE}=`));
+  if (!match) return "/dashboard";
+  try {
+    return safeNextPath(decodeURIComponent(match.slice(OAUTH_NEXT_COOKIE.length + 1)));
+  } catch {
+    return "/dashboard";
+  }
 }
