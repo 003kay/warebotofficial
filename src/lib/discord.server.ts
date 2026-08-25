@@ -3,7 +3,6 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 const DISCORD_API = "https://discord.com/api/v10";
 const WARE_DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || "1535352463232602173";
 const PRIMARY_AUTH_ORIGIN = "https://www.warebot.xyz";
-const ALLOWED_AUTH_ORIGINS = new Set([PRIMARY_AUTH_ORIGIN, "https://warebot.xyz"]);
 const MANAGE_GUILD = 0x20n;
 const ADMINISTRATOR = 0x8n;
 
@@ -18,7 +17,6 @@ export type DiscordGuild = {
 function getAuthOrigin(request: Request): string {
   const url = new URL(request.url);
   if (url.hostname === "localhost" || url.hostname === "127.0.0.1") return url.origin;
-  if (ALLOWED_AUTH_ORIGINS.has(url.origin)) return url.origin;
   return PRIMARY_AUTH_ORIGIN;
 }
 
