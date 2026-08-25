@@ -1,9 +1,27 @@
 const DISCORD_API = "https://discord.com/api/v10";
 
+function getBotToken() {
+  const token = (
+    process.env.DISCORD_BOT_TOKEN ||
+    process.env.BOT_TOKEN ||
+    process.env.DISCORD_TOKEN ||
+    ""
+  ).trim();
+
+  if (!token) {
+    throw new Error(
+      "Ware dashboard bot token is not configured. Set DISCORD_BOT_TOKEN in the website deployment environment.",
+    );
+  }
+
+  return token.replace(/^Bot\s+/i, "");
+}
+
 function botHeaders() {
-  const token = process.env.DISCORD_BOT_TOKEN;
-  if (!token) throw new Error("DISCORD_BOT_TOKEN not set");
-  return { Authorization: `Bot ${token}`, "Content-Type": "application/json" };
+  return {
+    Authorization: `Bot ${getBotToken()}`,
+    "Content-Type": "application/json",
+  };
 }
 
 export type DiscordChannel = {
@@ -22,18 +40,63 @@ export type DiscordRole = {
   managed: boolean;
 };
 
-// Returns null if the bot isn't in the guild.
+export type BotGuildStatus =
+  | { connected: true; reason: null }
+  | { connected: false; reason: "not_in_guild" | "forbidden" | "token_missing" | "token_invalid" | "discord_error" };
+
+/**
+ * Probe the guild itself instead of inferring bot membership from channel access.
+ * A bot may be in a guild while a channel/role request fails for another reason.
+ */
+export async function getBotGuildStatus(guildId: string): Promise<BotGuildStatus> {
+  let headers: ReturnType<typeof botHeaders>;
+  try {
+    headers = botHeaders();
+  } catch {
+    return { connected: false, reason: "token_missing" };
+  }
+
+  const res = await fetch(`${DISCORD_API}/guilds/${guildId}`, {
+    headers,
+    cache: "no-store",
+  });
+
+  if (res.ok) return { connected: true, reason: null };
+  if (res.status === 404) return { connected: false, reason: "not_in_guild" };
+  if (res.status === 401) return { connected: false, reason: "token_invalid" };
+  if (res.status === 403) return { connected: false, reason: "forbidden" };
+  return { connected: false, reason: "discord_error" };
+}
+
 export async function fetchGuildChannels(guildId: string): Promise<DiscordChannel[] | null> {
-  const res = await fetch(`${DISCORD_API}/guilds/${guildId}/channels`, { headers: botHeaders() });
-  if (res.status === 404 || res.status === 403) return null;
-  if (!res.ok) throw new Error(`Discord channels fetch failed: ${res.status} ${await res.text()}`);
+  const status = await getBotGuildStatus(guildId);
+  if (!status.connected) return null;
+
+  const res = await fetch(`${DISCORD_API}/guilds/${guildId}/channels`, {
+    headers: botHeaders(),
+    cache: "no-store",
+  });
+
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`Discord channels fetch failed: ${res.status} ${await res.text()}`);
+  }
   return (await res.json()) as DiscordChannel[];
 }
 
 export async function fetchGuildRoles(guildId: string): Promise<DiscordRole[] | null> {
-  const res = await fetch(`${DISCORD_API}/guilds/${guildId}/roles`, { headers: botHeaders() });
-  if (res.status === 404 || res.status === 403) return null;
-  if (!res.ok) throw new Error(`Discord roles fetch failed: ${res.status} ${await res.text()}`);
+  const status = await getBotGuildStatus(guildId);
+  if (!status.connected) return null;
+
+  const res = await fetch(`${DISCORD_API}/guilds/${guildId}/roles`, {
+    headers: botHeaders(),
+    cache: "no-store",
+  });
+
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`Discord roles fetch failed: ${res.status} ${await res.text()}`);
+  }
   return (await res.json()) as DiscordRole[];
 }
 
@@ -49,7 +112,6 @@ export type PanelOption = {
 
 function parseEmoji(raw: string): { name?: string; id?: string; animated?: boolean } | undefined {
   if (!raw) return undefined;
-  // <:name:id> or <a:name:id>
   const m = raw.match(/^<(a?):([^:]+):(\d+)>$/);
   if (m) return { name: m[2], id: m[3], animated: m[1] === "a" };
   return { name: raw };
@@ -117,7 +179,6 @@ function buildPanelPayload(
   };
 }
 
-// Creates the panel message (or edits it if we already have one).
 export async function publishPanelMessage(
   channelId: string,
   panel: Parameters<typeof buildPanelPayload>[0],
@@ -126,14 +187,13 @@ export async function publishPanelMessage(
 ): Promise<{ messageId: string }> {
   const payload = buildPanelPayload(panel, options);
 
-
   if (existingMessageId) {
-    const edit = await fetch(
-      `${DISCORD_API}/channels/${channelId}/messages/${existingMessageId}`,
-      { method: "PATCH", headers: botHeaders(), body: JSON.stringify(payload) },
-    );
+    const edit = await fetch(`${DISCORD_API}/channels/${channelId}/messages/${existingMessageId}`, {
+      method: "PATCH",
+      headers: botHeaders(),
+      body: JSON.stringify(payload),
+    });
     if (edit.ok) return { messageId: existingMessageId };
-    // Fall through to a fresh post if the old message is gone / channel changed.
   }
 
   const res = await fetch(`${DISCORD_API}/channels/${channelId}/messages`, {
