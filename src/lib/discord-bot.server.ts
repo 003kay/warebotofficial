@@ -7,50 +7,27 @@ function getBotToken() {
     process.env.DISCORD_TOKEN ||
     ""
   ).trim();
-
-  if (!token) {
-    throw new Error(
-      "Ware dashboard bot token is not configured. Set DISCORD_BOT_TOKEN in the website deployment environment.",
-    );
-  }
-
+  if (!token) throw new Error("Ware dashboard bot token is not configured. Set DISCORD_BOT_TOKEN in the website deployment environment.");
   return token.replace(/^Bot\s+/i, "");
 }
 
 function botHeaders() {
-  return {
-    Authorization: `Bot ${getBotToken()}`,
-    "Content-Type": "application/json",
-  };
+  return { Authorization: `Bot ${getBotToken()}`, "Content-Type": "application/json" };
 }
 
-export type DiscordChannel = {
-  id: string;
-  name: string;
-  type: number;
-  parent_id: string | null;
-  position: number;
+export type DiscordChannel = { id: string; name: string; type: number; parent_id: string | null; position: number };
+export type DiscordRole = { id: string; name: string; color: number; position: number; managed: boolean; permissions: string };
+export type DiscordGuildMember = {
+  user?: { id: string; username: string; global_name?: string | null; avatar?: string | null };
+  nick?: string | null;
+  roles: string[];
 };
-
-export type DiscordRole = {
-  id: string;
-  name: string;
-  color: number;
-  position: number;
-  managed: boolean;
-};
-
 export type DiscordAutoModRule = {
   id: string;
   name: string;
   enabled: boolean;
   trigger_type: number;
-  trigger_metadata?: {
-    keyword_filter?: string[];
-    regex_patterns?: string[];
-    presets?: number[];
-    allow_list?: string[];
-  };
+  trigger_metadata?: { keyword_filter?: string[]; regex_patterns?: string[]; presets?: number[]; allow_list?: string[] };
 };
 
 export type BotGuildStatus =
@@ -59,11 +36,7 @@ export type BotGuildStatus =
 
 export async function getBotGuildStatus(guildId: string): Promise<BotGuildStatus> {
   let headers: ReturnType<typeof botHeaders>;
-  try {
-    headers = botHeaders();
-  } catch {
-    return { connected: false, reason: "token_missing" };
-  }
+  try { headers = botHeaders(); } catch { return { connected: false, reason: "token_missing" }; }
   const res = await fetch(`${DISCORD_API}/guilds/${guildId}`, { headers, cache: "no-store" });
   if (res.ok) return { connected: true, reason: null };
   if (res.status === 404) return { connected: false, reason: "not_in_guild" };
@@ -90,28 +63,66 @@ export async function fetchGuildRoles(guildId: string): Promise<DiscordRole[] | 
   return (await res.json()) as DiscordRole[];
 }
 
+export async function fetchGuildMembers(guildId: string): Promise<DiscordGuildMember[] | null> {
+  const status = await getBotGuildStatus(guildId);
+  if (!status.connected) return null;
+  const all: DiscordGuildMember[] = [];
+  let after = "0";
+  for (let page = 0; page < 10; page += 1) {
+    const res = await fetch(`${DISCORD_API}/guilds/${guildId}/members?limit=1000&after=${after}`, { headers: botHeaders(), cache: "no-store" });
+    if (res.status === 403) return null;
+    if (!res.ok) throw new Error(`Discord members fetch failed: ${res.status} ${await res.text()}`);
+    const batch = (await res.json()) as DiscordGuildMember[];
+    all.push(...batch);
+    if (batch.length < 1000) break;
+    const last = batch[batch.length - 1]?.user?.id;
+    if (!last) break;
+    after = last;
+  }
+  return all;
+}
+
 export async function fetchGuildAutoModRules(guildId: string): Promise<DiscordAutoModRule[] | null> {
   const status = await getBotGuildStatus(guildId);
   if (!status.connected) return null;
-  const res = await fetch(`${DISCORD_API}/guilds/${guildId}/auto-moderation/rules`, {
-    headers: botHeaders(),
-    cache: "no-store",
-  });
+  const res = await fetch(`${DISCORD_API}/guilds/${guildId}/auto-moderation/rules`, { headers: botHeaders(), cache: "no-store" });
   if (res.status === 404) return [];
   if (res.status === 403) return null;
   if (!res.ok) throw new Error(`Discord AutoMod fetch failed: ${res.status} ${await res.text()}`);
   return (await res.json()) as DiscordAutoModRule[];
 }
 
-const STYLE_MAP: Record<string, number> = { primary: 1, secondary: 2, success: 3, danger: 4 };
+export async function removeGuildAutoModFilter(guildId: string, rawValue: string): Promise<boolean> {
+  const value = rawValue.trim();
+  if (!value) return false;
+  const rules = await fetchGuildAutoModRules(guildId);
+  if (!rules) throw new Error("Ware cannot edit Discord AutoMod. Make sure Ware has Manage Server permission.");
+  let changed = false;
+  for (const rule of rules) {
+    if (rule.trigger_type !== 1) continue;
+    const metadata = rule.trigger_metadata ?? {};
+    const nextKeywords = (metadata.keyword_filter ?? []).filter((entry) => entry.toLowerCase() !== value.toLowerCase());
+    const nextRegex = (metadata.regex_patterns ?? []).filter((entry) => entry.toLowerCase() !== value.toLowerCase());
+    if (nextKeywords.length === (metadata.keyword_filter ?? []).length && nextRegex.length === (metadata.regex_patterns ?? []).length) continue;
+    const res = await fetch(`${DISCORD_API}/guilds/${guildId}/auto-moderation/rules/${rule.id}`, {
+      method: "PATCH",
+      headers: botHeaders(),
+      body: JSON.stringify({
+        trigger_metadata: {
+          ...metadata,
+          keyword_filter: nextKeywords,
+          regex_patterns: nextRegex,
+        },
+      }),
+    });
+    if (!res.ok) throw new Error(`Discord AutoMod update failed: ${res.status} ${await res.text()}`);
+    changed = true;
+  }
+  return changed;
+}
 
-export type PanelOption = {
-  id: string;
-  position: number;
-  label: string;
-  description: string;
-  emoji: string;
-};
+const STYLE_MAP: Record<string, number> = { primary: 1, secondary: 2, success: 3, danger: 4 };
+export type PanelOption = { id: string; position: number; label: string; description: string; emoji: string };
 
 function parseEmoji(raw: string): { name?: string; id?: string; animated?: boolean } | undefined {
   if (!raw) return undefined;
@@ -120,19 +131,7 @@ function parseEmoji(raw: string): { name?: string; id?: string; animated?: boole
   return { name: raw };
 }
 
-function buildPanelPayload(
-  panel: {
-    title: string;
-    description: string;
-    color: string;
-    button_label: string;
-    button_emoji: string;
-    button_style: string;
-    panel_type?: string;
-    dropdown_placeholder?: string;
-  },
-  options: PanelOption[] = [],
-) {
+function buildPanelPayload(panel: { title: string; description: string; color: string; button_label: string; button_emoji: string; button_style: string; panel_type?: string; dropdown_placeholder?: string }, options: PanelOption[] = []) {
   const colorInt = parseInt((panel.color || "#5865F2").replace("#", ""), 16) || 0x5865f2;
   const useDropdown = panel.panel_type === "dropdown" && options.length > 0;
   const components = useDropdown
@@ -141,12 +140,7 @@ function buildPanelPayload(
   return { embeds: [{ title: panel.title, description: panel.description, color: colorInt }], components };
 }
 
-export async function publishPanelMessage(
-  channelId: string,
-  panel: Parameters<typeof buildPanelPayload>[0],
-  existingMessageId: string | null,
-  options: PanelOption[] = [],
-): Promise<{ messageId: string }> {
+export async function publishPanelMessage(channelId: string, panel: Parameters<typeof buildPanelPayload>[0], existingMessageId: string | null, options: PanelOption[] = []): Promise<{ messageId: string }> {
   const payload = buildPanelPayload(panel, options);
   if (existingMessageId) {
     const edit = await fetch(`${DISCORD_API}/channels/${channelId}/messages/${existingMessageId}`, { method: "PATCH", headers: botHeaders(), body: JSON.stringify(payload) });
@@ -158,21 +152,7 @@ export async function publishPanelMessage(
   return { messageId: json.id };
 }
 
-export async function publishTranscriptClosedLog(input: {
-  channelId: string;
-  transcriptId: string;
-  ticketId: string;
-  openerName?: string | null;
-  openerId: string;
-  closerName?: string | null;
-  closerId?: string | null;
-  claimerName?: string | null;
-  claimerId?: string | null;
-  reason?: string | null;
-  openedAt?: string | null;
-  closedAt?: string | null;
-  baseUrl: string;
-}) {
+export async function publishTranscriptClosedLog(input: { channelId: string; transcriptId: string; ticketId: string; openerName?: string | null; openerId: string; closerName?: string | null; closerId?: string | null; claimerName?: string | null; claimerId?: string | null; reason?: string | null; openedAt?: string | null; closedAt?: string | null; baseUrl: string }) {
   const transcriptUrl = `${input.baseUrl.replace(/\/$/, "")}/transcripts/${input.transcriptId}`;
   const opened = input.openedAt ? `<t:${Math.floor(new Date(input.openedAt).getTime() / 1000)}:f>` : "Unknown";
   const closed = input.closedAt ? `<t:${Math.floor(new Date(input.closedAt).getTime() / 1000)}:f>` : `<t:${Math.floor(Date.now() / 1000)}:f>`;
@@ -185,10 +165,7 @@ export async function publishTranscriptClosedLog(input: {
     { name: "⏱️ Closed", value: closed, inline: true },
   ];
   if (input.reason) fields.push({ name: "❔ Reason", value: input.reason.slice(0, 1024), inline: false });
-  const payload = {
-    embeds: [{ title: "Ticket Closed", color: 0x2b2d31, fields, timestamp: input.closedAt || new Date().toISOString(), footer: { text: "Ware Tickets" } }],
-    components: [{ type: 1, components: [{ type: 2, style: 5, label: "View Transcript", url: transcriptUrl, emoji: { name: "📄" } }] }],
-  };
+  const payload = { embeds: [{ title: "Ticket Closed", color: 0x2b2d31, fields, timestamp: input.closedAt || new Date().toISOString(), footer: { text: "Ware Tickets" } }], components: [{ type: 1, components: [{ type: 2, style: 5, label: "View Transcript", url: transcriptUrl, emoji: { name: "📄" } }] }] };
   const res = await fetch(`${DISCORD_API}/channels/${input.channelId}/messages`, { method: "POST", headers: botHeaders(), body: JSON.stringify(payload) });
   if (!res.ok) throw new Error(`Discord transcript log failed: ${res.status} ${await res.text()}`);
   return (await res.json()) as { id: string };
