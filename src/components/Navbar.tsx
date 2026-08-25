@@ -26,26 +26,20 @@ export function Navbar() {
         <div
           aria-disabled="true"
           title="Dashboard — Coming soon"
-          className="hidden min-h-10 cursor-not-allowed select-none items-center gap-3 rounded-xl border border-white/[0.045] bg-white/[0.014] px-3.5 text-left text-white/30 sm:flex"
+          className="group relative flex min-h-12 min-w-[118px] cursor-not-allowed select-none items-center justify-between overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.025] px-3.5 text-left text-white/40 shadow-[0_8px_30px_-18px_rgba(255,255,255,.18),inset_0_1px_0_rgba(255,255,255,.035)] sm:min-h-14 sm:min-w-[154px] sm:px-4"
         >
-          <span className="leading-none">
-            <span className="block text-[13px] font-medium text-white/34">Dashboard</span>
-            <span className="mt-1 block text-[8px] uppercase tracking-[0.16em] text-white/18">Coming soon</span>
+          <span className="pointer-events-none absolute -left-12 top-0 h-full w-10 -skew-x-12 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent animate-[dashboard-shimmer_4s_ease-in-out_infinite]" />
+          <span className="relative leading-none">
+            <span className="block text-[12px] font-semibold tracking-[-0.01em] text-white/45 sm:text-[15px]">Dashboard</span>
+            <span className="mt-1.5 block text-[7px] uppercase tracking-[0.16em] text-white/22 sm:text-[9px]">Coming soon</span>
           </span>
-          <span className="h-1.5 w-1.5 rounded-full bg-white/15" />
+          <span className="relative ml-2 flex h-5 w-5 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.025] sm:h-6 sm:w-6">
+            <span className="h-1.5 w-1.5 rounded-full bg-white/25 animate-pulse" />
+          </span>
         </div>
 
-        <div
-          aria-disabled="true"
-          title="Dashboard — Coming soon"
-          className="flex h-10 cursor-not-allowed select-none flex-col items-start justify-center rounded-xl border border-white/[0.045] bg-white/[0.014] px-2.5 text-white/30 sm:hidden"
-        >
-          <span className="text-[10px] font-medium leading-none text-white/34">Dashboard</span>
-          <span className="mt-1 text-[6px] uppercase leading-none tracking-[0.12em] text-white/18">Coming soon</span>
-        </div>
-
-        <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="group grid h-10 w-10 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.018] text-white/62 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white">
-          <Menu className="h-5 w-5" />
+        <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="group grid h-12 w-12 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.018] text-white/62 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white sm:h-14 sm:w-14">
+          <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
       </div>
     </header>
@@ -57,7 +51,7 @@ export function Navbar() {
           <button onClick={() => setMenuOpen(false)} className="grid h-11 w-11 place-items-center rounded-xl border border-white/[0.05] bg-white/[0.018] text-white/55"><X className="h-6 w-6" /></button>
         </div>
         <nav className="grid gap-3">
-          <Link to="/commands" onClick={() => setMenuOpen(false)} className={itemClass}><span>Commands</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">821+</span></Link>
+          <Link to="/commands" onClick={() => setMenuOpen(false)} className={itemClass}><span>Commands</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">1,008</span></Link>
           <Link to="/embeds" onClick={() => setMenuOpen(false)} className={itemClass}><span>Embeds</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">Builder</span></Link>
           <div aria-disabled="true" className="flex min-h-18 cursor-not-allowed items-center justify-between rounded-2xl border border-white/[0.035] bg-gradient-to-r from-white/[0.018] to-white/[0.009] px-5 text-white/30 sm:min-h-20 sm:px-6">
             <span>
