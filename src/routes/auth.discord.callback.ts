@@ -39,7 +39,7 @@ export const Route = createFileRoute("/auth/discord/callback")({
           }
 
           const headers = new Headers();
-          headers.set("Location", "https://warebot.xyz/dashboard");
+          headers.set("Location", "/dashboard");
           headers.append(
             "Set-Cookie",
             createSessionCookie({
