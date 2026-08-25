@@ -14,6 +14,28 @@ async function requireGuildManager(guildId: string) {
   return { userId, guild };
 }
 
+async function assertGuildChannel(guildId: string, channelId: string | null, allowedTypes: number[]) {
+  if (!channelId) return;
+  const { fetchGuildChannels } = await import("@/lib/discord-bot.server");
+  const channels = await fetchGuildChannels(guildId);
+  if (!channels) throw new Error("Ware is not currently in this server.");
+  const channel = channels.find((entry) => entry.id === channelId);
+  if (!channel || !allowedTypes.includes(channel.type)) {
+    throw new Error("That channel does not belong to the server you are managing.");
+  }
+}
+
+async function assertGuildRoleIds(guildId: string, roleIds: string[]) {
+  if (!roleIds.length) return;
+  const { fetchGuildRoles } = await import("@/lib/discord-bot.server");
+  const roles = await fetchGuildRoles(guildId);
+  if (!roles) throw new Error("Ware is not currently in this server.");
+  const valid = new Set(roles.map((role) => role.id));
+  if (roleIds.some((roleId) => !valid.has(roleId))) {
+    throw new Error("One or more selected roles do not belong to this server.");
+  }
+}
+
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(async () => {
   const { readSessionFromCookie } = await import("@/lib/session.server");
   const { getValidAccessToken } = await import("@/lib/discord.server");
@@ -79,6 +101,7 @@ export const getTicketPanel = createServerFn({ method: "GET" })
       welcome_message: string;
       ticket_name_format: string;
     };
+
     let options: OptionRow[] = [];
     if (panelRes.data) {
       const optRes = await supabaseAdmin
@@ -88,7 +111,6 @@ export const getTicketPanel = createServerFn({ method: "GET" })
         .order("position", { ascending: true });
       options = (optRes.data ?? []) as OptionRow[];
     }
-
 
     return {
       guild: {
@@ -115,7 +137,6 @@ export const getTicketPanel = createServerFn({ method: "GET" })
         .map((r) => ({ id: r.id, name: r.name, color: r.color })),
     };
   });
-
 
 export type PanelOptionInput = {
   position: number;
@@ -168,9 +189,23 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
     if (data.panel_type !== "button" && data.panel_type !== "dropdown") {
       throw new Error("Invalid panel type");
     }
-    if (data.panel_type === "dropdown" && data.options.length === 0) {
-      throw new Error("Add at least one dropdown option before saving.");
+    if (data.options.length === 0) {
+      throw new Error("Add at least one ticket option before saving.");
     }
+    if (data.options.length > 10) {
+      throw new Error("A ticket panel can have up to 10 options.");
+    }
+
+    await Promise.all([
+      assertGuildChannel(data.guildId, data.channel_id, [0, 5]),
+      assertGuildChannel(data.guildId, data.log_channel_id, [0, 5]),
+      assertGuildChannel(data.guildId, data.category_id, [4]),
+      assertGuildRoleIds(data.guildId, data.support_role_ids),
+      ...data.options.map(async (option) => {
+        await assertGuildChannel(data.guildId, option.category_id, [4]);
+        await assertGuildRoleIds(data.guildId, option.support_role_ids);
+      }),
+    ]);
 
     const { data: upserted, error } = await supabaseAdmin
       .from("ticket_panels")
@@ -178,25 +213,25 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
         {
           guild_id: data.guildId,
           owner_discord_id: userId,
-          title: data.title,
-          description: data.description,
+          title: data.title.slice(0, 256),
+          description: data.description.slice(0, 4000),
           color: data.color,
           panel_type: data.panel_type,
-          dropdown_placeholder: data.dropdown_placeholder,
-          button_label: data.button_label,
-          button_emoji: data.button_emoji,
+          dropdown_placeholder: data.dropdown_placeholder.slice(0, 150),
+          button_label: data.button_label.slice(0, 80),
+          button_emoji: data.button_emoji.slice(0, 100),
           button_style: data.button_style,
-          close_button_label: data.close_button_label,
-          close_button_emoji: data.close_button_emoji,
+          close_button_label: data.close_button_label.slice(0, 80),
+          close_button_emoji: data.close_button_emoji.slice(0, 100),
           close_button_style: data.close_button_style,
-          claim_button_label: data.claim_button_label,
-          claim_button_emoji: data.claim_button_emoji,
+          claim_button_label: data.claim_button_label.slice(0, 80),
+          claim_button_emoji: data.claim_button_emoji.slice(0, 100),
           claim_button_style: data.claim_button_style,
-          command_prefix: data.command_prefix,
-          close_command: data.close_command,
-          reopen_command: data.reopen_command,
-          delete_command: data.delete_command,
-          welcome_message: data.welcome_message,
+          command_prefix: data.command_prefix.slice(0, 5),
+          close_command: data.close_command.slice(0, 32),
+          reopen_command: data.reopen_command.slice(0, 32),
+          delete_command: data.delete_command.slice(0, 32),
+          welcome_message: data.welcome_message.slice(0, 4000),
           channel_id: data.channel_id,
           category_id: data.category_id,
           log_channel_id: data.log_channel_id,
@@ -206,25 +241,24 @@ export const saveTicketPanel = createServerFn({ method: "POST" })
       )
       .select("id")
       .single();
+
     if (error || !upserted) throw new Error(error?.message ?? "Failed to save panel");
 
-    // Replace dropdown options
     await supabaseAdmin.from("ticket_panel_options").delete().eq("panel_id", upserted.id);
-    if (data.options.length > 0) {
-      const rows = data.options.slice(0, 25).map((o, i) => ({
-        panel_id: upserted.id,
-        position: i,
-        label: o.label,
-        description: o.description,
-        emoji: o.emoji,
-        category_id: o.category_id,
-        support_role_ids: o.support_role_ids,
-        welcome_message: o.welcome_message,
-        ticket_name_format: o.ticket_name_format,
-      }));
-      const { error: optErr } = await supabaseAdmin.from("ticket_panel_options").insert(rows);
-      if (optErr) throw new Error(optErr.message);
-    }
+    const rows = data.options.slice(0, 10).map((option, index) => ({
+      panel_id: upserted.id,
+      position: index,
+      label: option.label.slice(0, 100),
+      description: option.description.slice(0, 100),
+      emoji: option.emoji.slice(0, 100),
+      category_id: option.category_id,
+      support_role_ids: option.support_role_ids,
+      welcome_message: option.welcome_message.slice(0, 4000),
+      ticket_name_format: option.ticket_name_format.slice(0, 100),
+    }));
+
+    const { error: optionError } = await supabaseAdmin.from("ticket_panel_options").insert(rows);
+    if (optionError) throw new Error(optionError.message);
 
     return { ok: true };
   });
@@ -245,7 +279,9 @@ export const publishTicketPanel = createServerFn({ method: "POST" })
     if (!panel) throw new Error("Save the panel before publishing.");
     if (!panel.channel_id) throw new Error("Pick a channel to post the panel in first.");
 
-    const { data: opts } = await supabaseAdmin
+    await assertGuildChannel(data.guildId, panel.channel_id, [0, 5]);
+
+    const { data: options } = await supabaseAdmin
       .from("ticket_panel_options")
       .select("id, position, label, description, emoji")
       .eq("panel_id", panel.id)
@@ -255,7 +291,13 @@ export const publishTicketPanel = createServerFn({ method: "POST" })
       panel.channel_id,
       panel,
       panel.panel_message_id,
-      (opts ?? []) as { id: string; position: number; label: string; description: string; emoji: string }[],
+      (options ?? []) as {
+        id: string;
+        position: number;
+        label: string;
+        description: string;
+        emoji: string;
+      }[],
     );
 
     await supabaseAdmin
@@ -265,4 +307,3 @@ export const publishTicketPanel = createServerFn({ method: "POST" })
 
     return { ok: true, messageId };
   });
-
