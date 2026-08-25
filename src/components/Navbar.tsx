@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 const WARE_AVATAR = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
 const DISCORD_URL = "https://discord.gg/wept";
+const DASHBOARD_LOGIN = "/auth/discord/login";
 const itemClass = "group flex min-h-18 items-center justify-between rounded-2xl border border-white/[0.04] bg-gradient-to-r from-white/[0.035] to-white/[0.018] px-5 text-lg font-medium text-white/82 shadow-[inset_0_1px_0_rgba(255,255,255,.025)] transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.10] hover:from-white/[0.065] hover:to-white/[0.03] hover:text-white sm:min-h-20 sm:px-6 sm:text-xl";
 
 export function Navbar() {
@@ -23,8 +24,8 @@ export function Navbar() {
       </Link>
 
       <div className="flex items-center gap-2.5 sm:gap-3">
-        <Link
-          to="/dashboard"
+        <a
+          href={DASHBOARD_LOGIN}
           title="Open Ware Dashboard"
           className="group relative flex min-h-12 min-w-[128px] items-center overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.032] px-4 text-left text-white/75 shadow-[0_8px_30px_-18px_rgba(255,255,255,.18),inset_0_1px_0_rgba(255,255,255,.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white sm:min-h-14 sm:min-w-[162px] sm:px-5"
         >
@@ -33,7 +34,7 @@ export function Navbar() {
             <span className="block text-[12px] font-semibold tracking-[-0.01em] text-white/80 transition-colors group-hover:text-white sm:text-[15px]">Dashboard</span>
             <span className="mt-1.5 block text-[7px] uppercase tracking-[0.16em] text-white/35 sm:text-[9px]">Manage servers</span>
           </span>
-        </Link>
+        </a>
 
         <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="group grid h-12 w-12 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.018] text-white/62 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white sm:h-14 sm:w-14">
           <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -50,13 +51,13 @@ export function Navbar() {
         <nav className="grid gap-3">
           <Link to="/commands" onClick={() => setMenuOpen(false)} className={itemClass}><span>Commands</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">1,008</span></Link>
           <Link to="/embeds" onClick={() => setMenuOpen(false)} className={itemClass}><span>Embeds</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">Builder</span></Link>
-          <Link to="/dashboard" onClick={() => setMenuOpen(false)} className={itemClass}>
+          <a href={DASHBOARD_LOGIN} onClick={() => setMenuOpen(false)} className={itemClass}>
             <span>
               <span className="block">Dashboard</span>
               <span className="mt-0.5 block text-[10px] uppercase tracking-[0.16em] text-white/28">Discord login required</span>
             </span>
             <span className="text-xs text-white/35">Open</span>
-          </Link>
+          </a>
           <div className="flex min-h-18 items-center justify-between rounded-2xl border border-white/[0.04] bg-gradient-to-r from-white/[0.028] to-white/[0.014] px-5 text-lg font-medium text-white/62 sm:min-h-20 sm:px-6 sm:text-xl"><span>Status</span><span className="inline-flex items-center gap-2 text-xs text-emerald-300/80"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Online</span></div>
           <a href={DISCORD_URL} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)} className={itemClass}><span>Discord</span><ExternalLink className="h-5 w-5 text-white/30" /></a>
           <Link to="/documentation" onClick={() => setMenuOpen(false)} className={itemClass}><span>Documentation</span></Link>
