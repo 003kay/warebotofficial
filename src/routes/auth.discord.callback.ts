@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { exchangeCode, fetchDiscordUser } from "@/lib/discord.server";
-import { clearStateCookie, createSessionCookie, readStateFromCookie } from "@/lib/session.server";
+import {
+  clearOAuthNextCookie,
+  clearStateCookie,
+  createSessionCookie,
+  readOAuthNextFromCookie,
+  readStateFromCookie,
+} from "@/lib/session.server";
 
 export const Route = createFileRoute("/auth/discord/callback")({
   server: {
@@ -9,7 +15,8 @@ export const Route = createFileRoute("/auth/discord/callback")({
         const url = new URL(request.url);
         const code = url.searchParams.get("code");
         const state = url.searchParams.get("state");
-        const cookieState = readStateFromCookie(request.headers.get("cookie"));
+        const cookieHeader = request.headers.get("cookie");
+        const cookieState = readStateFromCookie(cookieHeader);
 
         if (!code || !state || state !== cookieState) {
           return new Response("Invalid OAuth state. Please return to Ware and try again.", { status: 400 });
@@ -39,7 +46,7 @@ export const Route = createFileRoute("/auth/discord/callback")({
           }
 
           const headers = new Headers();
-          headers.set("Location", "/dashboard");
+          headers.set("Location", readOAuthNextFromCookie(cookieHeader));
           headers.append(
             "Set-Cookie",
             createSessionCookie({
@@ -52,6 +59,7 @@ export const Route = createFileRoute("/auth/discord/callback")({
             }),
           );
           headers.append("Set-Cookie", clearStateCookie());
+          headers.append("Set-Cookie", clearOAuthNextCookie());
           return new Response(null, { status: 302, headers });
         } catch (err) {
           console.error("Discord OAuth callback error", err);
