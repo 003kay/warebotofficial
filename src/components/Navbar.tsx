@@ -35,6 +35,13 @@ export function Navbar() {
         <nav className="grid gap-3">
           <Link to="/commands" onClick={() => setMenuOpen(false)} className={itemClass}><span>Commands</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">821+</span></Link>
           <Link to="/embeds" onClick={() => setMenuOpen(false)} className={itemClass}><span>Embeds</span><span className="text-xs uppercase tracking-[0.16em] text-white/25">Builder</span></Link>
+          <div aria-disabled="true" className="flex min-h-18 cursor-not-allowed items-center justify-between rounded-2xl border border-white/[0.035] bg-gradient-to-r from-white/[0.018] to-white/[0.009] px-5 text-white/30 sm:min-h-20 sm:px-6">
+            <span>
+              <span className="block text-lg font-medium text-white/34 sm:text-xl">Dashboard</span>
+              <span className="mt-0.5 block text-[10px] uppercase tracking-[0.16em] text-white/18">Coming soon</span>
+            </span>
+            <span className="rounded-full border border-white/[0.055] bg-white/[0.018] px-2.5 py-1 text-[9px] uppercase tracking-[0.14em] text-white/20">Soon</span>
+          </div>
           <div className="flex min-h-18 items-center justify-between rounded-2xl border border-white/[0.04] bg-gradient-to-r from-white/[0.028] to-white/[0.014] px-5 text-lg font-medium text-white/62 sm:min-h-20 sm:px-6 sm:text-xl"><span>Status</span><span className="inline-flex items-center gap-2 text-xs text-emerald-300/80"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Online</span></div>
           <a href={DISCORD_URL} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)} className={itemClass}><span>Discord</span><ExternalLink className="h-5 w-5 text-white/30" /></a>
           <Link to="/documentation" onClick={() => setMenuOpen(false)} className={itemClass}><span>Documentation</span></Link>
