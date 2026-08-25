@@ -30,9 +30,26 @@ async function validateRole(guildId: string, roleId: string | null) {
   if (!roles.some((r) => r.id === roleId)) throw new Error("Selected role does not belong to this server.");
 }
 
+function missingSchema(message?: string | null) {
+  return !!message && /does not exist|schema cache|could not find the table/i.test(message);
+}
+
+const DEFAULT_SETTINGS = {
+  log_channel_id: null as string | null,
+  dry_run_global: false,
+  profile: "medium",
+  raidmode: false,
+  panicmode: false,
+  verification_mode: "off",
+  verification_role_id: null as string | null,
+  captcha_difficulty: "medium",
+  quarantine_role_id: null as string | null,
+  quarantine_channel_id: null as string | null,
+};
+
 export type SecurityLoadResult = {
   guild: { id: string; name: string; iconUrl: string | null };
-  settings: { log_channel_id: string | null; dry_run_global: boolean; profile: string; raidmode: boolean; panicmode: boolean; verification_mode: string; verification_role_id: string | null; captcha_difficulty: string; quarantine_role_id: string | null; quarantine_channel_id: string | null };
+  settings: typeof DEFAULT_SETTINGS;
   modules: Record<string, { enabled: boolean; dry_run: boolean; punishment: string; threshold_count: number; threshold_seconds: number; extra: Json }>;
   lists: Record<ListType, { id: string; entry_type: string; value: string; note: string | null }[]>;
   events: { id: string; module_key: string | null; event_type: string; actor_id: string | null; target_id: string | null; dry_run: boolean; punishment: string | null; reason: string | null; created_at: string }[];
@@ -49,32 +66,34 @@ export const getSecurityConfig = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { fetchGuildChannels, fetchGuildRoles, getBotGuildStatus } = await import("@/lib/discord-bot.server");
 
-    const [settingsRes, modulesRes, listsRes, eventsRes, channels, roles, botStatus] = await Promise.all([
+    const [settingsRes, modulesRes, listsRes, eventsRes, fallbackRes, channels, roles, botStatus] = await Promise.all([
       supabaseAdmin.from("security_settings").select("*").eq("guild_id", data.guildId).maybeSingle(),
       supabaseAdmin.from("security_modules").select("*").eq("guild_id", data.guildId),
       supabaseAdmin.from("security_list_entries").select("*").eq("guild_id", data.guildId),
       supabaseAdmin.from("security_events").select("id,module_key,event_type,actor_id,target_id,dry_run,punishment,reason,created_at").eq("guild_id", data.guildId).order("created_at", { ascending: false }).limit(50),
+      (supabaseAdmin as any).from("guild_dashboard_settings").select("settings").eq("guild_id", data.guildId).maybeSingle(),
       fetchGuildChannels(data.guildId).catch(() => null),
       fetchGuildRoles(data.guildId).catch(() => null),
       getBotGuildStatus(data.guildId).catch(() => ({ connected: false as const, reason: "discord_error" as const })),
     ]);
 
     for (const [name, result] of [["security_settings", settingsRes], ["security_modules", modulesRes], ["security_list_entries", listsRes], ["security_events", eventsRes]] as const) {
-      if (result.error && !/does not exist|schema cache/i.test(result.error.message)) throw new Error(`${name}: ${result.error.message}`);
+      if (result.error && !missingSchema(result.error.message)) throw new Error(`${name}: ${result.error.message}`);
     }
 
-    const s = settingsRes.data;
+    const fallbackSettings = ((fallbackRes?.data?.settings ?? {}) as Record<string, any>).security_core as Record<string, any> | undefined;
+    const s = settingsRes.data ?? fallbackSettings ?? {};
     const settings = {
-      log_channel_id: s?.log_channel_id ?? null,
-      dry_run_global: s?.dry_run_global ?? false,
-      profile: s?.profile ?? "medium",
-      raidmode: s?.raidmode ?? false,
-      panicmode: s?.panicmode ?? false,
-      verification_mode: s?.verification_mode ?? "off",
-      verification_role_id: s?.verification_role_id ?? null,
-      captcha_difficulty: s?.captcha_difficulty ?? "medium",
-      quarantine_role_id: s?.quarantine_role_id ?? null,
-      quarantine_channel_id: s?.quarantine_channel_id ?? null,
+      log_channel_id: s.log_channel_id ?? DEFAULT_SETTINGS.log_channel_id,
+      dry_run_global: s.dry_run_global ?? DEFAULT_SETTINGS.dry_run_global,
+      profile: s.profile ?? DEFAULT_SETTINGS.profile,
+      raidmode: s.raidmode ?? DEFAULT_SETTINGS.raidmode,
+      panicmode: s.panicmode ?? DEFAULT_SETTINGS.panicmode,
+      verification_mode: s.verification_mode ?? DEFAULT_SETTINGS.verification_mode,
+      verification_role_id: s.verification_role_id ?? DEFAULT_SETTINGS.verification_role_id,
+      captcha_difficulty: s.captcha_difficulty ?? DEFAULT_SETTINGS.captcha_difficulty,
+      quarantine_role_id: s.quarantine_role_id ?? DEFAULT_SETTINGS.quarantine_role_id,
+      quarantine_channel_id: s.quarantine_channel_id ?? DEFAULT_SETTINGS.quarantine_channel_id,
     };
 
     const modules: SecurityLoadResult["modules"] = {};
@@ -104,10 +123,44 @@ export const saveSecuritySettings = createServerFn({ method: "POST" })
     if (!["low", "medium", "high", "extreme"].includes(data.profile)) throw new Error("Invalid protection profile");
     if (!["off", "button", "captcha", "questions"].includes(data.verification_mode)) throw new Error("Invalid verification mode");
     await Promise.all([validateChannel(data.guildId, data.log_channel_id), validateChannel(data.guildId, data.quarantine_channel_id), validateRole(data.guildId, data.verification_role_id), validateRole(data.guildId, data.quarantine_role_id)]);
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("security_settings").upsert({ guild_id: data.guildId, owner_discord_id: userId, log_channel_id: data.log_channel_id, dry_run_global: data.dry_run_global, profile: data.profile, raidmode: data.raidmode, panicmode: data.panicmode, verification_mode: data.verification_mode, verification_role_id: data.verification_role_id, captcha_difficulty: data.captcha_difficulty, quarantine_role_id: data.quarantine_role_id, quarantine_channel_id: data.quarantine_channel_id }, { onConflict: "guild_id" });
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    const payload = {
+      guild_id: data.guildId,
+      owner_discord_id: userId,
+      log_channel_id: data.log_channel_id,
+      dry_run_global: data.dry_run_global,
+      profile: data.profile,
+      raidmode: data.raidmode,
+      panicmode: data.panicmode,
+      verification_mode: data.verification_mode,
+      verification_role_id: data.verification_role_id,
+      captcha_difficulty: data.captcha_difficulty,
+      quarantine_role_id: data.quarantine_role_id,
+      quarantine_channel_id: data.quarantine_channel_id,
+    };
+    const { error } = await supabaseAdmin.from("security_settings").upsert(payload, { onConflict: "guild_id" });
+    if (!error) return { ok: true, storage: "security_settings" as const };
+    if (!missingSchema(error.message)) throw new Error(error.message);
+
+    const { data: current, error: currentError } = await (supabaseAdmin as any).from("guild_dashboard_settings").select("settings").eq("guild_id", data.guildId).maybeSingle();
+    if (currentError && !missingSchema(currentError.message)) throw new Error(currentError.message);
+    const existing = ((current?.settings ?? {}) as Record<string, unknown>);
+    const securityCore = {
+      log_channel_id: data.log_channel_id,
+      dry_run_global: data.dry_run_global,
+      profile: data.profile,
+      raidmode: data.raidmode,
+      panicmode: data.panicmode,
+      verification_mode: data.verification_mode,
+      verification_role_id: data.verification_role_id,
+      captcha_difficulty: data.captcha_difficulty,
+      quarantine_role_id: data.quarantine_role_id,
+      quarantine_channel_id: data.quarantine_channel_id,
+    };
+    const fallbackWrite = await (supabaseAdmin as any).from("guild_dashboard_settings").upsert({ guild_id: data.guildId, settings: { ...existing, security_core: securityCore }, updated_by: userId, updated_at: new Date().toISOString() }, { onConflict: "guild_id" });
+    if (fallbackWrite.error) throw new Error(fallbackWrite.error.message);
+    return { ok: true, storage: "dashboard_settings" as const };
   });
 
 export const saveSecurityModule = createServerFn({ method: "POST" })
