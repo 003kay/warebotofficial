@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { exchangeCode, fetchDiscordUser } from "@/lib/discord.server";
-import { createSessionCookie, readStateFromCookie } from "@/lib/session.server";
+import { clearStateCookie, createSessionCookie, readStateFromCookie } from "@/lib/session.server";
 
 export const Route = createFileRoute("/api/public/auth/discord/callback")({
   server: {
@@ -18,32 +18,22 @@ export const Route = createFileRoute("/api/public/auth/discord/callback")({
         try {
           const token = await exchangeCode(code, request);
           const user = await fetchDiscordUser(token.access_token);
-          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-          const expiresAt = new Date(Date.now() + token.expires_in * 1000).toISOString();
-          const { error } = await supabaseAdmin
-            .from("discord_sessions")
-            .upsert(
-              {
-                user_discord_id: user.id,
-                username: user.global_name || user.username,
-                avatar: user.avatar,
-                access_token: token.access_token,
-                refresh_token: token.refresh_token,
-                expires_at: expiresAt,
-              },
-              { onConflict: "user_discord_id" },
-            );
-
-          if (error) throw error;
+          const expiresAt = Date.now() + token.expires_in * 1000;
 
           const headers = new Headers();
-          headers.append("Location", "https://www.warebot.xyz/dashboard");
-          headers.append("Set-Cookie", createSessionCookie(user.id));
+          headers.append("Location", "/dashboard");
           headers.append(
             "Set-Cookie",
-            "ware_oauth_state=; Path=/; Domain=.warebot.xyz; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
+            createSessionCookie({
+              discordUserId: user.id,
+              username: user.global_name || user.username,
+              avatar: user.avatar,
+              accessToken: token.access_token,
+              refreshToken: token.refresh_token,
+              expiresAt,
+            }),
           );
+          headers.append("Set-Cookie", clearStateCookie());
           headers.append("Cache-Control", "no-store");
           return new Response(null, { status: 302, headers });
         } catch (err) {
