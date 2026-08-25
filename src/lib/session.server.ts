@@ -2,7 +2,6 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 const COOKIE_NAME = "ware_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
-const COOKIE_DOMAIN = ".warebot.xyz";
 
 export type WareSessionData = {
   discordUserId: string;
@@ -23,10 +22,6 @@ function sign(value: string): string {
   return createHmac("sha256", getSecret()).update(value).digest("base64url");
 }
 
-function domainPart() {
-  return process.env.NODE_ENV === "production" ? `; Domain=${COOKIE_DOMAIN}` : "";
-}
-
 function encodePayload(data: WareSessionData): string {
   return Buffer.from(JSON.stringify(data), "utf8").toString("base64url");
 }
@@ -45,11 +40,13 @@ export function createSessionCookie(data: WareSessionData): string {
   const payload = encodePayload(data);
   const sig = sign(payload);
   const value = `${payload}.${sig}`;
-  return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${MAX_AGE}${domainPart()}`;
+  // OAuth is canonicalized to www.warebot.xyz, so keep the cookie host-only.
+  // This avoids browser/domain edge cases that can cause an authorize loop.
+  return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${MAX_AGE}`;
 }
 
 export function clearSessionCookie(): string {
-  return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0${domainPart()}`;
+  return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 }
 
 export function readSessionDataFromCookie(cookieHeader: string | null): WareSessionData | null {
@@ -76,11 +73,11 @@ export function readSessionFromCookie(cookieHeader: string | null): string | nul
 }
 
 export function createStateCookie(state: string): string {
-  return `ware_oauth_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600${domainPart()}`;
+  return `ware_oauth_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`;
 }
 
 export function clearStateCookie(): string {
-  return `ware_oauth_state=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0${domainPart()}`;
+  return `ware_oauth_state=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 }
 
 export function readStateFromCookie(cookieHeader: string | null): string | null {
