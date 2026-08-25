@@ -12,7 +12,7 @@ export const Route = createFileRoute("/dashboard/")({
       queryFn: () => getManagedGuildsFn(),
     });
     if (!data.authenticated) {
-      throw redirect({ href: "/auth/discord/login" as never });
+      throw redirect({ href: "https://www.warebot.xyz/auth/discord/login" as never });
     }
     return null;
   },
@@ -53,10 +53,7 @@ function DashboardIndex() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data.guilds.map((g) => (
-              <div
-                key={g.id}
-                className="pill-surface flex flex-col gap-3 rounded-2xl p-4"
-              >
+              <div key={g.id} className="pill-surface flex flex-col gap-3 rounded-2xl p-4">
                 <div className="flex items-center gap-4">
                   {g.iconUrl ? (
                     <img src={g.iconUrl} alt="" className="h-14 w-14 rounded-2xl" />
@@ -71,20 +68,8 @@ function DashboardIndex() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Link
-                    to="/dashboard/$guildId/tickets"
-                    params={{ guildId: g.id }}
-                    className="flex-1 rounded-lg border border-white/10 px-3 py-1.5 text-center text-xs hover:bg-white/[0.06]"
-                  >
-                    Tickets
-                  </Link>
-                  <Link
-                    to="/dashboard/$guildId/security"
-                    params={{ guildId: g.id }}
-                    className="flex-1 rounded-lg border border-white/10 px-3 py-1.5 text-center text-xs hover:bg-white/[0.06]"
-                  >
-                    Security
-                  </Link>
+                  <Link to="/dashboard/$guildId/tickets" params={{ guildId: g.id }} className="flex-1 rounded-lg border border-white/10 px-3 py-1.5 text-center text-xs hover:bg-white/[0.06]">Tickets</Link>
+                  <Link to="/dashboard/$guildId/security" params={{ guildId: g.id }} className="flex-1 rounded-lg border border-white/10 px-3 py-1.5 text-center text-xs hover:bg-white/[0.06]">Security</Link>
                 </div>
               </div>
             ))}
