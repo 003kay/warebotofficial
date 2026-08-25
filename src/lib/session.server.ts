@@ -2,11 +2,9 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 const COOKIE_NAME = "ware_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+const COOKIE_DOMAIN = ".warebot.xyz";
 
 function getSecret(): string {
-  // SESSION_SECRET is preferred, but Discord OAuth already requires the client
-  // secret server-side. Falling back to it keeps production auth from crashing
-  // when a separate session secret has not been configured yet.
   const s = process.env.SESSION_SECRET || process.env.DISCORD_CLIENT_SECRET;
   if (!s) throw new Error("SESSION_SECRET or DISCORD_CLIENT_SECRET is not set");
   return s;
@@ -16,15 +14,19 @@ function sign(value: string): string {
   return createHmac("sha256", getSecret()).update(value).digest("base64url");
 }
 
+function domainPart() {
+  return process.env.NODE_ENV === "production" ? `; Domain=${COOKIE_DOMAIN}` : "";
+}
+
 export function createSessionCookie(discordUserId: string): string {
   const payload = `${discordUserId}.${Date.now()}`;
   const sig = sign(payload);
   const value = `${payload}.${sig}`;
-  return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${MAX_AGE}`;
+  return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${MAX_AGE}${domainPart()}`;
 }
 
 export function clearSessionCookie(): string {
-  return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+  return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0${domainPart()}`;
 }
 
 export function readSessionFromCookie(cookieHeader: string | null): string | null {
@@ -45,7 +47,7 @@ export function readSessionFromCookie(cookieHeader: string | null): string | nul
 }
 
 export function createStateCookie(state: string): string {
-  return `ware_oauth_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`;
+  return `ware_oauth_state=${state}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600${domainPart()}`;
 }
 
 export function readStateFromCookie(cookieHeader: string | null): string | null {
