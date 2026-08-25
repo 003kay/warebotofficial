@@ -29,11 +29,12 @@ export function getCanonicalAuthUrl(request: Request): string | null {
 }
 
 export function getRedirectUri(request: Request): string {
-  return `${getAuthOrigin(request)}/api/public/auth/discord/callback`;
+  return `${getAuthOrigin(request)}/auth/discord/callback`;
 }
 
 export function buildAuthorizeUrl(request: Request, state: string): string {
-  const clientId = process.env.DISCORD_CLIENT_ID!;
+  const clientId = process.env.DISCORD_CLIENT_ID;
+  if (!clientId) throw new Error("DISCORD_CLIENT_ID is not configured");
   const params = new URLSearchParams({
     client_id: clientId,
     response_type: "code",
@@ -46,12 +47,16 @@ export function buildAuthorizeUrl(request: Request, state: string): string {
 }
 
 export async function exchangeCode(code: string, request: Request) {
+  const clientId = process.env.DISCORD_CLIENT_ID;
+  const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+  if (!clientId || !clientSecret) throw new Error("Discord OAuth environment variables are not configured");
+
   const res = await fetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: process.env.DISCORD_CLIENT_ID!,
-      client_secret: process.env.DISCORD_CLIENT_SECRET!,
+      client_id: clientId,
+      client_secret: clientSecret,
       grant_type: "authorization_code",
       code,
       redirect_uri: getRedirectUri(request),
@@ -68,12 +73,16 @@ export async function exchangeCode(code: string, request: Request) {
 }
 
 export async function refreshToken(refresh: string) {
+  const clientId = process.env.DISCORD_CLIENT_ID;
+  const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+  if (!clientId || !clientSecret) throw new Error("Discord OAuth environment variables are not configured");
+
   const res = await fetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: process.env.DISCORD_CLIENT_ID!,
-      client_secret: process.env.DISCORD_CLIENT_SECRET!,
+      client_id: clientId,
+      client_secret: clientSecret,
       grant_type: "refresh_token",
       refresh_token: refresh,
     }),
