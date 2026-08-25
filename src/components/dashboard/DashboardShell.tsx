@@ -15,7 +15,6 @@ import {
   ScrollText,
   Settings2,
   ShieldCheck,
-  Sparkles,
   Ticket,
   UsersRound,
   WandSparkles,
@@ -57,23 +56,12 @@ function NavItem({ active, icon: Icon, children, href, disabled, badge }: NavIte
   const body = (
     <>
       <span className="flex min-w-0 items-center gap-3">
-        <span
-          className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg transition-colors ${
-            active ? "bg-white/[0.06]" : "bg-transparent group-hover:bg-white/[0.035]"
-          }`}
-        >
-          <Icon
-            className={`h-[15px] w-[15px] ${active ? "text-[#d6e2e8]" : "text-white/34 group-hover:text-white/66"}`}
-            strokeWidth={1.8}
-          />
+        <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg transition-colors ${active ? "bg-white/[0.06]" : "bg-transparent group-hover:bg-white/[0.035]"}`}>
+          <Icon className={`h-[15px] w-[15px] ${active ? "text-[#d6e2e8]" : "text-white/34 group-hover:text-white/66"}`} strokeWidth={1.8} />
         </span>
         <span className="truncate">{children}</span>
       </span>
-      {badge ? (
-        <span className="rounded-md border border-white/[0.06] bg-black/20 px-1.5 py-0.5 text-[8px] uppercase tracking-[0.16em] text-white/24">
-          {badge}
-        </span>
-      ) : null}
+      {badge ? <span className="rounded-md border border-white/[0.06] bg-black/20 px-1.5 py-0.5 text-[8px] uppercase tracking-[0.16em] text-white/24">{badge}</span> : null}
       {active ? <span className="absolute left-0 h-5 w-[2px] rounded-full bg-[#c3d4dc]" /> : null}
     </>
   );
@@ -94,11 +82,7 @@ function NavSection({ title, children }: { title: string; children: ReactNode })
 function GuildAvatar({ guild, size = "lg" }: { guild: GuildInfo; size?: "sm" | "lg" }) {
   const sizeClass = size === "lg" ? "h-11 w-11 rounded-[13px]" : "h-7 w-7 rounded-lg";
   if (guild.iconUrl) return <img src={guild.iconUrl} alt="" className={`${sizeClass} object-cover ring-1 ring-white/[0.07]`} />;
-  return (
-    <div className={`${sizeClass} grid place-items-center bg-gradient-to-br from-[#c5d2d8] to-[#68757c] text-[11px] font-bold text-[#071014] ring-1 ring-white/[0.08]`}>
-      {guild.name.slice(0, 2).toUpperCase()}
-    </div>
-  );
+  return <div className={`${sizeClass} grid place-items-center bg-gradient-to-br from-[#c5d2d8] to-[#68757c] text-[11px] font-bold text-[#071014] ring-1 ring-white/[0.08]`}>{guild.name.slice(0, 2).toUpperCase()}</div>;
 }
 
 export function DashboardShell({ guild, guildId, active, children }: DashboardShellProps) {
@@ -109,21 +93,17 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_45%_-20%,rgba(147,170,182,0.08),transparent_36%)]" />
 
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[272px] border-r border-white/[0.055] bg-[#090a0a]/98 lg:flex lg:flex-col">
-        <div className="flex h-[68px] items-center gap-3 border-b border-white/[0.05] px-5">
-          <div className="grid h-9 w-9 place-items-center rounded-xl border border-white/[0.07] bg-gradient-to-br from-white/[0.07] to-white/[0.025] shadow-[0_8px_25px_rgba(0,0,0,0.28)]">
-            <Sparkles className="h-4 w-4 text-[#d6e2e8]" strokeWidth={1.8} />
+        <a href="/dashboard" className="flex h-[68px] items-center gap-3 border-b border-white/[0.05] px-5 transition hover:bg-white/[0.018]">
+          <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl border border-white/[0.07] bg-black shadow-[0_8px_25px_rgba(0,0,0,0.28)]">
+            <img src="/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png" alt="Ware" className="h-full w-full object-contain p-1" />
           </div>
-          <div className="leading-none">
-            <div className="text-[14px] font-semibold tracking-[-0.02em]">ware</div>
-            <div className="mt-1.5 text-[8px] uppercase tracking-[0.22em] text-white/23">control center</div>
-          </div>
-        </div>
+          <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">Dashboard</div>
+        </a>
 
         <div className="px-4 pb-3 pt-4">
           <a href="/dashboard" className="mb-3 inline-flex items-center gap-1.5 px-1 text-[10px] text-white/28 transition-colors hover:text-white/70">
             <ChevronLeft className="h-3 w-3" /> All servers
           </a>
-
           <a href={`/dashboard/${guildId}/`} className="group flex w-full items-center gap-3 rounded-2xl border border-white/[0.07] bg-gradient-to-b from-white/[0.045] to-white/[0.02] p-3 text-left shadow-[0_14px_35px_rgba(0,0,0,0.16)] transition hover:border-white/[0.1] hover:bg-white/[0.05]">
             <GuildAvatar guild={guild} />
             <div className="min-w-0 flex-1">
@@ -140,19 +120,16 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
             <NavItem icon={Settings2} disabled badge="soon">Settings</NavItem>
             <NavItem icon={BarChart3} disabled badge="soon">Leaderboard</NavItem>
           </NavSection>
-
           <NavSection title="Security">
             <NavItem icon={ShieldCheck} active={active === "security"} href={`/dashboard/${guildId}/security`}>Security Center</NavItem>
             <NavItem icon={LockKeyhole} disabled badge="soon">Join Gate</NavItem>
             <NavItem icon={UsersRound} disabled badge="soon">Permissions</NavItem>
           </NavSection>
-
           <NavSection title="Ticketing">
             <NavItem icon={PanelsTopLeft} active={active === "panels"} href={`/dashboard/${guildId}/panels`}>Panels</NavItem>
             <NavItem icon={LayoutPanelTop} active={active === "designer"} href={`/dashboard/${guildId}/tickets`}>Panel Designer</NavItem>
             <NavItem icon={Ticket} disabled badge="soon">Ticket History</NavItem>
           </NavSection>
-
           <NavSection title="Configuration">
             <NavItem icon={MessageSquareText} disabled badge="soon">Messages</NavItem>
             <NavItem icon={Radio} disabled badge="soon">VoiceMaster</NavItem>
@@ -160,7 +137,6 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
             <NavItem icon={WandSparkles} disabled badge="soon">Automations</NavItem>
             <NavItem icon={ScrollText} disabled badge="soon">Logging</NavItem>
           </NavSection>
-
           <NavSection title="Integrations">
             <NavItem icon={Webhook} disabled badge="soon">Webhooks</NavItem>
             <NavItem icon={CircleDot} disabled badge="soon">Last.fm</NavItem>
@@ -170,14 +146,8 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
 
         <div className="border-t border-white/[0.05] p-4">
           <div className="flex items-center gap-3 rounded-2xl border border-white/[0.055] bg-white/[0.025] px-3 py-3">
-            <span className="relative flex h-2 w-2 shrink-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/20" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-            </span>
-            <div className="min-w-0">
-              <div className="text-[10px] font-medium text-white/72">Dashboard online</div>
-              <div className="mt-0.5 truncate text-[9px] text-white/24">Discord data updates live</div>
-            </div>
+            <span className="relative flex h-2 w-2 shrink-0"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/20" /><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" /></span>
+            <div className="min-w-0"><div className="text-[10px] font-medium text-white/72">Dashboard online</div><div className="mt-0.5 truncate text-[9px] text-white/24">Discord data updates live</div></div>
           </div>
         </div>
       </aside>
@@ -186,36 +156,21 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
         <header className="sticky top-0 z-30 border-b border-white/[0.05] bg-[#080909]/88 backdrop-blur-2xl">
           <div className="flex h-[68px] items-center justify-between gap-4 px-4 md:px-8">
             <div className="flex min-w-0 items-center gap-2 text-[11px]">
-              <span className="hidden text-white/23 sm:inline">Server</span>
-              <span className="hidden text-white/12 sm:inline">/</span>
-              <span className="flex min-w-0 items-center gap-2 text-white/42">
-                <GuildAvatar guild={guild} size="sm" />
-                <span className="max-w-[180px] truncate">{guild.name}</span>
-              </span>
-              <span className="text-white/12">/</span>
-              <span className="font-medium text-white/88">{activeLabel}</span>
+              <span className="hidden text-white/23 sm:inline">Server</span><span className="hidden text-white/12 sm:inline">/</span>
+              <span className="flex min-w-0 items-center gap-2 text-white/42"><GuildAvatar guild={guild} size="sm" /><span className="max-w-[180px] truncate">{guild.name}</span></span>
+              <span className="text-white/12">/</span><span className="font-medium text-white/88">{activeLabel}</span>
             </div>
-
             <div className="flex items-center gap-2">
-              <div className="hidden items-center gap-2 rounded-full border border-white/[0.055] bg-white/[0.018] px-3 py-1.5 text-[9px] text-white/36 md:flex">
-                <Activity className="h-3 w-3 text-emerald-400" /> Live
-              </div>
+              <div className="hidden items-center gap-2 rounded-full border border-white/[0.055] bg-white/[0.018] px-3 py-1.5 text-[9px] text-white/36 md:flex"><Activity className="h-3 w-3 text-emerald-400" /> Live</div>
               <a href="https://discord.gg/warebot" className="rounded-full border border-white/[0.07] bg-white/[0.03] px-3.5 py-1.5 text-[10px] font-medium text-white/62 transition hover:bg-white/[0.07] hover:text-white">Support</a>
             </div>
           </div>
-
           <div className="flex gap-1 overflow-x-auto border-t border-white/[0.03] px-3 py-2 lg:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {[
-              ["Overview", `/dashboard/${guildId}/`, active === "home"],
-              ["Panels", `/dashboard/${guildId}/panels`, active === "panels"],
-              ["Designer", `/dashboard/${guildId}/tickets`, active === "designer"],
-              ["Security", `/dashboard/${guildId}/security`, active === "security"],
-            ].map(([label, href, isActive]) => (
+            {[["Overview", `/dashboard/${guildId}/`, active === "home"],["Panels", `/dashboard/${guildId}/panels`, active === "panels"],["Designer", `/dashboard/${guildId}/tickets`, active === "designer"],["Security", `/dashboard/${guildId}/security`, active === "security"]].map(([label, href, isActive]) => (
               <a key={String(label)} href={String(href)} className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-[10px] ${isActive ? "bg-white/[0.08] text-white" : "text-white/35"}`}>{String(label)}</a>
             ))}
           </div>
         </header>
-
         <main className="relative px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>
     </div>
