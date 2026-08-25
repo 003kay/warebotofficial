@@ -46,7 +46,6 @@ export function buildAuthorizeUrl(request: Request, state: string): string {
 export async function exchangeCode(code: string, request: Request) {
   const clientSecret = process.env.DISCORD_CLIENT_SECRET;
   if (!clientSecret) throw new Error("DISCORD_CLIENT_SECRET is not configured");
-
   const res = await fetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -71,7 +70,6 @@ export async function exchangeCode(code: string, request: Request) {
 export async function refreshToken(refresh: string) {
   const clientSecret = process.env.DISCORD_CLIENT_SECRET;
   if (!clientSecret) throw new Error("DISCORD_CLIENT_SECRET is not configured");
-
   const res = await fetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -105,7 +103,6 @@ const GUILDS_TTL_MS = 30_000;
 async function fetchGuildsRaw(accessToken: string): Promise<DiscordGuild[]> {
   const cached = guildsCache.get(accessToken);
   if (cached && Date.now() - cached.at < GUILDS_TTL_MS) return cached.guilds;
-
   const res = await fetch(`${DISCORD_API}/users/@me/guilds`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
@@ -120,6 +117,16 @@ async function fetchGuildsRaw(accessToken: string): Promise<DiscordGuild[]> {
 }
 
 export async function getValidAccessToken(discordUserId: string): Promise<{ accessToken: string; username: string; avatar: string | null } | null> {
+  try {
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const { readSessionDataFromCookie } = await import("@/lib/session.server");
+    const request = getRequest();
+    const localSession = readSessionDataFromCookie(request?.headers.get("cookie") ?? null);
+    if (localSession?.discordUserId === discordUserId) {
+      return { accessToken: localSession.accessToken, username: localSession.username, avatar: localSession.avatar };
+    }
+  } catch {}
+
   const { data } = await supabaseAdmin
     .from("discord_sessions")
     .select("access_token, refresh_token, expires_at, username, avatar")
@@ -137,11 +144,7 @@ export async function getValidAccessToken(discordUserId: string): Promise<{ acce
     const newExpires = new Date(Date.now() + refreshed.expires_in * 1000).toISOString();
     await supabaseAdmin
       .from("discord_sessions")
-      .update({
-        access_token: refreshed.access_token,
-        refresh_token: refreshed.refresh_token,
-        expires_at: newExpires,
-      })
+      .update({ access_token: refreshed.access_token, refresh_token: refreshed.refresh_token, expires_at: newExpires })
       .eq("user_discord_id", discordUserId);
     return { accessToken: refreshed.access_token, username: data.username, avatar: data.avatar };
   } catch {
