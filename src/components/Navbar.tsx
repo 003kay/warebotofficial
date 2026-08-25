@@ -26,15 +26,12 @@ export function Navbar() {
         <Link
           to="/dashboard"
           title="Open Ware Dashboard"
-          className="group relative flex min-h-12 min-w-[128px] items-center justify-between overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.032] px-3.5 text-left text-white/75 shadow-[0_8px_30px_-18px_rgba(255,255,255,.18),inset_0_1px_0_rgba(255,255,255,.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white sm:min-h-14 sm:min-w-[162px] sm:px-4"
+          className="group relative flex min-h-12 min-w-[128px] items-center overflow-hidden rounded-xl border border-white/[0.09] bg-white/[0.032] px-4 text-left text-white/75 shadow-[0_8px_30px_-18px_rgba(255,255,255,.18),inset_0_1px_0_rgba(255,255,255,.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white sm:min-h-14 sm:min-w-[162px] sm:px-5"
         >
           <span className="pointer-events-none absolute -left-12 top-0 h-full w-10 -skew-x-12 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent animate-[dashboard-shimmer_4s_ease-in-out_infinite]" />
           <span className="relative leading-none">
             <span className="block text-[12px] font-semibold tracking-[-0.01em] text-white/80 transition-colors group-hover:text-white sm:text-[15px]">Dashboard</span>
             <span className="mt-1.5 block text-[7px] uppercase tracking-[0.16em] text-white/35 sm:text-[9px]">Manage servers</span>
-          </span>
-          <span className="relative ml-2 flex h-5 w-5 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] sm:h-6 sm:w-6">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
           </span>
         </Link>
 
@@ -58,7 +55,7 @@ export function Navbar() {
               <span className="block">Dashboard</span>
               <span className="mt-0.5 block text-[10px] uppercase tracking-[0.16em] text-white/28">Discord login required</span>
             </span>
-            <span className="inline-flex items-center gap-2 text-xs text-emerald-300/80"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />Open</span>
+            <span className="text-xs text-white/35">Open</span>
           </Link>
           <div className="flex min-h-18 items-center justify-between rounded-2xl border border-white/[0.04] bg-gradient-to-r from-white/[0.028] to-white/[0.014] px-5 text-lg font-medium text-white/62 sm:min-h-20 sm:px-6 sm:text-xl"><span>Status</span><span className="inline-flex items-center gap-2 text-xs text-emerald-300/80"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Online</span></div>
           <a href={DISCORD_URL} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)} className={itemClass}><span>Discord</span><ExternalLink className="h-5 w-5 text-white/30" /></a>
