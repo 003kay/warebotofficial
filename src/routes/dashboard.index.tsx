@@ -12,7 +12,7 @@ export const Route = createFileRoute("/dashboard/")({
       queryFn: () => getManagedGuildsFn(),
     });
     if (!data.authenticated) {
-      throw redirect({ href: "https://www.warebot.xyz/auth/discord/login" as never });
+      throw redirect({ href: "https://warebot.xyz/auth/discord/login" as never });
     }
     return null;
   },
