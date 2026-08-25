@@ -2,7 +2,6 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const DISCORD_API = "https://discord.com/api/v10";
 const WARE_DISCORD_CLIENT_ID = (process.env.DISCORD_CLIENT_ID || "1535352463232602173").trim();
-const PRIMARY_AUTH_ORIGIN = "https://warebot.xyz";
 const MANAGE_GUILD = 0x20n;
 const ADMINISTRATOR = 0x8n;
 
@@ -15,16 +14,7 @@ export type DiscordGuild = {
 };
 
 function getAuthOrigin(request: Request): string {
-  const url = new URL(request.url);
-  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") return url.origin;
-  return PRIMARY_AUTH_ORIGIN;
-}
-
-export function getCanonicalAuthUrl(request: Request): string | null {
-  const url = new URL(request.url);
-  const authOrigin = getAuthOrigin(request);
-  if (url.origin === authOrigin) return null;
-  return `${authOrigin}${url.pathname}${url.search}`;
+  return new URL(request.url).origin;
 }
 
 export function getRedirectUri(request: Request): string {
