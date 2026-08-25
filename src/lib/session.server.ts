@@ -4,8 +4,11 @@ const COOKIE_NAME = "ware_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 function getSecret(): string {
-  const s = process.env.SESSION_SECRET;
-  if (!s) throw new Error("SESSION_SECRET is not set");
+  // SESSION_SECRET is preferred, but Discord OAuth already requires the client
+  // secret server-side. Falling back to it keeps production auth from crashing
+  // when a separate session secret has not been configured yet.
+  const s = process.env.SESSION_SECRET || process.env.DISCORD_CLIENT_SECRET;
+  if (!s) throw new Error("SESSION_SECRET or DISCORD_CLIENT_SECRET is not set");
   return s;
 }
 
