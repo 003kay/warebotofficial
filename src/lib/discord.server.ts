@@ -30,7 +30,7 @@ export function getCanonicalAuthUrl(request: Request): string | null {
 }
 
 export function getRedirectUri(request: Request): string {
-  return `${getAuthOrigin(request)}/auth/discord/callback`;
+  return `${getAuthOrigin(request)}/api/public/auth/discord/callback`;
 }
 
 export function buildAuthorizeUrl(request: Request, state: string): string {
