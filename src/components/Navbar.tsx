@@ -21,9 +21,33 @@ export function Navbar() {
       <Link to="/" aria-label="Ware home" className="group relative h-12 w-12 overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.025] shadow-[0_12px_40px_-24px_rgba(255,255,255,.32),inset_0_1px_0_rgba(255,255,255,.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.05]">
         <img src={WARE_AVATAR} alt="Ware bot" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
       </Link>
-      <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="group grid h-10 w-10 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.018] text-white/62 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white">
-        <Menu className="h-5 w-5" />
-      </button>
+
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <div
+          aria-disabled="true"
+          title="Dashboard — Coming soon"
+          className="hidden min-h-10 cursor-not-allowed select-none items-center gap-3 rounded-xl border border-white/[0.045] bg-white/[0.014] px-3.5 text-left text-white/30 sm:flex"
+        >
+          <span className="leading-none">
+            <span className="block text-[13px] font-medium text-white/34">Dashboard</span>
+            <span className="mt-1 block text-[8px] uppercase tracking-[0.16em] text-white/18">Coming soon</span>
+          </span>
+          <span className="h-1.5 w-1.5 rounded-full bg-white/15" />
+        </div>
+
+        <div
+          aria-disabled="true"
+          title="Dashboard — Coming soon"
+          className="flex h-10 cursor-not-allowed select-none flex-col items-start justify-center rounded-xl border border-white/[0.045] bg-white/[0.014] px-2.5 text-white/30 sm:hidden"
+        >
+          <span className="text-[10px] font-medium leading-none text-white/34">Dashboard</span>
+          <span className="mt-1 text-[6px] uppercase leading-none tracking-[0.12em] text-white/18">Coming soon</span>
+        </div>
+
+        <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} className="group grid h-10 w-10 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.018] text-white/62 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white">
+          <Menu className="h-5 w-5" />
+        </button>
+      </div>
     </header>
 
     {menuOpen && <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/76 px-4 pb-8 pt-20 backdrop-blur-[9px]" onMouseDown={e => { if (e.currentTarget === e.target) setMenuOpen(false); }}>
