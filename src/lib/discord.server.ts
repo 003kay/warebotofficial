@@ -1,7 +1,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const DISCORD_API = "https://discord.com/api/v10";
-const WARE_DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || "1535352463232602173";
+const WARE_DISCORD_CLIENT_ID = (process.env.DISCORD_CLIENT_ID || "1535352463232602173").trim();
 const PRIMARY_AUTH_ORIGIN = "https://warebot.xyz";
 const MANAGE_GUILD = 0x20n;
 const ADMINISTRATOR = 0x8n;
@@ -44,8 +44,9 @@ export function buildAuthorizeUrl(request: Request, state: string): string {
 }
 
 export async function exchangeCode(code: string, request: Request) {
-  const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+  const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
   if (!clientSecret) throw new Error("DISCORD_CLIENT_SECRET is not configured");
+
   const res = await fetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -57,7 +58,16 @@ export async function exchangeCode(code: string, request: Request) {
       redirect_uri: getRedirectUri(request),
     }),
   });
-  if (!res.ok) throw new Error(`Discord token exchange failed: ${res.status} ${await res.text()}`);
+
+  if (!res.ok) {
+    let detail = `HTTP ${res.status}`;
+    try {
+      const body = (await res.json()) as { error?: string; error_description?: string };
+      detail = [body.error, body.error_description].filter(Boolean).join(": ") || detail;
+    } catch {}
+    throw new Error(`Discord token exchange failed (${detail})`);
+  }
+
   return (await res.json()) as {
     access_token: string;
     refresh_token: string;
@@ -68,7 +78,7 @@ export async function exchangeCode(code: string, request: Request) {
 }
 
 export async function refreshToken(refresh: string) {
-  const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+  const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
   if (!clientSecret) throw new Error("DISCORD_CLIENT_SECRET is not configured");
   const res = await fetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
