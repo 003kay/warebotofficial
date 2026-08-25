@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const DISCORD_API = "https://discord.com/api/v10";
+const WARE_DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || "1535352463232602173";
 const PRIMARY_AUTH_ORIGIN = "https://www.warebot.xyz";
 const ALLOWED_AUTH_ORIGINS = new Set([PRIMARY_AUTH_ORIGIN, "https://warebot.xyz"]);
 const MANAGE_GUILD = 0x20n;
@@ -33,10 +34,8 @@ export function getRedirectUri(request: Request): string {
 }
 
 export function buildAuthorizeUrl(request: Request, state: string): string {
-  const clientId = process.env.DISCORD_CLIENT_ID;
-  if (!clientId) throw new Error("DISCORD_CLIENT_ID is not configured");
   const params = new URLSearchParams({
-    client_id: clientId,
+    client_id: WARE_DISCORD_CLIENT_ID,
     response_type: "code",
     scope: "identify guilds",
     redirect_uri: getRedirectUri(request),
@@ -47,15 +46,14 @@ export function buildAuthorizeUrl(request: Request, state: string): string {
 }
 
 export async function exchangeCode(code: string, request: Request) {
-  const clientId = process.env.DISCORD_CLIENT_ID;
   const clientSecret = process.env.DISCORD_CLIENT_SECRET;
-  if (!clientId || !clientSecret) throw new Error("Discord OAuth environment variables are not configured");
+  if (!clientSecret) throw new Error("DISCORD_CLIENT_SECRET is not configured");
 
   const res = await fetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: clientId,
+      client_id: WARE_DISCORD_CLIENT_ID,
       client_secret: clientSecret,
       grant_type: "authorization_code",
       code,
@@ -73,15 +71,14 @@ export async function exchangeCode(code: string, request: Request) {
 }
 
 export async function refreshToken(refresh: string) {
-  const clientId = process.env.DISCORD_CLIENT_ID;
   const clientSecret = process.env.DISCORD_CLIENT_SECRET;
-  if (!clientId || !clientSecret) throw new Error("Discord OAuth environment variables are not configured");
+  if (!clientSecret) throw new Error("DISCORD_CLIENT_SECRET is not configured");
 
   const res = await fetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: clientId,
+      client_id: WARE_DISCORD_CLIENT_ID,
       client_secret: clientSecret,
       grant_type: "refresh_token",
       refresh_token: refresh,
