@@ -49,16 +49,73 @@ export type GuildAnalyticsPayload = {
   };
 };
 
-function resolveChannelRows(rows: AnalyticsRankRow[] | undefined, channels: { id: string; name: string }[]) {
+function getBotToken() {
+  return (
+    process.env.DISCORD_BOT_TOKEN ||
+    process.env.BOT_TOKEN ||
+    process.env.DISCORD_TOKEN ||
+    ""
+  ).trim().replace(/^Bot\s+/i, "");
+}
+
+function looksLikeSnowflake(value: string) {
+  return /^\d{15,22}$/.test(value.trim());
+}
+
+async function fetchChannelMap(guildId: string, ids: string[]) {
+  const token = getBotToken();
+  const map = new Map<string, string>();
+  if (!token || !ids.length) return map;
+
+  const headers = { Authorization: `Bot ${token}` };
+
+  try {
+    const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+      headers,
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const channels = (await res.json()) as { id: string; name?: string }[];
+      for (const channel of channels) {
+        if (channel?.id && channel?.name) map.set(String(channel.id), String(channel.name));
+      }
+    }
+  } catch {
+    // Individual channel lookups below are the fallback.
+  }
+
+  const unresolved = [...new Set(ids)].filter((id) => id && !map.has(id));
+  await Promise.all(
+    unresolved.slice(0, 30).map(async (id) => {
+      try {
+        const res = await fetch(`https://discord.com/api/v10/channels/${id}`, {
+          headers,
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const channel = (await res.json()) as { id?: string; name?: string };
+        if (channel.id && channel.name) map.set(String(channel.id), String(channel.name));
+      } catch {
+        // Keep the snapshot fallback rather than hiding the row.
+      }
+    }),
+  );
+
+  return map;
+}
+
+function resolveChannelRows(rows: AnalyticsRankRow[] | undefined, channelMap: Map<string, string>) {
   if (!rows?.length) return rows ?? [];
-  const byId = new Map(channels.map((channel) => [String(channel.id), channel.name]));
   return rows.map((row) => {
-    const id = String(row.id || row.name || "");
-    const resolved = byId.get(id);
+    const id = String(row.id || (looksLikeSnowflake(String(row.name || "")) ? row.name : "") || "");
+    const liveName = id ? channelMap.get(id) : undefined;
+    const snapshotName = String(row.name || "").trim();
+    const usableSnapshotName = snapshotName && !looksLikeSnowflake(snapshotName) && snapshotName !== "Unknown channel";
+
     return {
       ...row,
       id: id || row.id,
-      name: resolved || (row.name && row.name !== id ? row.name : `Unknown channel`),
+      name: liveName || (usableSnapshotName ? snapshotName : "Channel"),
     };
   });
 }
@@ -68,16 +125,12 @@ export const getGuildAnalytics = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     await requireGuildManager(data.guildId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { fetchGuildChannels } = await import("@/lib/discord-bot.server");
 
-    const [{ data: row, error }, channels] = await Promise.all([
-      (supabaseAdmin as any)
-        .from("guild_analytics_snapshots")
-        .select("payload,updated_at")
-        .eq("guild_id", data.guildId)
-        .maybeSingle(),
-      fetchGuildChannels(data.guildId).catch(() => null),
-    ]);
+    const { data: row, error } = await (supabaseAdmin as any)
+      .from("guild_analytics_snapshots")
+      .select("payload,updated_at")
+      .eq("guild_id", data.guildId)
+      .maybeSingle();
 
     if (error) {
       console.error("Guild analytics lookup failed", error);
@@ -89,11 +142,18 @@ export const getGuildAnalytics = createServerFn({ method: "GET" })
     }
 
     const payload = row.payload as GuildAnalyticsPayload;
-    const liveChannels = channels ?? [];
+    const channelIds = [
+      ...(payload.top_message_channels ?? []),
+      ...(payload.top_voice_channels ?? []),
+    ]
+      .map((entry) => String(entry.id || (looksLikeSnowflake(String(entry.name || "")) ? entry.name : "")))
+      .filter(Boolean);
+
+    const channelMap = await fetchChannelMap(data.guildId, channelIds);
     const enriched: GuildAnalyticsPayload = {
       ...payload,
-      top_message_channels: resolveChannelRows(payload.top_message_channels, liveChannels),
-      top_voice_channels: resolveChannelRows(payload.top_voice_channels, liveChannels),
+      top_message_channels: resolveChannelRows(payload.top_message_channels, channelMap),
+      top_voice_channels: resolveChannelRows(payload.top_voice_channels, channelMap),
     };
 
     return {
