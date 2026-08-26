@@ -3,7 +3,7 @@ import { ExternalLink, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const WARE_AVATAR = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
-const DISCORD_URL = "https://discord.gg/wept";
+const DISCORD_URL = "https://discord.gg/warebot";
 const DASHBOARD_LOGIN = "/auth/discord/login";
 const itemClass = "group flex min-h-18 items-center justify-between rounded-2xl border border-white/[0.04] bg-gradient-to-r from-white/[0.035] to-white/[0.018] px-5 text-lg font-medium text-white/82 shadow-[inset_0_1px_0_rgba(255,255,255,.025)] transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.10] hover:from-white/[0.065] hover:to-white/[0.03] hover:text-white sm:min-h-20 sm:px-6 sm:text-xl";
 
