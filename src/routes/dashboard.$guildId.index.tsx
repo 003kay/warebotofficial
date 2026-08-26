@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Activity, Bot, Command, Heart, MessageSquare, Mic2, Radio, ShieldCheck, TicketCheck, UserMinus, UserPlus, UsersRound } from "lucide-react";
+import {
+  Activity, ArrowUpRight, Bot, Command, Gauge, Hash, MessageSquare, Mic2,
+  Radio, ShieldCheck, Sparkles, TicketCheck, UserMinus, UserPlus, UsersRound,
+} from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
@@ -13,9 +16,9 @@ export const Route = createFileRoute("/dashboard/$guildId/")({
   head: () => ({ meta: [{ title: "Overview — Ware Dashboard" }] }),
   loader: async ({ context, params }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData({ queryKey: ["ticketPanel", params.guildId], queryFn: () => getTicketPanel({ data: { guildId: params.guildId } }) }),
-      context.queryClient.ensureQueryData({ queryKey: ["guildAnalytics", params.guildId], queryFn: () => getGuildAnalytics({ data: { guildId: params.guildId } }) }),
-      context.queryClient.ensureQueryData({ queryKey: ["dashboardSettings", params.guildId], queryFn: () => getDashboardSettings({ data: { guildId: params.guildId } }) }),
+      context.queryClient.ensureQueryData({ queryKey:["ticketPanel",params.guildId], queryFn:()=>getTicketPanel({ data:{ guildId:params.guildId } }) }),
+      context.queryClient.ensureQueryData({ queryKey:["guildAnalytics",params.guildId], queryFn:()=>getGuildAnalytics({ data:{ guildId:params.guildId } }) }),
+      context.queryClient.ensureQueryData({ queryKey:["dashboardSettings",params.guildId], queryFn:()=>getDashboardSettings({ data:{ guildId:params.guildId } }) }),
     ]);
     return null;
   },
@@ -24,132 +27,120 @@ export const Route = createFileRoute("/dashboard/$guildId/")({
 
 type RangeKey = "today" | "7d" | "30d" | "90d" | "6m" | "1y" | "all";
 type ChartMode = "messages" | "voice" | "members";
-
-const RANGES: { key: RangeKey; label: string; days: number | null }[] = [
-  { key: "today", label: "Today", days: 1 },
-  { key: "7d", label: "7D", days: 7 },
-  { key: "30d", label: "30D", days: 30 },
-  { key: "90d", label: "3M", days: 90 },
-  { key: "6m", label: "6M", days: 183 },
-  { key: "1y", label: "1Y", days: 365 },
-  { key: "all", label: "All", days: null },
+const RANGES: { key:RangeKey; label:string; days:number|null }[] = [
+  { key:"today", label:"Today", days:1 }, { key:"7d", label:"7D", days:7 }, { key:"30d", label:"30D", days:30 },
+  { key:"90d", label:"3M", days:90 }, { key:"6m", label:"6M", days:183 }, { key:"1y", label:"1Y", days:365 }, { key:"all", label:"All", days:null },
 ];
-
 const nf = new Intl.NumberFormat("en-US");
-const number = (value: number) => nf.format(Math.max(0, Math.round(Number(value || 0))));
-const minutes = (seconds: number) => `${number(Number(seconds || 0) / 60)} min`;
-const hours = (seconds: number) => `${(Math.max(0, Number(seconds || 0)) / 3600).toFixed(1)}h`;
+const number = (v:number) => nf.format(Math.max(0,Math.round(Number(v||0))));
+const hours = (v:number) => `${(Math.max(0,Number(v||0))/3600).toFixed(1)}h`;
+const minutes = (v:number) => `${number(Number(v||0)/60)}m`;
 
-function labelDate(value: string, includeYear = false) {
-  const d = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: includeYear ? "2-digit" : undefined, timeZone: "UTC" });
+function selectedDays(all:AnalyticsDay[], range:RangeKey) {
+  const n = RANGES.find(r=>r.key===range)?.days;
+  return n == null ? all : all.slice(-n);
 }
-
-function selectedDays(all: AnalyticsDay[], range: RangeKey) {
-  const days = RANGES.find((item) => item.key === range)?.days;
-  return days == null ? all : all.slice(-days);
+function labelDate(value:string, year=false) {
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US",{month:"short",day:"numeric",year:year?"2-digit":undefined,timeZone:"UTC"});
 }
-
-function chartRows(days: AnalyticsDay[], range: RangeKey) {
+function chartRows(days:AnalyticsDay[], range:RangeKey) {
   if (!days.length) return [];
-  const targetPoints = 28;
-  const bucket = Math.max(1, Math.ceil(days.length / targetPoints));
-  const rows: any[] = [];
-  for (let i = 0; i < days.length; i += bucket) {
-    const chunk = days.slice(i, i + bucket);
-    const sum = chunk.reduce((a, d) => ({
-      messages: a.messages + Number(d.messages || 0),
-      reactions: a.reactions + Number(d.reactions || 0),
-      commands: a.commands + Number(d.commands || 0),
-      voice_seconds: a.voice_seconds + Number(d.voice_seconds || 0),
-      joins: a.joins + Number(d.joins || 0),
-      leaves: a.leaves + Number(d.leaves || 0),
-    }), { messages: 0, reactions: 0, commands: 0, voice_seconds: 0, joins: 0, leaves: 0 });
-    rows.push({
-      ...sum,
-      label: labelDate(chunk[0].date, range === "1y" || range === "all"),
-      voice_hours: sum.voice_seconds / 3600,
-      net_members: sum.joins - sum.leaves,
-    });
+  const maxPoints = range === "today" ? 1 : 22;
+  const bucket = Math.max(1,Math.ceil(days.length/maxPoints));
+  const out:any[] = [];
+  for (let i=0;i<days.length;i+=bucket) {
+    const chunk = days.slice(i,i+bucket);
+    const sum = chunk.reduce((a,d)=>({
+      messages:a.messages+Number(d.messages||0), reactions:a.reactions+Number(d.reactions||0), commands:a.commands+Number(d.commands||0),
+      voice_seconds:a.voice_seconds+Number(d.voice_seconds||0), joins:a.joins+Number(d.joins||0), leaves:a.leaves+Number(d.leaves||0),
+    }),{messages:0,reactions:0,commands:0,voice_seconds:0,joins:0,leaves:0});
+    out.push({...sum,label:labelDate(chunk[0].date,range==="1y"||range==="all"),voice_hours:sum.voice_seconds/3600,net_members:sum.joins-sum.leaves});
   }
-  return rows;
+  return out;
 }
 
-function Metric({ icon: Icon, label, value, detail }: { icon: typeof Activity; label: string; value: string; detail: string }) {
-  return <div className="ware-rise rounded-[18px] border border-white/[.055] bg-[#0e1010] p-4 transition duration-200 hover:-translate-y-0.5 hover:border-white/[.10] hover:bg-[#111313]">
-    <div className="flex items-start justify-between gap-3"><div><div className="text-[8px] font-semibold uppercase tracking-[.15em] text-white/24">{label}</div><div className="mt-2 text-[24px] font-semibold tracking-[-.045em] text-white/92">{value}</div><div className="mt-1 text-[9px] text-white/25">{detail}</div></div><div className="grid h-9 w-9 place-items-center rounded-[11px] border border-white/[.06] bg-white/[.025]"><Icon className="h-4 w-4 text-[#a9bec7]" /></div></div>
+function StatCard({ icon:Icon, label, value, hint, emphasis=false }: { icon:typeof Activity; label:string; value:string; hint:string; emphasis?:boolean }) {
+  return <div className={`group relative overflow-hidden rounded-[18px] border p-4 transition-all duration-200 hover:-translate-y-0.5 ${emphasis?"border-[#a9bec7]/[.13] bg-[linear-gradient(145deg,rgba(169,190,199,.065),rgba(255,255,255,.014))]":"border-white/[.05] bg-[#0d0f0f] hover:border-white/[.085] hover:bg-[#101212]"}`}>
+    <div className="flex items-center justify-between"><span className="text-[8px] font-semibold uppercase tracking-[.14em] text-white/23">{label}</span><span className="grid h-8 w-8 place-items-center rounded-[10px] border border-white/[.05] bg-white/[.025]"><Icon className="h-3.5 w-3.5 text-[#aec1ca]/70"/></span></div>
+    <div className="mt-4 text-[25px] font-semibold tracking-[-.05em] text-white/92">{value}</div>
+    <div className="mt-1 text-[8px] text-white/22">{hint}</div>
   </div>;
 }
 
-function Podium({ title, rows, kind }: { title: string; rows: AnalyticsRankRow[]; kind: "messages" | "voice" }) {
-  return <section className="ware-rise rounded-[20px] border border-white/[.055] bg-[#0e1010] p-4">
-    <div className="mb-3 flex items-center justify-between"><div className="text-[11px] font-semibold text-white/72">{title}</div><div className="text-[8px] uppercase tracking-[.16em] text-white/20">Top 3</div></div>
-    <div className="space-y-2">{rows.slice(0, 3).map((row, i) => <div key={`${row.id || row.name}-${i}`} className="flex items-center gap-3 rounded-[14px] border border-white/[.04] bg-white/[.018] px-3 py-3">
-      <div className="grid h-7 w-7 shrink-0 place-items-center rounded-[9px] bg-white/[.04] text-[9px] font-semibold text-white/35">{i + 1}</div>
-      {row.avatar_url ? <img src={row.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" /> : null}
-      <div className="min-w-0 flex-1"><div className="truncate text-[10px] font-semibold text-white/68">{row.name}</div>{row.id ? <div className="mt-0.5 truncate font-mono text-[8px] text-white/18">{row.id}</div> : null}</div>
-      <div className="text-[9px] font-medium text-white/38">{kind === "messages" ? `${number(row.value)} msgs` : minutes(row.value)}</div>
-    </div>)}{!rows.length ? <div className="grid min-h-32 place-items-center rounded-[14px] border border-dashed border-white/[.055] text-[9px] text-white/20">Waiting for ranking data</div> : null}</div>
-  </section>;
+function QuickAction({ href, icon:Icon, title, detail, status }: { href:string; icon:typeof Activity; title:string; detail:string; status?:string }) {
+  return <a href={href} className="group flex items-center gap-3 rounded-[15px] border border-white/[.05] bg-white/[.018] p-3.5 transition hover:-translate-y-0.5 hover:border-white/[.09] hover:bg-white/[.035]">
+    <span className="grid h-9 w-9 place-items-center rounded-[11px] border border-white/[.05] bg-white/[.025]"><Icon className="h-4 w-4 text-white/48"/></span>
+    <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><span className="text-[10px] font-semibold text-white/66">{title}</span>{status?<span className="rounded-full border border-white/[.05] bg-white/[.025] px-1.5 py-0.5 text-[7px] uppercase tracking-[.08em] text-white/27">{status}</span>:null}</div><div className="mt-1 truncate text-[8px] text-white/21">{detail}</div></div>
+    <ArrowUpRight className="h-3.5 w-3.5 text-white/18 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white/50"/>
+  </a>;
 }
 
-function ChannelTop({ title, rows, kind }: { title: string; rows: AnalyticsRankRow[]; kind: "messages" | "voice" }) {
-  return <section className="ware-rise rounded-[20px] border border-white/[.055] bg-[#0e1010] p-4">
-    <div className="mb-3 flex items-center justify-between"><div className="text-[11px] font-semibold text-white/72">{title}</div><div className="text-[8px] uppercase tracking-[.16em] text-white/20">Top 3</div></div>
-    <div className="space-y-2">{rows.slice(0, 3).map((row, i) => <div key={`${row.id || row.name}-${i}`} className="rounded-[14px] border border-white/[.04] bg-white/[.018] px-3 py-3">
-      <div className="flex items-center gap-3"><div className="grid h-7 w-7 place-items-center rounded-[9px] bg-white/[.04] text-[9px] text-white/30">{i + 1}</div><div className="min-w-0 flex-1"><div className="truncate text-[10px] font-semibold text-white/68"># {row.name}</div><div className="mt-0.5 truncate font-mono text-[8px] text-white/18">{row.id}</div></div><div className="text-[9px] text-white/38">{kind === "messages" ? `${number(row.value)} msgs` : hours(row.value)}</div></div>
-    </div>)}</div>
+function RankPanel({ title, subtitle, rows, kind, member=false }: { title:string; subtitle:string; rows:AnalyticsRankRow[]; kind:"messages"|"voice"; member?:boolean }) {
+  const max = Math.max(1,...rows.slice(0,3).map(r=>Number(r.value||0)));
+  return <section className="rounded-[18px] border border-white/[.05] bg-[#0d0f0f] p-4">
+    <div className="mb-4 flex items-start justify-between gap-3"><div><div className="text-[11px] font-semibold text-white/70">{title}</div><div className="mt-1 text-[8px] text-white/20">{subtitle}</div></div><span className="rounded-full border border-white/[.05] px-2 py-1 text-[7px] uppercase tracking-[.12em] text-white/20">Top 3</span></div>
+    <div className="space-y-2.5">{rows.slice(0,3).map((row,i)=><div key={`${row.id||row.name}-${i}`} className="group rounded-[13px] border border-white/[.04] bg-white/[.014] p-3 transition hover:bg-white/[.025]">
+      <div className="flex items-center gap-3"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-[8px] bg-white/[.035] text-[8px] font-semibold text-white/29">0{i+1}</span>{member && row.avatar_url?<img src={row.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover ring-1 ring-white/[.06]"/>:<span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-white/[.025]"><Hash className="h-3.5 w-3.5 text-white/24"/></span>}<div className="min-w-0 flex-1"><div className="truncate text-[9px] font-semibold text-white/62">{member?row.name:`# ${row.name}`}</div>{row.id?<div className="mt-0.5 truncate font-mono text-[7px] text-white/14">{row.id}</div>:null}</div><div className="text-[8px] font-medium text-white/35">{kind==="messages"?`${number(row.value)} msgs`:member?minutes(row.value):hours(row.value)}</div></div>
+      <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-white/[.035]"><div className="h-full rounded-full bg-[#9eb4be]/50 transition-all duration-500" style={{width:`${Math.max(5,(Number(row.value||0)/max)*100)}%`}}/></div>
+    </div>)}{!rows.length?<div className="grid min-h-28 place-items-center rounded-[13px] border border-dashed border-white/[.05] text-[8px] text-white/17">No ranking data yet</div>:null}</div>
   </section>;
 }
 
 function GuildDashboardHome() {
   const { guildId } = Route.useParams();
-  const [range, setRange] = useState<RangeKey>("7d");
-  const [mode, setMode] = useState<ChartMode>("messages");
-  const { data: tickets } = useSuspenseQuery({ queryKey: ["ticketPanel", guildId], queryFn: () => getTicketPanel({ data: { guildId } }) });
-  const { data: analytics } = useSuspenseQuery({ queryKey: ["guildAnalytics", guildId], queryFn: () => getGuildAnalytics({ data: { guildId } }), refetchInterval: 60_000 });
-  const { data: settings } = useSuspenseQuery({ queryKey: ["dashboardSettings", guildId], queryFn: () => getDashboardSettings({ data: { guildId } }) });
-
+  const [range,setRange] = useState<RangeKey>("7d");
+  const [mode,setMode] = useState<ChartMode>("messages");
+  const { data:tickets } = useSuspenseQuery({ queryKey:["ticketPanel",guildId], queryFn:()=>getTicketPanel({data:{guildId}}) });
+  const { data:analytics } = useSuspenseQuery({ queryKey:["guildAnalytics",guildId], queryFn:()=>getGuildAnalytics({data:{guildId}}), refetchInterval:60_000 });
+  const { data:settings } = useSuspenseQuery({ queryKey:["dashboardSettings",guildId], queryFn:()=>getDashboardSettings({data:{guildId}}) });
   const payload = analytics.payload;
-  const all = useMemo(() => [...(payload?.days ?? [])].sort((a, b) => a.date.localeCompare(b.date)), [payload?.days]);
-  const days = useMemo(() => selectedDays(all, range), [all, range]);
-  const rows = useMemo(() => chartRows(days, range), [days, range]);
-  const totals = useMemo(() => days.reduce((a, d) => ({ messages: a.messages + d.messages, reactions: a.reactions + d.reactions, voice_seconds: a.voice_seconds + d.voice_seconds, joins: a.joins + d.joins, leaves: a.leaves + d.leaves, commands: a.commands + d.commands }), { messages: 0, reactions: 0, voice_seconds: 0, joins: 0, leaves: 0, commands: 0 }), [days]);
-  const joinGate = (settings.settings.joinGate as Record<string, unknown> | undefined) ?? {};
-  const yKey = mode === "messages" ? "messages" : mode === "voice" ? "voice_hours" : "net_members";
-  const chartName = mode === "messages" ? "Messages" : mode === "voice" ? "Voice hours" : "Net members";
+  const all = useMemo(()=>[...(payload?.days??[])].sort((a,b)=>a.date.localeCompare(b.date)),[payload?.days]);
+  const days = useMemo(()=>selectedDays(all,range),[all,range]);
+  const rows = useMemo(()=>chartRows(days,range),[days,range]);
+  const totals = useMemo(()=>days.reduce((a,d)=>({messages:a.messages+d.messages,reactions:a.reactions+d.reactions,voice_seconds:a.voice_seconds+d.voice_seconds,joins:a.joins+d.joins,leaves:a.leaves+d.leaves,commands:a.commands+d.commands}),{messages:0,reactions:0,voice_seconds:0,joins:0,leaves:0,commands:0}),[days]);
+  const joinGate = (settings.settings.joinGate as Record<string,unknown>|undefined)??{};
+  const yKey = mode==="messages"?"messages":mode==="voice"?"voice_hours":"net_members";
+  const chartName = mode==="messages"?"Messages":mode==="voice"?"Voice hours":"Net members";
+  const engagement = totals.messages + totals.reactions + totals.commands;
 
   return <DashboardShell guild={tickets.guild} guildId={guildId} active="home">
-    <style>{`@keyframes wareRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}} .ware-rise{animation:wareRise .34s ease both} @media (prefers-reduced-motion:reduce){.ware-rise{animation:none!important;transition:none!important}}`}</style>
-    <div className="mx-auto max-w-[1480px] space-y-4 pb-12">
-      <section className="ware-rise relative overflow-hidden rounded-[22px] border border-white/[.06] bg-[#0d0f0f] p-5 md:p-6">
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#a9bec7]/[.035] blur-3xl" />
-        <div className="relative flex flex-wrap items-end justify-between gap-5"><div className="flex items-center gap-4">{tickets.guild.iconUrl ? <img src={tickets.guild.iconUrl} alt="" className="h-12 w-12 rounded-[14px] object-cover" /> : <div className="grid h-12 w-12 place-items-center rounded-[14px] bg-white/[.03]"><Bot className="h-5 w-5 text-white/35" /></div>}<div><div className="flex items-center gap-2 text-[9px] text-white/27"><Radio className="h-3 w-3" /><span className={`h-1.5 w-1.5 rounded-full ${analytics.connected ? "bg-emerald-400" : "bg-amber-300"}`} />{analytics.connected ? "Live telemetry" : "Waiting for telemetry"}</div><h1 className="mt-1.5 text-[28px] font-semibold tracking-[-.05em] text-white/94">{tickets.guild.name}</h1><p className="mt-1 text-[10px] text-white/25">Community health, activity, security and tickets.</p></div></div><div className="flex flex-wrap gap-1 rounded-[12px] border border-white/[.06] bg-black/20 p-1">{RANGES.map((item) => <button key={item.key} onClick={() => setRange(item.key)} className={`rounded-[8px] px-3 py-2 text-[9px] transition ${range === item.key ? "bg-white/[.09] text-white/80" : "text-white/25 hover:text-white/55"}`}>{item.label}</button>)}</div></div>
+    <style>{`@keyframes overviewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.overview-in{animation:overviewIn .28s ease both}@media(prefers-reduced-motion:reduce){.overview-in{animation:none!important;transition:none!important}}`}</style>
+    <div className="mx-auto max-w-[1500px] space-y-4 pb-10">
+      <section className="overview-in relative overflow-hidden rounded-[22px] border border-white/[.055] bg-[linear-gradient(135deg,#0d0f0f,#0a0b0b)] p-5 md:p-6">
+        <div className="pointer-events-none absolute right-[-80px] top-[-90px] h-72 w-72 rounded-full bg-[#a8bec8]/[.045] blur-[90px]"/>
+        <div className="relative flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex items-center gap-4">{tickets.guild.iconUrl?<img src={tickets.guild.iconUrl} alt="" className="h-14 w-14 rounded-[16px] object-cover ring-1 ring-white/[.08]"/>:<div className="grid h-14 w-14 place-items-center rounded-[16px] border border-white/[.06] bg-white/[.025]"><Bot className="h-5 w-5 text-white/36"/></div>}<div><div className="flex items-center gap-2 text-[8px] text-white/25"><Radio className="h-3 w-3"/><span className={`h-1.5 w-1.5 rounded-full ${analytics.connected?"bg-emerald-400":"bg-amber-300"}`}/>{analytics.connected?"Live telemetry connected":"Waiting for telemetry"}</div><h1 className="mt-1.5 text-[28px] font-semibold tracking-[-.05em] text-white/92">{tickets.guild.name}</h1><p className="mt-1 text-[9px] text-white/22">A focused view of activity, growth, protection and community health.</p></div></div>
+          <div className="flex flex-wrap gap-1 rounded-[12px] border border-white/[.05] bg-black/20 p-1">{RANGES.map(item=><button key={item.key} onClick={()=>setRange(item.key)} className={`rounded-[8px] px-3 py-2 text-[8px] font-medium transition ${range===item.key?"bg-white/[.085] text-white/76 shadow-sm":"text-white/23 hover:bg-white/[.03] hover:text-white/52"}`}>{item.label}</button>)}</div>
+        </div>
       </section>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-        <Metric icon={MessageSquare} label="Messages" value={number(totals.messages)} detail="Selected range" />
-        <Metric icon={Mic2} label="Voice" value={hours(totals.voice_seconds)} detail="Completed sessions" />
-        <Metric icon={UsersRound} label="Members" value={number(payload?.member_count ?? 0)} detail="Current server size" />
-        <Metric icon={Command} label="Commands" value={number(totals.commands)} detail="Successful uses" />
-        <Metric icon={UserPlus} label="Joined" value={number(totals.joins)} detail="Selected range" />
-        <Metric icon={UserMinus} label="Left" value={number(totals.leaves)} detail="Selected range" />
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard icon={MessageSquare} label="Messages" value={number(totals.messages)} hint="Messages in selected range" emphasis/>
+        <StatCard icon={Mic2} label="Voice activity" value={hours(totals.voice_seconds)} hint="Completed voice time"/>
+        <StatCard icon={UsersRound} label="Members" value={number(payload?.member_count??0)} hint="Current server population"/>
+        <StatCard icon={Gauge} label="Engagement" value={number(engagement)} hint="Messages + reactions + commands"/>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr]">
-        <a href={`/dashboard/${guildId}/security`} className="ware-rise flex items-center gap-3 rounded-[16px] border border-white/[.055] bg-[#0e1010] p-4 hover:border-white/[.1]"><ShieldCheck className="h-4 w-4 text-emerald-300/65" /><div><div className="text-[10px] font-medium text-white/68">Security Center</div><div className="mt-1 text-[9px] text-white/24">Protection modules and events</div></div></a>
-        <a href={`/dashboard/${guildId}/join-gate`} className="ware-rise flex items-center gap-3 rounded-[16px] border border-white/[.055] bg-[#0e1010] p-4 hover:border-white/[.1]"><Activity className="h-4 w-4 text-[#a9bec7]" /><div><div className="text-[10px] font-medium text-white/68">Join Gate · {Boolean(joinGate.enabled) ? "On" : "Off"}</div><div className="mt-1 text-[9px] text-white/24">New-member screening</div></div></a>
-        <a href={`/dashboard/${guildId}/tickets`} className="ware-rise flex items-center gap-3 rounded-[16px] border border-white/[.055] bg-[#0e1010] p-4 hover:border-white/[.1]"><TicketCheck className="h-4 w-4 text-[#a9bec7]" /><div><div className="text-[10px] font-medium text-white/68">Tickets</div><div className="mt-1 text-[9px] text-white/24">Panels, routing and support</div></div></a>
+      <div className="grid gap-3 lg:grid-cols-[1.45fr_.55fr]">
+        <section className="overview-in overflow-hidden rounded-[20px] border border-white/[.055] bg-[#0d0f0f]">
+          <div className="flex flex-col gap-3 border-b border-white/[.045] px-5 py-4 md:flex-row md:items-center md:justify-between"><div><div className="text-[11px] font-semibold text-white/72">Activity</div><div className="mt-1 text-[8px] text-white/20">Telemetry trend for the selected period</div></div><div className="flex w-fit rounded-[9px] border border-white/[.05] bg-black/20 p-1">{(["messages","voice","members"] as ChartMode[]).map(item=><button key={item} onClick={()=>setMode(item)} className={`rounded-[6px] px-3 py-1.5 text-[8px] capitalize transition ${mode===item?"bg-white/[.08] text-white/70":"text-white/22 hover:text-white/48"}`}>{item}</button>)}</div></div>
+          <div className="h-[330px] px-2 pb-3 pt-4 md:px-4">{rows.length?<ResponsiveContainer width="100%" height="100%"><AreaChart data={rows} margin={{top:10,right:12,left:-22,bottom:0}}><defs><linearGradient id="wareOverviewFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a9bec7" stopOpacity={0.18}/><stop offset="100%" stopColor="#a9bec7" stopOpacity={0}/></linearGradient></defs><CartesianGrid vertical={false} stroke="rgba(255,255,255,.03)"/><XAxis dataKey="label" axisLine={false} tickLine={false} minTickGap={34} tick={{fill:"rgba(255,255,255,.18)",fontSize:8}} dy={8}/><YAxis axisLine={false} tickLine={false} width={48} tick={{fill:"rgba(255,255,255,.14)",fontSize:8}}/><Tooltip animationDuration={0} cursor={{stroke:"rgba(255,255,255,.06)"}} contentStyle={{background:"#101212",border:"1px solid rgba(255,255,255,.07)",borderRadius:10,fontSize:9,boxShadow:"0 18px 50px rgba(0,0,0,.35)"}} labelStyle={{color:"rgba(255,255,255,.4)"}}/><Area type="monotone" dataKey={yKey} name={chartName} stroke="#a9bec7" strokeWidth={1.8} fill="url(#wareOverviewFill)" dot={false} activeDot={{r:3,fill:"#d7e0e4"}} isAnimationActive={false}/></AreaChart></ResponsiveContainer>:<div className="grid h-full place-items-center"><div className="text-center"><Sparkles className="mx-auto h-5 w-5 text-white/14"/><div className="mt-2 text-[9px] text-white/18">No analytics in this range yet</div></div></div>}</div>
+        </section>
+
+        <section className="overview-in rounded-[20px] border border-white/[.055] bg-[#0d0f0f] p-4"><div className="mb-3"><div className="text-[11px] font-semibold text-white/70">Server controls</div><div className="mt-1 text-[8px] text-white/20">Jump into the areas that matter</div></div><div className="space-y-2"><QuickAction href={`/dashboard/${guildId}/security`} icon={ShieldCheck} title="Security Center" detail="Protection, AutoMod and anti-nuke" status="Protected"/><QuickAction href={`/dashboard/${guildId}/join-gate`} icon={Activity} title="Join Gate" detail="Screen new members before access" status={Boolean(joinGate.enabled)?"On":"Off"}/><QuickAction href={`/dashboard/${guildId}/tickets`} icon={TicketCheck} title="Ticket Designer" detail="Panels, routing and support flows"/><QuickAction href={`/dashboard/${guildId}/logging`} icon={Radio} title="Logging" detail="Audit server events and destinations"/></div></section>
       </div>
 
-      <section className="ware-rise overflow-hidden rounded-[20px] border border-white/[.06] bg-[#0e1010]">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[.05] px-5 py-4"><div><div className="text-[12px] font-semibold text-white/78">Activity trend</div><div className="mt-1 text-[9px] text-white/24">Reduced point count and chart animations disabled for smoother dashboard performance.</div></div><div className="flex rounded-[10px] border border-white/[.055] bg-black/20 p-1">{(["messages", "voice", "members"] as ChartMode[]).map((item) => <button key={item} onClick={() => setMode(item)} className={`rounded-[7px] px-3 py-1.5 text-[9px] capitalize ${mode === item ? "bg-white/[.08] text-white/75" : "text-white/25"}`}>{item}</button>)}</div></div>
-        <div className="h-[340px] px-2 pb-3 pt-4 md:px-4">{rows.length ? <ResponsiveContainer width="100%" height="100%"><AreaChart data={rows} margin={{ top: 12, right: 16, left: -18, bottom: 0 }}><defs><linearGradient id="overviewFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a9bec7" stopOpacity={0.18}/><stop offset="100%" stopColor="#a9bec7" stopOpacity={0}/></linearGradient></defs><CartesianGrid vertical={false} stroke="rgba(255,255,255,.035)" strokeDasharray="2 7"/><XAxis dataKey="label" axisLine={false} tickLine={false} minTickGap={34} tick={{ fill:"rgba(255,255,255,.20)", fontSize:8 }} dy={9}/><YAxis axisLine={false} tickLine={false} width={48} tick={{ fill:"rgba(255,255,255,.16)", fontSize:8 }}/><Tooltip animationDuration={0} contentStyle={{ background:"#121414", border:"1px solid rgba(255,255,255,.08)", borderRadius:12, fontSize:10 }} labelStyle={{ color:"rgba(255,255,255,.42)" }}/><Area type="linear" dataKey={yKey} name={chartName} stroke="#a9bec7" strokeWidth={1.7} fill="url(#overviewFill)" dot={false} activeDot={{ r:3 }} isAnimationActive={false}/></AreaChart></ResponsiveContainer> : <div className="grid h-full place-items-center text-[10px] text-white/20">No analytics in this range yet.</div>}</div>
-      </section>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard icon={Command} label="Commands" value={number(totals.commands)} hint="Successful command uses"/>
+        <StatCard icon={UserPlus} label="Joined" value={number(totals.joins)} hint="Members joined"/>
+        <StatCard icon={UserMinus} label="Left" value={number(totals.leaves)} hint="Members left"/>
+        <StatCard icon={Activity} label="Net growth" value={`${totals.joins-totals.leaves>=0?"+":""}${number(Math.abs(totals.joins-totals.leaves))}`} hint="Join / leave difference"/>
+      </div>
 
-      <div className="grid gap-4 xl:grid-cols-2"><ChannelTop title="Top message channels" rows={payload?.top_message_channels ?? []} kind="messages"/><ChannelTop title="Top voice channels" rows={payload?.top_voice_channels ?? []} kind="voice"/></div>
-      <div className="grid gap-4 xl:grid-cols-2"><Podium title="Most active members" rows={payload?.top_message_members ?? []} kind="messages"/><Podium title="Most voice time" rows={payload?.top_voice_members ?? []} kind="voice"/></div>
+      <div className="grid gap-3 xl:grid-cols-2"><RankPanel title="Top message channels" subtitle="Channels carrying the most conversation" rows={payload?.top_message_channels??[]} kind="messages"/><RankPanel title="Top voice channels" subtitle="Voice channels with the most completed time" rows={payload?.top_voice_channels??[]} kind="voice"/></div>
+      <div className="grid gap-3 xl:grid-cols-2"><RankPanel title="Most active members" subtitle="Members with the most messages" rows={payload?.top_message_members??[]} kind="messages" member/><RankPanel title="Most voice time" subtitle="Members spending the most time in voice" rows={payload?.top_voice_members??[]} kind="voice" member/></div>
     </div>
   </DashboardShell>;
 }
