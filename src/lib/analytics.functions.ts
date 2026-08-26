@@ -70,10 +70,7 @@ async function fetchChannelMap(guildId: string, ids: string[]) {
   const headers = { Authorization: `Bot ${token}` };
 
   try {
-    const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
-      headers,
-      cache: "no-store",
-    });
+    const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers, cache: "no-store" });
     if (res.ok) {
       const channels = (await res.json()) as { id: string; name?: string }[];
       for (const channel of channels) {
@@ -81,25 +78,20 @@ async function fetchChannelMap(guildId: string, ids: string[]) {
       }
     }
   } catch {
-    // Individual channel lookups below are the fallback.
+    // Individual lookups below are the fallback.
   }
 
   const unresolved = [...new Set(ids)].filter((id) => id && !map.has(id));
-  await Promise.all(
-    unresolved.slice(0, 30).map(async (id) => {
-      try {
-        const res = await fetch(`https://discord.com/api/v10/channels/${id}`, {
-          headers,
-          cache: "no-store",
-        });
-        if (!res.ok) return;
-        const channel = (await res.json()) as { id?: string; name?: string };
-        if (channel.id && channel.name) map.set(String(channel.id), String(channel.name));
-      } catch {
-        // Keep the snapshot fallback rather than hiding the row.
-      }
-    }),
-  );
+  await Promise.all(unresolved.slice(0, 30).map(async (id) => {
+    try {
+      const res = await fetch(`https://discord.com/api/v10/channels/${id}`, { headers, cache: "no-store" });
+      if (!res.ok) return;
+      const channel = (await res.json()) as { id?: string; name?: string };
+      if (channel.id && channel.name) map.set(String(channel.id), String(channel.name));
+    } catch {
+      // The bot snapshot may still have a stored name.
+    }
+  }));
 
   return map;
 }
@@ -107,15 +99,16 @@ async function fetchChannelMap(guildId: string, ids: string[]) {
 function resolveChannelRows(rows: AnalyticsRankRow[] | undefined, channelMap: Map<string, string>) {
   if (!rows?.length) return rows ?? [];
   return rows.map((row) => {
-    const id = String(row.id || (looksLikeSnowflake(String(row.name || "")) ? row.name : "") || "");
-    const liveName = id ? channelMap.get(id) : undefined;
     const snapshotName = String(row.name || "").trim();
-    const usableSnapshotName = snapshotName && !looksLikeSnowflake(snapshotName) && snapshotName !== "Unknown channel";
+    const id = String(row.id || (looksLikeSnowflake(snapshotName) ? snapshotName : "") || "");
+    const liveName = id ? channelMap.get(id) : undefined;
+    const usableSnapshotName = snapshotName && !looksLikeSnowflake(snapshotName) && snapshotName.toLowerCase() !== "unknown channel" && snapshotName.toLowerCase() !== "channel";
+    const fallback = id ? `channel-${id.slice(-6)}` : "channel";
 
     return {
       ...row,
       id: id || row.id,
-      name: liveName || (usableSnapshotName ? snapshotName : "Channel"),
+      name: liveName || (usableSnapshotName ? snapshotName : fallback),
     };
   });
 }
@@ -136,16 +129,10 @@ export const getGuildAnalytics = createServerFn({ method: "GET" })
       console.error("Guild analytics lookup failed", error);
       return { connected: false as const, payload: null, updatedAt: null };
     }
-
-    if (!row?.payload) {
-      return { connected: false as const, payload: null, updatedAt: null };
-    }
+    if (!row?.payload) return { connected: false as const, payload: null, updatedAt: null };
 
     const payload = row.payload as GuildAnalyticsPayload;
-    const channelIds = [
-      ...(payload.top_message_channels ?? []),
-      ...(payload.top_voice_channels ?? []),
-    ]
+    const channelIds = [...(payload.top_message_channels ?? []), ...(payload.top_voice_channels ?? [])]
       .map((entry) => String(entry.id || (looksLikeSnowflake(String(entry.name || "")) ? entry.name : "")))
       .filter(Boolean);
 
@@ -156,9 +143,5 @@ export const getGuildAnalytics = createServerFn({ method: "GET" })
       top_voice_channels: resolveChannelRows(payload.top_voice_channels, channelMap),
     };
 
-    return {
-      connected: true as const,
-      payload: enriched,
-      updatedAt: String(row.updated_at || ""),
-    };
+    return { connected: true as const, payload: enriched, updatedAt: String(row.updated_at || "") };
   });
