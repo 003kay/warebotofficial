@@ -1,125 +1,246 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
-import { Activity, AlertTriangle, ChevronDown, ChevronRight, Crown, ListFilter, Plus, Save, Shield, ShieldCheck, SlidersHorizontal, Trash2, UsersRound, X } from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import {
+  Activity,
+  BadgeCheck,
+  Bot,
+  ChevronRight,
+  CircleGauge,
+  Filter,
+  Globe2,
+  Hand,
+  Link2,
+  LockKeyhole,
+  Save,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  SlidersHorizontal,
+  UserRoundCheck,
+  UsersRound,
+} from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { SECURITY_GROUPS, PUNISHMENTS, type SecurityModule } from "@/lib/security-modules";
-import { getSecurityConfig, saveSecuritySettings, saveSecurityModule, addSecurityListEntry } from "@/lib/security.functions";
-import { getSecurityCandidates, removeSecurityEntrySmart } from "@/lib/security-extras.functions";
+import { PUNISHMENTS, SECURITY_GROUPS, type SecurityModule } from "@/lib/security-modules";
+import { addSecurityListEntry, getSecurityConfig, saveSecurityModule, saveSecuritySettings } from "@/lib/security.functions";
 import type { Json } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/dashboard/$guildId/security")({
   head: () => ({ meta: [{ title: "Security Center — Ware Dashboard" }] }),
   loader: async ({ context, params }) => {
-    await context.queryClient.ensureQueryData({ queryKey: ["security", params.guildId], queryFn: () => getSecurityConfig({ data: { guildId: params.guildId } }) });
+    await context.queryClient.ensureQueryData({
+      queryKey: ["security", params.guildId],
+      queryFn: () => getSecurityConfig({ data: { guildId: params.guildId } }),
+    });
     return null;
   },
   component: SecurityPage,
 });
 
-const input = "w-full rounded-xl border border-white/[.07] bg-[#090a0a] px-3 py-2.5 text-[12px] text-white outline-none transition focus:border-white/[.18]";
-const card = "rounded-[20px] border border-white/[.06] bg-[#0d0f0f]";
-type View = "overview" | "protections" | "lists" | "activity";
-type CoreSettings = { log_channel_id: string | null; dry_run_global: boolean; profile: string; raidmode: boolean; panicmode: boolean; verification_mode: string; verification_role_id: string | null; captcha_difficulty: string; quarantine_role_id: string | null; quarantine_channel_id: string | null };
+type Area = "automod" | "antinuke" | "joins";
+type Section =
+  | "automod-general"
+  | "automod-filters"
+  | "automod-discord"
+  | "automod-whitelist"
+  | "antinuke-general"
+  | "antinuke-filters"
+  | "antinuke-panic"
+  | "joins-gate"
+  | "joins-raid"
+  | "joins-verification";
+
+type CoreSettings = {
+  log_channel_id: string | null;
+  dry_run_global: boolean;
+  profile: string;
+  raidmode: boolean;
+  panicmode: boolean;
+  verification_mode: string;
+  verification_role_id: string | null;
+  captcha_difficulty: string;
+  quarantine_role_id: string | null;
+  quarantine_channel_id: string | null;
+};
+
+const shell = "rounded-[20px] border border-white/[0.06] bg-[#0d0f0f]";
+const input = "w-full rounded-xl border border-white/[0.07] bg-[#090a0a] px-3 py-2.5 text-[11px] text-white/76 outline-none transition focus:border-white/[0.17]";
+
+const SECTIONS: Record<Area, { key: Section; label: string; icon: typeof Shield }[]> = {
+  automod: [
+    { key: "automod-general", label: "General", icon: Globe2 },
+    { key: "automod-filters", label: "Filters", icon: SlidersHorizontal },
+    { key: "automod-discord", label: "Discord AutoMod", icon: Bot },
+    { key: "automod-whitelist", label: "Whitelist", icon: Hand },
+  ],
+  antinuke: [
+    { key: "antinuke-general", label: "General", icon: Globe2 },
+    { key: "antinuke-filters", label: "Sensitive actions", icon: Filter },
+    { key: "antinuke-panic", label: "Panic mode", icon: ShieldAlert },
+  ],
+  joins: [
+    { key: "joins-gate", label: "Join Gate", icon: LockKeyhole },
+    { key: "joins-raid", label: "Join Raid", icon: UsersRound },
+    { key: "joins-verification", label: "Verification", icon: BadgeCheck },
+  ],
+};
 
 function SecurityPage() {
   const { guildId } = Route.useParams();
   const router = useRouter();
-  const { data } = useSuspenseQuery({ queryKey: ["security", guildId], queryFn: () => getSecurityConfig({ data: { guildId } }), refetchInterval: 45_000 });
-  const candidates = useQuery({ queryKey: ["securityCandidates", guildId], queryFn: () => getSecurityCandidates({ data: { guildId } }), staleTime: 30_000 });
-  const [view, setView] = useState<View>("overview");
-  const [core, setCore] = useState<CoreSettings>(data.settings);
-  const [savedCore, setSavedCore] = useState<CoreSettings>(data.settings);
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [attention, setAttention] = useState(false);
-  const dirty = JSON.stringify(core) !== JSON.stringify(savedCore);
-  const modules = SECURITY_GROUPS.flatMap((group) => group.modules);
-  const enabledCount = modules.filter((mod) => data.modules[mod.key]?.enabled).length;
+  const { data } = useSuspenseQuery({
+    queryKey: ["security", guildId],
+    queryFn: () => getSecurityConfig({ data: { guildId } }),
+    refetchInterval: 45_000,
+  });
 
-  useEffect(() => {
-    if (!dirty) return;
-    const beforeUnload = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
-    const captureLinks = (event: MouseEvent) => {
-      const anchor = (event.target as HTMLElement | null)?.closest("a[href]") as HTMLAnchorElement | null;
-      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
-      event.preventDefault(); event.stopPropagation(); setAttention(true); window.setTimeout(() => setAttention(false), 800);
-    };
-    window.addEventListener("beforeunload", beforeUnload); document.addEventListener("click", captureLinks, true);
-    return () => { window.removeEventListener("beforeunload", beforeUnload); document.removeEventListener("click", captureLinks, true); };
-  }, [dirty]);
+  const [area, setArea] = useState<Area>("automod");
+  const [section, setSection] = useState<Section>("automod-general");
+  const [core, setCore] = useState<CoreSettings>(data.settings);
+  const [savingCore, setSavingCore] = useState(false);
+  const [coreNotice, setCoreNotice] = useState<string | null>(null);
+
+  const allModules = useMemo(() => SECURITY_GROUPS.flatMap((group) => group.modules), []);
+  const byKey = useMemo(() => new Map(allModules.map((module) => [module.key, module])), [allModules]);
+
+  const chooseArea = (next: Area) => {
+    setArea(next);
+    setSection(SECTIONS[next][0].key);
+  };
 
   async function saveCore() {
-    setSaving(true); setSaveError(null);
-    try { await saveSecuritySettings({ data: { guildId, ...core } }); setSavedCore(core); setAttention(false); await router.invalidate(); }
-    catch (error) { setSaveError((error as Error).message); setAttention(true); }
-    finally { setSaving(false); }
+    setSavingCore(true);
+    setCoreNotice(null);
+    try {
+      await saveSecuritySettings({ data: { guildId, ...core } });
+      setCoreNotice("Saved");
+      await router.invalidate();
+    } catch (error) {
+      setCoreNotice((error as Error).message || "Save failed");
+    } finally {
+      setSavingCore(false);
+    }
   }
-  function changeView(next: View) { if (next === view) return; if (dirty) { setAttention(true); window.setTimeout(() => setAttention(false), 800); return; } setView(next); }
 
-  return <DashboardShell guild={data.guild} guildId={guildId} active="security">
-    <style>{`@keyframes security-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`}</style>
-    <div className="mx-auto max-w-[1420px] pb-32">
-      <div className="mb-7 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between"><div><div className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[.22em] text-white/24"><Shield className="h-3 w-3" /> Protection</div><h1 className="mt-2 text-[32px] font-semibold tracking-[-.05em] text-white">Security Center</h1><p className="mt-1.5 max-w-2xl text-[12px] leading-5 text-white/34">Core controls stay simple. Trusted access, filters, administrators, and deeper protections are separated when you need them.</p></div><div className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] ${data.botInGuild ? "border-emerald-400/15 bg-emerald-400/[.05] text-emerald-100/70" : "border-amber-300/15 bg-amber-300/[.05] text-amber-100/70"}`}><span className={`h-1.5 w-1.5 rounded-full ${data.botInGuild ? "bg-emerald-400" : "bg-amber-300"}`} />{data.botInGuild ? "Ware is protecting this server" : `Connection: ${data.botStatus ?? "unavailable"}`}</div></div>
-      {!data.botInGuild ? <div className="mb-5 flex gap-3 rounded-2xl border border-amber-300/15 bg-amber-300/[.045] px-4 py-3 text-[11px] text-amber-100/70"><AlertTriangle className="h-4 w-4" /> Ware cannot validate channels, roles, or administrators until bot access is restored.</div> : null}
-      <div className="mb-6 grid gap-3 md:grid-cols-3"><StatCard label="Protection level" value={String(core.profile ?? "medium")} detail="Server-wide preset" icon={ShieldCheck} /><StatCard label="Active protections" value={`${enabledCount}/${modules.length}`} detail="Rules currently enabled" icon={SlidersHorizontal} /><StatCard label="Filters" value={String(data.lists.word_filter?.length ?? 0)} detail={data.automodSynced ? `${data.automodSynced} synced from Discord AutoMod` : "Ware + Discord AutoMod"} icon={ListFilter} /></div>
-      <div className="mb-6 flex gap-1 overflow-x-auto rounded-2xl border border-white/[.055] bg-[#090a0a] p-1.5"><ViewButton active={view === "overview"} onClick={() => changeView("overview")} icon={ShieldCheck}>Overview</ViewButton><ViewButton active={view === "protections"} onClick={() => changeView("protections")} icon={SlidersHorizontal}>Protections</ViewButton><ViewButton active={view === "lists"} onClick={() => changeView("lists")} icon={UsersRound}>Trusted & filters</ViewButton><ViewButton active={view === "activity"} onClick={() => changeView("activity")} icon={Activity}>Activity</ViewButton></div>
-      {view === "overview" ? <Overview data={data} core={core} setCore={setCore} modules={modules} onOpenProtections={() => changeView("protections")} onOpenLists={() => changeView("lists")} /> : null}
-      {view === "protections" ? <Protections data={data} guildId={guildId} /> : null}
-      {view === "lists" ? <TrustedFilters data={data} guildId={guildId} candidates={candidates.data} loadingCandidates={candidates.isLoading} /> : null}
-      {view === "activity" ? <ActivityView data={data} /> : null}
-    </div>
-    {dirty ? <div className="pointer-events-none fixed bottom-3 right-3 z-[80] w-[min(360px,calc(100vw-24px))]"><div className={`pointer-events-auto rounded-[14px] border bg-[#0b0c0c]/98 p-2.5 shadow-[0_20px_60px_rgba(0,0,0,.6)] ${attention ? "border-red-500/70 ring-4 ring-red-500/10 animate-[security-shake_.36s_ease-in-out]" : "border-amber-300/20"}`}><div className="flex items-center justify-between gap-3"><div className="min-w-0"><div className="text-[10px] font-semibold text-white/85">Unsaved security changes</div><div className={`mt-0.5 truncate text-[8px] ${attention ? "text-red-200/70" : "text-white/28"}`}>{saveError || (attention ? "Save or cancel before leaving." : "Changes are not live yet.")}</div></div><div className="flex gap-1.5"><button onClick={() => { setCore(savedCore); setSaveError(null); setAttention(false); }} disabled={saving} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-white/[.08] px-2.5 text-[9px] text-white/55"><X className="h-3 w-3" />Cancel</button><button onClick={saveCore} disabled={saving} className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white px-3 text-[9px] font-semibold text-black"><Save className="h-3 w-3" />{saving ? "Saving…" : "Save"}</button></div></div></div></div> : null}
-  </DashboardShell>;
+  const moduleKeys = (() => {
+    switch (section) {
+      case "automod-general": return ["anti_spam", "anti_flood", "anti_mention", "anti_caps", "anti_emojispam", "anti_stickerspam", "anti_ghostping"];
+      case "automod-filters": return ["anti_invite", "anti_link", "anti_scam", "anti_token", "anti_nsfw", "filter_words"];
+      case "antinuke-general": return ["anti_channel", "anti_role", "anti_ban", "anti_kick", "anti_prune", "anti_emoji", "anti_server"];
+      case "antinuke-filters": return ["anti_permission", "anti_bot", "anti_webhook"];
+      case "joins-raid": return ["anti_raid", "anti_impersonation", "anti_selfbot"];
+      case "joins-verification": return ["verification", "captcha", "agecheck", "altdetect"];
+      default: return [];
+    }
+  })();
+
+  const visibleModules = moduleKeys.map((key) => byKey.get(key)).filter(Boolean) as SecurityModule[];
+
+  return (
+    <DashboardShell guild={data.guild} guildId={guildId} active="security">
+      <div className="mx-auto max-w-[1500px] pb-20">
+        <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[.2em] text-white/24"><Shield className="h-3.5 w-3.5" /> Security workspace</div>
+            <h1 className="mt-2 text-[32px] font-semibold tracking-[-.05em] text-white/95">Protection Center</h1>
+            <p className="mt-1.5 max-w-2xl text-[11px] leading-5 text-white/31">The controls are grouped by what they protect. Nothing here copies another dashboard's look — only the useful control structure and security actions.</p>
+          </div>
+          <div className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-[9px] ${data.botInGuild ? "border-emerald-400/15 bg-emerald-400/[.05] text-emerald-100/70" : "border-amber-300/15 bg-amber-300/[.05] text-amber-100/70"}`}>
+            <span className={`h-1.5 w-1.5 rounded-full ${data.botInGuild ? "bg-emerald-400" : "bg-amber-300"}`} />
+            {data.botInGuild ? "Ware connected" : "Bot connection unavailable"}
+          </div>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[250px_minmax(0,1fr)]">
+          <aside className={`${shell} h-fit p-2 xl:sticky xl:top-24`}>
+            <AreaButton active={area === "automod"} icon={CircleGauge} label="AutoMod" onClick={() => chooseArea("automod")} />
+            {area === "automod" ? <Subnav items={SECTIONS.automod} active={section} onClick={setSection} /> : null}
+            <AreaButton active={area === "antinuke"} icon={ShieldAlert} label="Anti-Nuke" onClick={() => chooseArea("antinuke")} />
+            {area === "antinuke" ? <Subnav items={SECTIONS.antinuke} active={section} onClick={setSection} /> : null}
+            <AreaButton active={area === "joins"} icon={UserRoundCheck} label="Server Joins" onClick={() => chooseArea("joins")} />
+            {area === "joins" ? <Subnav items={SECTIONS.joins} active={section} onClick={setSection} /> : null}
+          </aside>
+
+          <main className="min-w-0 space-y-4">
+            {section === "automod-discord" ? <DiscordAutoModPanel count={data.automodSynced} /> : null}
+            {section === "automod-whitelist" ? <WhitelistPanel guildId={guildId} rows={data.lists.link_whitelist ?? []} onChanged={() => router.invalidate()} /> : null}
+            {section === "antinuke-panic" ? <PanicPanel data={data} core={core} setCore={setCore} saving={savingCore} notice={coreNotice} onSave={saveCore} /> : null}
+            {section === "joins-gate" ? <JoinGatePanel guildId={guildId} /> : null}
+            {section === "joins-verification" ? <VerificationPanel data={data} core={core} setCore={setCore} saving={savingCore} notice={coreNotice} onSave={saveCore} /> : null}
+
+            {visibleModules.length ? (
+              <section className={`${shell} overflow-hidden`}>
+                <div className="border-b border-white/[.05] px-5 py-4">
+                  <div className="text-[13px] font-semibold text-white/82">{SECTIONS[area].find((item) => item.key === section)?.label}</div>
+                  <div className="mt-1 text-[9px] text-white/25">Enable only the protections you want, then tune thresholds and actions per rule.</div>
+                </div>
+                <div className="grid gap-3 p-3 lg:grid-cols-2">
+                  {visibleModules.map((module) => <ModuleCard key={module.key} guildId={guildId} module={module} stored={data.modules[module.key]} />)}
+                </div>
+              </section>
+            ) : null}
+          </main>
+        </div>
+      </div>
+    </DashboardShell>
+  );
 }
 
-function StatCard({ label, value, detail, icon: Icon }: { label: string; value: string; detail: string; icon: typeof Shield }) { return <div className="rounded-[18px] border border-white/[.055] bg-gradient-to-b from-white/[.035] to-white/[.012] p-4"><div className="flex items-start justify-between"><div><div className="text-[9px] uppercase tracking-[.16em] text-white/22">{label}</div><div className="mt-2 capitalize text-[21px] font-semibold text-white/88">{value}</div><div className="mt-1 text-[10px] text-white/24">{detail}</div></div><div className="grid h-9 w-9 place-items-center rounded-xl border border-white/[.055] bg-black/30"><Icon className="h-4 w-4 text-white/42" /></div></div></div>; }
-function ViewButton({ active, onClick, icon: Icon, children }: { active: boolean; onClick: () => void; icon: typeof Shield; children: React.ReactNode }) { return <button type="button" onClick={onClick} className={`inline-flex min-w-fit flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[11px] ${active ? "bg-white/[.085] text-white" : "text-white/32 hover:bg-white/[.035] hover:text-white/70"}`}><Icon className="h-3.5 w-3.5" />{children}</button>; }
-
-function Overview({ data, core, setCore, modules, onOpenProtections, onOpenLists }: { data: any; core: CoreSettings; setCore: React.Dispatch<React.SetStateAction<CoreSettings>>; modules: SecurityModule[]; onOpenProtections: () => void; onOpenLists: () => void }) {
-  const enabled = modules.filter((mod) => data.modules[mod.key]?.enabled);
-  return <div className="grid gap-5 xl:grid-cols-[1.1fr_.9fr]"><GlobalSettings data={data} state={core} setState={setCore} /><div className="space-y-5"><section className={`${card} p-5`}><div className="flex items-center justify-between"><div><div className="text-[13px] font-semibold text-white/82">Protection summary</div><div className="mt-1 text-[10px] text-white/25">Only rules currently active.</div></div><button onClick={onOpenProtections} className="inline-flex items-center gap-1 text-[10px] text-white/38">Manage all <ChevronRight className="h-3.5 w-3.5" /></button></div><div className="mt-4 space-y-2">{enabled.length ? enabled.slice(0, 6).map((mod) => <div key={mod.key} className="flex items-center justify-between rounded-xl bg-white/[.018] px-3.5 py-3"><div><div className="text-[11px] text-white/68">{mod.name}</div><div className="mt-0.5 text-[9px] capitalize text-white/22">{data.modules[mod.key]?.punishment ?? "log"}</div></div><span className="rounded-full bg-emerald-400/[.08] px-2 py-1 text-[8px] text-emerald-200/65">Active</span></div>) : <div className="rounded-xl border border-dashed border-white/[.07] px-4 py-8 text-center text-[10px] text-white/25">No protection modules enabled yet.</div>}</div></section><button onClick={onOpenLists} className="flex w-full items-center justify-between rounded-[18px] border border-white/[.055] bg-white/[.02] p-4 text-left"><div><div className="text-[12px] text-white/72">Trusted access & filters</div><div className="mt-1 text-[10px] text-white/24">Users, roles, administrators, whitelists, and AutoMod.</div></div><ChevronRight className="h-4 w-4 text-white/28" /></button></div></div>;
+function AreaButton({ active, icon: Icon, label, onClick }: { active: boolean; icon: typeof Shield; label: string; onClick: () => void }) {
+  return <button type="button" onClick={onClick} className={`mb-1 flex w-full items-center gap-3 rounded-[13px] px-3 py-3 text-left transition ${active ? "bg-white/[.075] text-white" : "text-white/46 hover:bg-white/[.035] hover:text-white/78"}`}><span className="grid h-8 w-8 place-items-center rounded-[10px] border border-white/[.05] bg-white/[.02]"><Icon className="h-4 w-4" /></span><span className="text-[12px] font-semibold">{label}</span><ChevronRight className={`ml-auto h-3.5 w-3.5 transition ${active ? "rotate-90 text-white/55" : "text-white/20"}`} /></button>;
 }
 
-function GlobalSettings({ data, state, setState }: { data: any; state: CoreSettings; setState: React.Dispatch<React.SetStateAction<CoreSettings>> }) {
-  const set = (key: keyof CoreSettings, value: CoreSettings[keyof CoreSettings]) => setState((s) => ({ ...s, [key]: value }));
-  return <section className={`${card} p-5`}><div className="mb-5 flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-300/65" /><div><div className="text-[13px] text-white/82">Core protection</div><div className="mt-1 text-[10px] text-white/25">The settings most servers actually need.</div></div></div><div className="grid gap-3 md:grid-cols-2"><Field label="Protection profile"><select className={input} value={state.profile} onChange={(e) => set("profile", e.target.value)}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="extreme">Extreme</option></select></Field><Field label="Security log channel"><select className={input} value={state.log_channel_id ?? ""} onChange={(e) => set("log_channel_id", e.target.value || null)}><option value="">No log channel</option>{data.textChannels.map((c: any) => <option key={c.id} value={c.id}># {c.name}</option>)}</select></Field><Field label="Verification mode"><select className={input} value={state.verification_mode} onChange={(e) => set("verification_mode", e.target.value)}><option value="off">Off</option><option value="button">Button</option><option value="captcha">Captcha</option><option value="questions">Questions</option></select></Field><Toggle label="Global dry-run" value={state.dry_run_global} onChange={(v) => set("dry_run_global", v)} /><Toggle label="Raid mode" value={state.raidmode} onChange={(v) => set("raidmode", v)} /></div><details className="mt-4 rounded-xl border border-white/[.055] bg-white/[.015] px-4 py-3"><summary className="cursor-pointer list-none text-[10px] text-white/42">Advanced global settings</summary><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3"><Field label="Verification role"><select className={input} value={state.verification_role_id ?? ""} onChange={(e) => set("verification_role_id", e.target.value || null)}><option value="">No role</option>{data.roles.map((r: any) => <option key={r.id} value={r.id}>{r.name}</option>)}</select></Field><Field label="Quarantine role"><select className={input} value={state.quarantine_role_id ?? ""} onChange={(e) => set("quarantine_role_id", e.target.value || null)}><option value="">No role</option>{data.roles.map((r: any) => <option key={r.id} value={r.id}>{r.name}</option>)}</select></Field><Field label="Quarantine channel"><select className={input} value={state.quarantine_channel_id ?? ""} onChange={(e) => set("quarantine_channel_id", e.target.value || null)}><option value="">No channel</option>{data.textChannels.map((c: any) => <option key={c.id} value={c.id}># {c.name}</option>)}</select></Field><Field label="Captcha difficulty"><select className={input} value={state.captcha_difficulty} onChange={(e) => set("captcha_difficulty", e.target.value)}><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></Field><Toggle label="Panic mode" value={state.panicmode} onChange={(v) => set("panicmode", v)} /></div></details></section>;
+function Subnav({ items, active, onClick }: { items: { key: Section; label: string; icon: typeof Shield }[]; active: Section; onClick: (value: Section) => void }) {
+  return <div className="mb-3 ml-4 border-l border-white/[.05] pl-3">{items.map((item) => <button key={item.key} type="button" onClick={() => onClick(item.key)} className={`flex w-full items-center gap-2 rounded-[10px] px-3 py-2 text-left text-[10px] transition ${active === item.key ? "bg-white/[.07] text-white/78" : "text-white/30 hover:bg-white/[.025] hover:text-white/60"}`}><item.icon className="h-3.5 w-3.5" />{item.label}</button>)}</div>;
 }
 
-function Protections({ data, guildId }: { data: any; guildId: string }) { return <div className="space-y-7">{SECURITY_GROUPS.map((group) => <section key={group.slug}><div className="mb-3"><h2 className="text-[14px] text-white/80">{group.name}</h2><p className="mt-1 text-[10px] text-white/25">{group.description}</p></div><div className="grid gap-3 xl:grid-cols-2">{group.modules.map((mod) => <ModuleCard key={mod.key} guildId={guildId} module={mod} value={data.modules[mod.key]} />)}</div></section>)}</div>; }
-function ModuleCard({ guildId, module, value }: { guildId: string; module: SecurityModule; value: any }) {
-  const router = useRouter(); const [state, setState] = useState(value); const [open, setOpen] = useState(false); const [saving, setSaving] = useState(false); const [notice, setNotice] = useState<string | null>(null); const extra = (state.extra && typeof state.extra === "object" ? state.extra : {}) as Record<string, any>;
-  async function save() { setSaving(true); setNotice(null); try { await saveSecurityModule({ data: { guildId, module_key: module.key, enabled: !!state.enabled, dry_run: !!state.dry_run, punishment: state.punishment, threshold_count: Number(state.threshold_count), threshold_seconds: Number(state.threshold_seconds), extra: state.extra as Json } }); setNotice("Saved"); await router.invalidate(); } catch (e) { setNotice((e as Error).message); } finally { setSaving(false); } }
-  return <div className={`${card} overflow-hidden`}><div className="flex items-start justify-between gap-4 p-4"><button onClick={() => setOpen(!open)} className="flex min-w-0 flex-1 items-start gap-3 text-left"><span className="grid h-8 w-8 place-items-center rounded-xl bg-white/[.02]"><Shield className="h-3.5 w-3.5 text-white/35" /></span><span className="min-w-0"><span className="block text-[12px] text-white/78">{module.name}</span><span className="mt-1 block text-[10px] text-white/27">{module.description}</span><span className="mt-2 inline-flex items-center gap-1 text-[9px] text-white/25">{open ? "Hide settings" : "Configure"}<ChevronDown className={`h-3 w-3 ${open ? "rotate-180" : ""}`} /></span></span></button><button onClick={() => setState((s: any) => ({ ...s, enabled: !s.enabled }))} className={`relative h-6 w-11 rounded-full ${state.enabled ? "bg-emerald-500/65" : "bg-white/[.08]"}`}><span className={`absolute top-1 h-4 w-4 rounded-full bg-white ${state.enabled ? "left-6" : "left-1"}`} /></button></div>{open ? <div className="border-t border-white/[.045] p-4"><div className="grid gap-3 sm:grid-cols-2"><Field label="Action"><select className={input} value={state.punishment} onChange={(e) => setState((s: any) => ({ ...s, punishment: e.target.value }))}>{PUNISHMENTS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}</select></Field><Toggle label="DM user when action is taken" value={extra.dm_user !== false} onChange={(v) => setState((s: any) => ({ ...s, extra: { ...extra, dm_user: v } }))} />{state.punishment === "mute" ? <Field label="Timeout seconds"><input className={input} type="number" min={60} max={2419200} value={Number(extra.timeout_seconds ?? 600)} onChange={(e) => setState((s: any) => ({ ...s, extra: { ...extra, timeout_seconds: Number(e.target.value) } }))} /></Field> : null}<Toggle label="Dry-run only" value={!!state.dry_run} onChange={(v) => setState((s: any) => ({ ...s, dry_run: v }))} />{module.supportsThreshold ? <><Field label="Actions"><input type="number" min={1} className={input} value={state.threshold_count} onChange={(e) => setState((s: any) => ({ ...s, threshold_count: Number(e.target.value) }))} /></Field><Field label="Window seconds"><input type="number" min={1} className={input} value={state.threshold_seconds} onChange={(e) => setState((s: any) => ({ ...s, threshold_seconds: Number(e.target.value) }))} /></Field></> : null}{module.extraFields?.map((field) => field.kind === "extra_number" ? <Field key={field.key} label={field.label}><input type="number" min={field.min} max={field.max} className={input} value={extra[field.key] ?? field.default} onChange={(e) => setState((s: any) => ({ ...s, extra: { ...extra, [field.key]: Number(e.target.value) } }))} /></Field> : null)}</div><div className="mt-4 flex items-center justify-between"><span className="text-[9px] text-white/35">{notice}</span><button onClick={save} disabled={saving} className="rounded-lg bg-black px-3 py-2 text-[10px] text-white/72">{saving ? "Saving…" : "Save module"}</button></div></div> : null}</div>;
+function ModuleCard({ guildId, module, stored }: { guildId: string; module: SecurityModule; stored: { enabled: boolean; dry_run: boolean; punishment: string; threshold_count: number; threshold_seconds: number; extra: Json } }) {
+  const [enabled, setEnabled] = useState(Boolean(stored.enabled));
+  const [punishment, setPunishment] = useState(stored.punishment || module.defaultPunishment);
+  const [count, setCount] = useState(Number(stored.threshold_count || module.defaultCount));
+  const [seconds, setSeconds] = useState(Number(stored.threshold_seconds || module.defaultSeconds));
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function save() {
+    setSaving(true); setSaved(false);
+    try {
+      await saveSecurityModule({ data: { guildId, module_key: module.key, enabled, dry_run: false, punishment, threshold_count: count, threshold_seconds: seconds, extra: stored.extra ?? {} } });
+      setSaved(true);
+    } finally { setSaving(false); }
+  }
+
+  return <div className="rounded-[16px] border border-white/[.05] bg-white/[.018] p-4 transition hover:border-white/[.09]">
+    <div className="flex items-start justify-between gap-3"><div><div className="text-[11px] font-semibold text-white/76">{module.name}</div><div className="mt-1 text-[9px] leading-4 text-white/25">{module.description}</div></div><button type="button" onClick={() => setEnabled((v) => !v)} className={`relative h-6 w-11 shrink-0 rounded-full border transition ${enabled ? "border-emerald-400/25 bg-emerald-400/15" : "border-white/[.08] bg-white/[.025]"}`}><span className={`absolute top-[3px] h-[18px] w-[18px] rounded-full transition-all ${enabled ? "left-[20px] bg-emerald-300" : "left-[3px] bg-white/40"}`} /></button></div>
+    <div className="mt-4 grid gap-2 sm:grid-cols-2"><label><span className="mb-1.5 block text-[8px] uppercase tracking-[.12em] text-white/22">Action</span><select className={input} value={punishment} onChange={(e) => setPunishment(e.target.value)}>{PUNISHMENTS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}</select></label>{module.supportsThreshold ? <><label><span className="mb-1.5 block text-[8px] uppercase tracking-[.12em] text-white/22">Trigger count</span><input className={input} type="number" min={1} value={count} onChange={(e) => setCount(Number(e.target.value))} /></label><label><span className="mb-1.5 block text-[8px] uppercase tracking-[.12em] text-white/22">Window (seconds)</span><input className={input} type="number" min={1} value={seconds} onChange={(e) => setSeconds(Number(e.target.value))} /></label></> : null}</div>
+    <div className="mt-3 flex items-center justify-between"><span className="text-[8px] text-white/22">{saved ? "Saved" : enabled ? "Protection enabled" : "Protection disabled"}</span><button type="button" onClick={save} disabled={saving} className="inline-flex items-center gap-1.5 rounded-lg border border-white/[.08] bg-white/[.035] px-3 py-2 text-[9px] text-white/65 hover:bg-white/[.06] disabled:opacity-40"><Save className="h-3 w-3" />{saving ? "Saving…" : "Save"}</button></div>
+  </div>;
 }
 
-function TrustedFilters({ data, guildId, candidates, loadingCandidates }: { data: any; guildId: string; candidates: any; loadingCandidates: boolean }) { return <div className="space-y-6"><section className="grid gap-4 xl:grid-cols-2"><AccessCard title="Trusted access" description="Users and roles ignored by trust-aware Ware protections." guildId={guildId} entries={data.lists.trusted ?? []} roles={candidates?.roles ?? []} kind="trusted" /><AccessCard title="Whitelist access" description="Users and roles explicitly allowed through whitelist-aware protections." guildId={guildId} entries={data.lists.whitelist ?? []} roles={candidates?.roles ?? []} kind="whitelist" /></section><AdminSuggestions guildId={guildId} admins={candidates?.adminMembers ?? []} loading={loadingCandidates} trusted={data.lists.trusted ?? []} whitelist={data.lists.whitelist ?? []} membersAvailable={candidates?.membersAvailable} /><section className="grid gap-4 xl:grid-cols-2"><SimpleList title="Name filters" type="name_filter" guildId={guildId} entries={data.lists.name_filter ?? []} placeholder="name or pattern" /><SimpleList title="Allowed domains" type="link_whitelist" guildId={guildId} entries={data.lists.link_whitelist ?? []} placeholder="example.com" /><SimpleList title="Scam domains" type="scam_domain" guildId={guildId} entries={data.lists.scam_domain ?? []} placeholder="bad-domain.example" /><WordFilterCard guildId={guildId} entries={data.lists.word_filter ?? []} automodCount={data.automodSynced ?? 0} /></section></div>; }
-
-function AccessCard({ title, description, guildId, entries, roles, kind }: { title: string; description: string; guildId: string; entries: any[]; roles: any[]; kind: "trusted" | "whitelist" }) {
-  const router = useRouter(); const [userId, setUserId] = useState(""); const [roleId, setRoleId] = useState(""); const [busy, setBusy] = useState(false); const [notice, setNotice] = useState<string | null>(null); const users = entries.filter((e) => e.entry_type !== "role"); const roleEntries = entries.filter((e) => e.entry_type === "role"); const selected = new Set(roleEntries.map((e) => e.value));
-  async function add(value: string, entryType: "user" | "role") { if (!value) return; setBusy(true); setNotice(null); try { await addSecurityListEntry({ data: { guildId, list_type: kind, entry_type: entryType, value, note: null } }); setUserId(""); setRoleId(""); await router.invalidate(); } catch (e) { setNotice((e as Error).message); } finally { setBusy(false); } }
-  async function remove(id: string) { setBusy(true); try { await removeSecurityEntrySmart({ data: { guildId, id } }); await router.invalidate(); } catch (e) { setNotice((e as Error).message); } finally { setBusy(false); } }
-  return <div className={`${card} p-5`}><div className="text-[13px] text-white/82">{title}</div><div className="mt-1 text-[10px] text-white/27">{description}</div><div className="mt-4 grid gap-3 sm:grid-cols-2"><Field label="Add user by Discord ID"><div className="flex gap-2"><input className={input} value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Discord user ID" /><button onClick={() => add(userId, "user")} disabled={busy || !userId.trim()} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[.08] bg-black text-white/70 disabled:opacity-30"><Plus className="h-4 w-4" /></button></div></Field><Field label={kind === "trusted" ? "Trusted role" : "Whitelist role"}><div className="flex gap-2"><select className={input} value={roleId} onChange={(e) => setRoleId(e.target.value)}><option value="">Choose a role…</option>{roles.filter((r) => !selected.has(r.id)).map((r) => <option key={r.id} value={r.id}>{r.administrator ? "★ " : ""}{r.name}</option>)}</select><button onClick={() => add(roleId, "role")} disabled={busy || !roleId} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[.08] bg-black text-white/70 disabled:opacity-30"><Plus className="h-4 w-4" /></button></div></Field></div>{notice ? <div className="mt-2 text-[9px] text-rose-200/70">{notice}</div> : null}<div className="mt-4 grid gap-2 sm:grid-cols-2"><EntryGroup label="Users" entries={users} onRemove={remove} busy={busy} /><EntryGroup label="Roles" entries={roleEntries} roles={roles} onRemove={remove} busy={busy} /></div></div>;
+function DiscordAutoModPanel({ count }: { count: number }) {
+  return <section className={`${shell} p-5`}><div className="flex items-start justify-between gap-4"><div><div className="flex items-center gap-2 text-[12px] font-semibold text-white/80"><Bot className="h-4 w-4" /> Discord AutoMod</div><p className="mt-1.5 text-[9px] leading-4 text-white/28">Ware reads Discord's keyword AutoMod rules and mirrors them into the security workspace instead of making you maintain the same blacklist twice.</p></div><span className="rounded-full border border-white/[.07] bg-white/[.025] px-3 py-1.5 text-[9px] text-white/45">{count} synced rule{count === 1 ? "" : "s"}</span></div></section>;
 }
 
-function AdminSuggestions({ guildId, admins, loading, trusted, whitelist, membersAvailable }: { guildId: string; admins: any[]; loading: boolean; trusted: any[]; whitelist: any[]; membersAvailable?: boolean }) {
-  const router = useRouter(); const [busyId, setBusyId] = useState<string | null>(null); const trustedIds = new Set(trusted.filter((e) => e.entry_type !== "role").map((e) => e.value)); const whitelistIds = new Set(whitelist.filter((e) => e.entry_type !== "role").map((e) => e.value));
-  async function add(userId: string, kind: "trusted" | "whitelist") { setBusyId(`${kind}:${userId}`); try { await addSecurityListEntry({ data: { guildId, list_type: kind, entry_type: "user", value: userId, note: "Added from administrator suggestions" } }); await router.invalidate(); } finally { setBusyId(null); } }
-  return <section className={`${card} p-5`}><div className="flex items-start justify-between"><div><div className="flex items-center gap-2 text-[13px] text-white/82"><Crown className="h-4 w-4 text-amber-200/70" /> Server administrators</div><div className="mt-1 text-[10px] text-white/27">Members with Discord Administrator permission appear here. Trust or whitelist them with one click.</div></div><span className="rounded-full border border-white/[.06] px-2.5 py-1 text-[8px] text-white/30">{admins.length} found</span></div><div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">{loading ? <div className="col-span-full py-6 text-center text-[10px] text-white/25">Loading administrators…</div> : admins.length ? admins.map((admin) => <div key={admin.id} className="flex items-center gap-3 rounded-xl border border-white/[.05] bg-white/[.018] p-3">{admin.avatarUrl ? <img src={admin.avatarUrl} className="h-9 w-9 rounded-xl object-cover" alt="" /> : <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/[.06] text-[10px]">{admin.displayName.slice(0,2).toUpperCase()}</div>}<div className="min-w-0 flex-1"><div className="truncate text-[11px] text-white/72">{admin.displayName}</div><div className="truncate text-[8px] text-white/25">{admin.username}</div></div><div className="flex gap-1"><button onClick={() => add(admin.id, "trusted")} disabled={trustedIds.has(admin.id) || busyId === `trusted:${admin.id}`} className="rounded-lg border border-white/[.07] px-2 py-1.5 text-[8px] text-white/50 disabled:opacity-25">Trust</button><button onClick={() => add(admin.id, "whitelist")} disabled={whitelistIds.has(admin.id) || busyId === `whitelist:${admin.id}`} className="rounded-lg bg-white px-2 py-1.5 text-[8px] font-semibold text-black disabled:opacity-25">Allow</button></div></div>) : <div className="col-span-full rounded-xl border border-dashed border-white/[.06] px-4 py-6 text-center text-[10px] text-white/24">{membersAvailable === false ? "Enable Ware's Server Members intent to show administrator suggestions." : "No administrator members found."}</div>}</div></section>;
+function WhitelistPanel({ guildId, rows, onChanged }: { guildId: string; rows: { id: string; entry_type: string; value: string; note: string | null }[]; onChanged: () => void }) {
+  const [value, setValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  async function add() { if (!value.trim()) return; setSaving(true); try { await addSecurityListEntry({ data: { guildId, list_type: "link_whitelist", entry_type: "domain", value: value.trim(), note: null } }); setValue(""); onChanged(); } finally { setSaving(false); } }
+  return <section className={`${shell} p-5`}><div className="flex items-center gap-2 text-[12px] font-semibold text-white/80"><Link2 className="h-4 w-4" /> Allowed domains</div><p className="mt-1 text-[9px] text-white/25">Domains here bypass Ware's link filter.</p><div className="mt-4 flex gap-2"><input className={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder="example.com" /><button onClick={add} disabled={saving || !value.trim()} className="rounded-xl bg-white px-4 text-[10px] font-semibold text-black disabled:opacity-40">Add</button></div><div className="mt-4 flex flex-wrap gap-2">{rows.length ? rows.map((row) => <span key={row.id} className="rounded-full border border-white/[.06] bg-white/[.025] px-3 py-1.5 text-[9px] text-white/48">{row.value}</span>) : <span className="text-[9px] text-white/22">No domains whitelisted.</span>}</div></section>;
 }
 
-function EntryGroup({ label, entries, roles = [], onRemove, busy }: { label: string; entries: any[]; roles?: any[]; onRemove: (id: string) => void; busy: boolean }) { const roleMap = useMemo(() => new Map(roles.map((r) => [r.id, r.name])), [roles]); return <div className="rounded-xl border border-white/[.045] bg-black/20 p-3"><div className="mb-2 text-[8px] uppercase tracking-[.15em] text-white/22">{label}</div><div className="space-y-1.5">{entries.length ? entries.map((entry) => <div key={entry.id} className="flex items-center justify-between gap-2 rounded-lg bg-white/[.025] px-2.5 py-2"><span className="min-w-0 truncate text-[9px] text-white/52">{entry.entry_type === "role" ? `@${roleMap.get(entry.value) || entry.value}` : entry.value}</span><button onClick={() => onRemove(entry.id)} disabled={busy} className="text-white/22 hover:text-rose-300"><Trash2 className="h-3.5 w-3.5" /></button></div>) : <div className="py-3 text-center text-[9px] text-white/18">None added.</div>}</div></div>; }
-
-function WordFilterCard({ guildId, entries, automodCount }: { guildId: string; entries: any[]; automodCount: number }) {
-  const router = useRouter(); const [value, setValue] = useState(""); const [busy, setBusy] = useState(false); const [notice, setNotice] = useState<string | null>(null);
-  async function add() { if (!value.trim()) return; setBusy(true); try { await addSecurityListEntry({ data: { guildId, list_type: "word_filter" as any, entry_type: "pattern", value, note: "Ware filter" } }); setValue(""); await router.invalidate(); } catch (e) { setNotice((e as Error).message); } finally { setBusy(false); } }
-  async function remove(entry: any) { setBusy(true); setNotice(entry.entry_type === "discord_automod" ? "Updating Discord AutoMod…" : null); try { await removeSecurityEntrySmart({ data: { guildId, id: entry.id } }); setNotice(null); await router.invalidate(); } catch (e) { setNotice((e as Error).message); } finally { setBusy(false); } }
-  return <div className={`${card} p-5`}><div className="flex items-start justify-between"><div><div className="text-[13px] text-white/82">Message filters</div><div className="mt-1 text-[10px] text-white/27">AutoMod filters sync here. Removing a Discord filter here also removes it from Discord AutoMod.</div></div><span className="rounded-full border border-[#5865f2]/20 bg-[#5865f2]/[.08] px-2.5 py-1 text-[8px] text-[#aeb6ff]">{automodCount} AutoMod</span></div><div className="mt-4 flex gap-2"><input className={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder="word, phrase, wildcard, or regex" /><button onClick={add} disabled={busy || !value.trim()} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[.08] bg-black text-white/70 disabled:opacity-30"><Plus className="h-4 w-4" /></button></div>{notice ? <div className="mt-2 text-[9px] text-white/40">{notice}</div> : null}<div className="mt-3 space-y-1.5">{entries.length ? entries.map((entry) => <div key={entry.id} className="flex items-center justify-between gap-3 rounded-lg bg-white/[.025] px-3 py-2"><div className="min-w-0"><div className="truncate text-[10px] text-white/55">{entry.value}</div><div className={`mt-0.5 text-[7px] uppercase tracking-[.12em] ${entry.entry_type === "discord_automod" ? "text-[#8ea1ff]" : "text-white/18"}`}>{entry.entry_type === "discord_automod" ? "Discord AutoMod" : "Ware"}</div></div><button onClick={() => remove(entry)} disabled={busy} className="text-white/24 hover:text-rose-300"><Trash2 className="h-3.5 w-3.5" /></button></div>) : <div className="py-4 text-center text-[10px] text-white/20">No filters.</div>}</div></div>;
+function PanicPanel({ data, core, setCore, saving, notice, onSave }: { data: any; core: CoreSettings; setCore: React.Dispatch<React.SetStateAction<CoreSettings>>; saving: boolean; notice: string | null; onSave: () => void }) {
+  return <section className={`${shell} p-5`}><div className="flex items-center gap-2 text-[12px] font-semibold text-white/80"><ShieldAlert className="h-4 w-4 text-amber-200/60" /> Emergency controls</div><p className="mt-1.5 text-[9px] text-white/27">Use these only when the server is actively being raided or damaged.</p><div className="mt-4 grid gap-3 md:grid-cols-2"><CoreToggle label="Panic mode" detail="Lock down and quarantine recent joiners." value={core.panicmode} onChange={(v) => setCore((s) => ({ ...s, panicmode: v }))} /><CoreToggle label="Raid mode" detail="Tighten join handling and kick suspicious new joins." value={core.raidmode} onChange={(v) => setCore((s) => ({ ...s, raidmode: v }))} /><label><span className="mb-1.5 block text-[9px] text-white/30">Protection profile</span><select className={input} value={core.profile} onChange={(e) => setCore((s) => ({ ...s, profile: e.target.value }))}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="extreme">Extreme</option></select></label><label><span className="mb-1.5 block text-[9px] text-white/30">Security log channel</span><select className={input} value={core.log_channel_id ?? ""} onChange={(e) => setCore((s) => ({ ...s, log_channel_id: e.target.value || null }))}><option value="">No log channel</option>{data.textChannels.map((c: any) => <option key={c.id} value={c.id}># {c.name}</option>)}</select></label></div><div className="mt-4 flex items-center justify-between"><span className="text-[9px] text-white/28">{notice}</span><button onClick={onSave} disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[10px] font-semibold text-black disabled:opacity-40"><Save className="h-3.5 w-3.5" />{saving ? "Saving…" : "Save emergency settings"}</button></div></section>;
 }
 
-function SimpleList({ title, type, guildId, entries, placeholder }: { title: string; type: any; guildId: string; entries: any[]; placeholder: string }) { const router = useRouter(); const [value, setValue] = useState(""); const [busy, setBusy] = useState(false); const [notice, setNotice] = useState<string | null>(null); async function add() { if (!value.trim()) return; setBusy(true); try { await addSecurityListEntry({ data: { guildId, list_type: type, entry_type: type.includes("domain") ? "domain" : "pattern", value, note: null } }); setValue(""); await router.invalidate(); } catch (e) { setNotice((e as Error).message); } finally { setBusy(false); } } async function remove(id: string) { setBusy(true); try { await removeSecurityEntrySmart({ data: { guildId, id } }); await router.invalidate(); } catch (e) { setNotice((e as Error).message); } finally { setBusy(false); } } return <div className={`${card} p-5`}><div className="text-[12px] text-white/76">{title}</div><div className="mt-3 flex gap-2"><input className={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder={placeholder} /><button onClick={add} disabled={busy || !value.trim()} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[.08] bg-black text-white/70 disabled:opacity-35"><Plus className="h-4 w-4" /></button></div>{notice ? <div className="mt-2 text-[9px] text-rose-200/65">{notice}</div> : null}<div className="mt-3 space-y-1.5">{entries.length ? entries.map((entry) => <div key={entry.id} className="flex items-center justify-between gap-3 rounded-lg bg-white/[.025] px-3 py-2"><span className="truncate text-[10px] text-white/52">{entry.value}</span><button onClick={() => remove(entry.id)} disabled={busy} className="text-white/24 hover:text-rose-300"><Trash2 className="h-3.5 w-3.5" /></button></div>) : <div className="py-3 text-center text-[10px] text-white/20">No entries.</div>}</div></div>; }
+function VerificationPanel({ data, core, setCore, saving, notice, onSave }: { data: any; core: CoreSettings; setCore: React.Dispatch<React.SetStateAction<CoreSettings>>; saving: boolean; notice: string | null; onSave: () => void }) {
+  return <section className={`${shell} p-5`}><div className="flex items-center gap-2 text-[12px] font-semibold text-white/80"><BadgeCheck className="h-4 w-4" /> Verification</div><div className="mt-4 grid gap-3 md:grid-cols-3"><label><span className="mb-1.5 block text-[9px] text-white/30">Mode</span><select className={input} value={core.verification_mode} onChange={(e) => setCore((s) => ({ ...s, verification_mode: e.target.value }))}><option value="off">Off</option><option value="button">Button</option><option value="captcha">Captcha</option><option value="questions">Questions</option></select></label><label><span className="mb-1.5 block text-[9px] text-white/30">Verified role</span><select className={input} value={core.verification_role_id ?? ""} onChange={(e) => setCore((s) => ({ ...s, verification_role_id: e.target.value || null }))}><option value="">No role</option>{data.roles.map((r: any) => <option key={r.id} value={r.id}>{r.name}</option>)}</select></label><label><span className="mb-1.5 block text-[9px] text-white/30">Captcha difficulty</span><select className={input} value={core.captcha_difficulty} onChange={(e) => setCore((s) => ({ ...s, captcha_difficulty: e.target.value }))}><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label></div><div className="mt-4 flex items-center justify-between"><span className="text-[9px] text-white/28">{notice}</span><button onClick={onSave} disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[10px] font-semibold text-black disabled:opacity-40"><Save className="h-3.5 w-3.5" />{saving ? "Saving…" : "Save verification"}</button></div></section>;
+}
 
-function ActivityView({ data }: { data: any }) { return <section className={`${card} overflow-hidden`}><div className="border-b border-white/[.05] px-5 py-4"><div className="text-[13px] text-white/80">Recent security events</div><div className="mt-1 text-[10px] text-white/24">Latest detections and enforcement actions.</div></div><div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left"><thead className="text-[9px] uppercase tracking-[.16em] text-white/22"><tr><th className="px-5 py-3">Time</th><th>Module</th><th>Event</th><th>Actor</th><th>Action</th><th>Reason</th></tr></thead><tbody>{data.events.length ? data.events.map((event: any) => <tr key={event.id} className="border-t border-white/[.045] text-[11px] text-white/48"><td className="px-5 py-3">{new Date(event.created_at).toLocaleString()}</td><td>{event.module_key ?? "—"}</td><td>{event.event_type}</td><td>{event.actor_id ?? "—"}</td><td>{event.dry_run ? "Dry run" : event.punishment ?? "Logged"}</td><td>{event.reason ?? "—"}</td></tr>) : <tr><td colSpan={6} className="px-5 py-12 text-center text-[11px] text-white/22">No security events yet.</td></tr>}</tbody></table></div></section>; }
-function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label><span className="mb-2 block text-[9px] text-white/31">{label}</span>{children}</label>; }
-function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) { return <button type="button" onClick={() => onChange(!value)} className="flex min-h-[58px] items-center justify-between gap-3 rounded-xl border border-white/[.06] bg-white/[.018] px-3 text-left"><span className="text-[10px] text-white/48">{label}</span><span className={`relative h-5 w-9 rounded-full ${value ? "bg-emerald-500/65" : "bg-white/[.08]"}`}><span className={`absolute top-1 h-3 w-3 rounded-full bg-white ${value ? "left-5" : "left-1"}`} /></span></button>; }
+function JoinGatePanel({ guildId }: { guildId: string }) {
+  return <a href={`/dashboard/${guildId}/join-gate`} className={`${shell} group flex items-center justify-between p-5 transition hover:border-white/[.11] hover:bg-[#111313]`}><div><div className="flex items-center gap-2 text-[12px] font-semibold text-white/80"><LockKeyhole className="h-4 w-4" /> Join Gate</div><p className="mt-1.5 text-[9px] text-white/27">Account-age checks, avatar requirements, bot-add filtering, actions, and alert channel selection.</p></div><ChevronRight className="h-4 w-4 text-white/24 transition group-hover:translate-x-1 group-hover:text-white/55" /></a>;
+}
+
+function CoreToggle({ label, detail, value, onChange }: { label: string; detail: string; value: boolean; onChange: (value: boolean) => void }) {
+  return <div className="flex items-center justify-between gap-3 rounded-[14px] border border-white/[.05] bg-white/[.018] p-3.5"><div><div className="text-[10px] font-medium text-white/68">{label}</div><div className="mt-1 text-[8px] text-white/24">{detail}</div></div><button type="button" onClick={() => onChange(!value)} className={`relative h-6 w-11 shrink-0 rounded-full border transition ${value ? "border-emerald-400/25 bg-emerald-400/15" : "border-white/[.08] bg-white/[.025]"}`}><span className={`absolute top-[3px] h-[18px] w-[18px] rounded-full transition-all ${value ? "left-[20px] bg-emerald-300" : "left-[3px] bg-white/40"}`} /></button></div>;
+}
