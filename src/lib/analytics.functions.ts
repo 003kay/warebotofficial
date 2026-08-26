@@ -28,6 +28,7 @@ export type AnalyticsRankRow = {
   id?: string;
   name: string;
   value: number;
+  avatar_url?: string | null;
 };
 
 export type GuildAnalyticsPayload = {
@@ -38,6 +39,8 @@ export type GuildAnalyticsPayload = {
   days?: AnalyticsDay[];
   top_message_channels?: AnalyticsRankRow[];
   top_voice_channels?: AnalyticsRankRow[];
+  top_message_members?: AnalyticsRankRow[];
+  top_voice_members?: AnalyticsRankRow[];
   top_commands?: AnalyticsRankRow[];
   totals?: {
     messages?: number;
@@ -46,6 +49,7 @@ export type GuildAnalyticsPayload = {
     joins?: number;
     leaves?: number;
     commands?: number;
+    active_users?: number;
   };
 };
 
@@ -66,20 +70,15 @@ async function fetchChannelMap(guildId: string, ids: string[]) {
   const token = getBotToken();
   const map = new Map<string, string>();
   if (!token || !ids.length) return map;
-
   const headers = { Authorization: `Bot ${token}` };
 
   try {
     const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers, cache: "no-store" });
     if (res.ok) {
       const channels = (await res.json()) as { id: string; name?: string }[];
-      for (const channel of channels) {
-        if (channel?.id && channel?.name) map.set(String(channel.id), String(channel.name));
-      }
+      for (const channel of channels) if (channel?.id && channel?.name) map.set(String(channel.id), String(channel.name));
     }
-  } catch {
-    // Individual lookups below are the fallback.
-  }
+  } catch {}
 
   const unresolved = [...new Set(ids)].filter((id) => id && !map.has(id));
   await Promise.all(unresolved.slice(0, 30).map(async (id) => {
@@ -88,11 +87,8 @@ async function fetchChannelMap(guildId: string, ids: string[]) {
       if (!res.ok) return;
       const channel = (await res.json()) as { id?: string; name?: string };
       if (channel.id && channel.name) map.set(String(channel.id), String(channel.name));
-    } catch {
-      // The bot snapshot may still have a stored name.
-    }
+    } catch {}
   }));
-
   return map;
 }
 
@@ -104,12 +100,7 @@ function resolveChannelRows(rows: AnalyticsRankRow[] | undefined, channelMap: Ma
     const liveName = id ? channelMap.get(id) : undefined;
     const usableSnapshotName = snapshotName && !looksLikeSnowflake(snapshotName) && snapshotName.toLowerCase() !== "unknown channel" && snapshotName.toLowerCase() !== "channel";
     const fallback = id ? `channel-${id.slice(-6)}` : "channel";
-
-    return {
-      ...row,
-      id: id || row.id,
-      name: liveName || (usableSnapshotName ? snapshotName : fallback),
-    };
+    return { ...row, id: id || row.id, name: liveName || (usableSnapshotName ? snapshotName : fallback) };
   });
 }
 
@@ -118,7 +109,6 @@ export const getGuildAnalytics = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     await requireGuildManager(data.guildId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
     const { data: row, error } = await (supabaseAdmin as any)
       .from("guild_analytics_snapshots")
       .select("payload,updated_at")
