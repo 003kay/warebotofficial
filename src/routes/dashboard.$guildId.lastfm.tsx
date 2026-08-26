@@ -28,7 +28,6 @@ function Page() {
   const { guildId } = Route.useParams();
   const { data: server } = useSuspenseQuery({ queryKey: ["dashboardSettings", guildId], queryFn: () => getDashboardSettings({ data: { guildId } }) });
   const { data: connection } = useSuspenseQuery({ queryKey: ["lastfmConnection"], queryFn: () => getLastfmConnection(), refetchInterval: 30_000 });
-
   const profileUrl = connection.username ? `https://www.last.fm/user/${encodeURIComponent(connection.username)}` : null;
 
   return (
@@ -75,10 +74,10 @@ function Page() {
           <section className="rounded-[20px] border border-white/[0.06] bg-[#101212] p-5">
             <div className="flex items-center gap-2 text-[10px] font-medium text-white/65"><Radio className="h-4 w-4 text-[#a7bdc7]" /> Quick links</div>
             <div className="mt-4 space-y-2">
+              <a href="/commands?category=lastfm" className="flex items-center justify-between rounded-[13px] border border-white/[0.05] bg-white/[0.018] px-3.5 py-3 text-[10px] text-white/55 hover:bg-white/[0.03] hover:text-white/80"><span>Browse Last.fm commands</span><ExternalLink className="h-3.5 w-3.5" /></a>
               {profileUrl ? <a href={profileUrl} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-[13px] border border-white/[0.05] bg-white/[0.018] px-3.5 py-3 text-[10px] text-white/55 hover:bg-white/[0.03] hover:text-white/80"><span>Open Last.fm profile</span><ExternalLink className="h-3.5 w-3.5" /></a> : null}
               <a href="https://www.last.fm/settings/applications" target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-[13px] border border-white/[0.05] bg-white/[0.018] px-3.5 py-3 text-[10px] text-white/55 hover:bg-white/[0.03] hover:text-white/80"><span>Last.fm applications</span><ExternalLink className="h-3.5 w-3.5" /></a>
             </div>
-            {!connection.connected ? <div className="mt-4 rounded-[13px] border border-amber-300/10 bg-amber-300/[0.03] px-3.5 py-3 text-[9px] leading-4 text-amber-100/45">If Discord already says you are linked, refresh after the deployment finishes. This page now reads the same stored Discord-to-Last.fm connection instead of failing on a nonexistent database field.</div> : null}
           </section>
         </div>
       </div>
