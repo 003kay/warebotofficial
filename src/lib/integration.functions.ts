@@ -9,19 +9,33 @@ async function session() {
 
 export const getLastfmConnection = createServerFn({ method: "GET" }).handler(async () => {
   const current = await session();
-  if (!current) return { authenticated: false as const, connected: false as const, username: null };
+  if (!current) {
+    return {
+      authenticated: false as const,
+      connected: false as const,
+      username: null,
+      connectedAt: null,
+      discordUserId: null,
+    };
+  }
+
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await (supabaseAdmin as any)
     .from("lastfm_connections")
-    .select("lastfm_username,subscriber,connected_at")
+    .select("lastfm_username,connected_at,updated_at")
     .eq("discord_user_id", current.discordUserId)
     .maybeSingle();
-  if (error) console.warn("Last.fm connection lookup failed", error.message);
+
+  if (error) {
+    console.warn("Last.fm connection lookup failed", error.message);
+  }
+
   return {
     authenticated: true as const,
     connected: Boolean(data?.lastfm_username),
     username: data?.lastfm_username ? String(data.lastfm_username) : null,
-    subscriber: Boolean(data?.subscriber),
     connectedAt: data?.connected_at ? String(data.connected_at) : null,
+    updatedAt: data?.updated_at ? String(data.updated_at) : null,
+    discordUserId: current.discordUserId,
   };
 });
