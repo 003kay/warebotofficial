@@ -5,12 +5,10 @@ import {
   Activity,
   Command,
   Heart,
-  Hash,
   MessageSquare,
   Mic2,
   Radio,
   Server,
-  TrendingUp,
   UserMinus,
   UserPlus,
   UsersRound,
@@ -28,7 +26,7 @@ import {
 
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getTicketPanel } from "@/lib/dashboard.functions";
-import { getGuildAnalytics } from "@/lib/analytics.functions";
+import { getGuildAnalytics, type AnalyticsDay } from "@/lib/analytics.functions";
 
 export const Route = createFileRoute("/dashboard/$guildId/")({
   head: () => ({ meta: [{ title: "Overview — Ware Dashboard" }] }),
@@ -48,6 +46,18 @@ export const Route = createFileRoute("/dashboard/$guildId/")({
   component: GuildDashboardHome,
 });
 
+type RangeKey = "today" | "7d" | "30d" | "90d" | "6m" | "1y" | "all";
+
+const RANGES: { key: RangeKey; label: string; days: number | null }[] = [
+  { key: "today", label: "Today", days: 1 },
+  { key: "7d", label: "7D", days: 7 },
+  { key: "30d", label: "30D", days: 30 },
+  { key: "90d", label: "90D", days: 90 },
+  { key: "6m", label: "6M", days: 183 },
+  { key: "1y", label: "1Y", days: 365 },
+  { key: "all", label: "All", days: null },
+];
+
 function number(value: number) {
   return new Intl.NumberFormat("en-US").format(Math.max(0, Math.round(Number(value || 0))));
 }
@@ -62,26 +72,54 @@ function hours(seconds: number) {
   return value >= 100 ? `${number(value)} hrs` : `${value.toFixed(value >= 10 ? 1 : 2)} hrs`;
 }
 
-function shortDate(value: string) {
+function dateLabel(value: string, long = false) {
   const parsed = new Date(`${value}T00:00:00Z`);
-  return Number.isNaN(parsed.getTime())
-    ? value
-    : parsed.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString("en-US", {
+    month: "short",
+    day: long ? "numeric" : undefined,
+    year: long ? "numeric" : undefined,
+    timeZone: "UTC",
+  });
 }
 
-function MetricCard({
-  label,
-  value,
-  detail,
-  icon: Icon,
-}: {
-  label: string;
-  value: string;
-  detail: string;
-  icon: typeof Activity;
-}) {
+function filterDays(allDays: AnalyticsDay[], range: RangeKey) {
+  if (range === "all") return allDays;
+  const days = RANGES.find((item) => item.key === range)?.days ?? 7;
+  return allDays.slice(-days);
+}
+
+function bucketDays(days: AnalyticsDay[], range: RangeKey) {
+  if (days.length <= 45 || range === "today" || range === "7d" || range === "30d") {
+    return days.map((day) => ({ ...day, label: dateLabel(day.date, true) }));
+  }
+
+  const bucketSize = range === "90d" ? 7 : range === "6m" || range === "1y" ? 14 : 30;
+  const rows: Array<AnalyticsDay & { label: string }> = [];
+
+  for (let i = 0; i < days.length; i += bucketSize) {
+    const chunk = days.slice(i, i + bucketSize);
+    if (!chunk.length) continue;
+    const sum = chunk.reduce(
+      (acc, day) => ({
+        date: chunk[0].date,
+        messages: acc.messages + Number(day.messages || 0),
+        reactions: acc.reactions + Number(day.reactions || 0),
+        voice_seconds: acc.voice_seconds + Number(day.voice_seconds || 0),
+        joins: acc.joins + Number(day.joins || 0),
+        leaves: acc.leaves + Number(day.leaves || 0),
+        commands: acc.commands + Number(day.commands || 0),
+      }),
+      { date: chunk[0].date, messages: 0, reactions: 0, voice_seconds: 0, joins: 0, leaves: 0, commands: 0 },
+    );
+    rows.push({ ...sum, label: dateLabel(chunk[0].date, bucketSize >= 30) });
+  }
+  return rows;
+}
+
+function MetricCard({ label, value, detail, icon: Icon }: { label: string; value: string; detail: string; icon: typeof Activity }) {
   return (
-    <div className="group relative overflow-hidden rounded-[18px] border border-white/[0.06] bg-[#0f1111] p-4 transition-colors hover:border-white/[0.10]">
+    <div className="relative overflow-hidden rounded-[18px] border border-white/[0.06] bg-[#0f1111] p-4 transition-colors hover:border-white/[0.10]">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.10] to-transparent" />
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
@@ -102,61 +140,43 @@ function Ranking({
   subtitle,
   rows,
   suffix,
-  showIds = false,
+  channels = false,
 }: {
   title: string;
   subtitle: string;
   rows: { id?: string; name: string; value: number }[];
   suffix: (value: number) => string;
-  showIds?: boolean;
+  channels?: boolean;
 }) {
   const max = Math.max(1, ...rows.map((row) => Number(row.value || 0)));
 
   return (
     <section className="overflow-hidden rounded-[19px] border border-white/[0.06] bg-[#0f1111]">
-      <div className="flex items-start justify-between gap-4 border-b border-white/[0.05] px-5 py-4">
-        <div>
-          <h2 className="text-[12px] font-semibold text-white/78">{title}</h2>
-          <p className="mt-1 text-[9px] text-white/24">{subtitle}</p>
-        </div>
-        <div className="rounded-full border border-white/[0.06] bg-white/[0.025] px-2.5 py-1 text-[8px] text-white/30">
-          Top {Math.min(7, rows.length || 7)}
-        </div>
+      <div className="border-b border-white/[0.05] px-5 py-4">
+        <h2 className="text-[12px] font-semibold text-white/78">{title}</h2>
+        <p className="mt-1 text-[9px] text-white/24">{subtitle}</p>
       </div>
-
       <div className="p-3">
         {rows.length ? (
           <div className="space-y-2">
-            {rows.slice(0, 7).map((row, index) => (
-              <div
-                key={`${row.id || row.name}-${index}`}
-                className="rounded-[13px] border border-white/[0.035] bg-white/[0.018] px-3.5 py-3 transition-colors hover:bg-white/[0.028]"
-              >
+            {rows.slice(0, 8).map((row, index) => (
+              <div key={`${row.id || row.name}-${index}`} className="rounded-[13px] border border-white/[0.035] bg-white/[0.018] px-3.5 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="grid h-7 w-7 shrink-0 place-items-center rounded-[9px] bg-white/[0.035] text-[9px] font-medium text-white/28">
-                    {index + 1}
-                  </div>
+                  <div className="grid h-7 w-7 shrink-0 place-items-center rounded-[9px] bg-white/[0.035] text-[9px] font-medium text-white/28">{index + 1}</div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
-                        <div className="truncate text-[10px] font-semibold text-white/67">
-                          {showIds ? `# ${row.name}` : row.name}
+                        <div className="truncate text-[10px] font-semibold text-white/72">
+                          {channels ? `# ${row.name || "Channel"}` : row.name}
                         </div>
-                        {showIds && row.id ? (
-                          <div className="mt-0.5 truncate font-mono text-[8px] tracking-[0.02em] text-white/20">
-                            {row.id}
-                          </div>
+                        {channels && row.id ? (
+                          <div className="mt-0.5 truncate font-mono text-[8px] tracking-[0.02em] text-white/22">{row.id}</div>
                         ) : null}
                       </div>
-                      <span className="shrink-0 pt-0.5 text-[9px] font-medium text-white/34">
-                        {suffix(Number(row.value || 0))}
-                      </span>
+                      <span className="shrink-0 pt-0.5 text-[9px] font-medium text-white/36">{suffix(Number(row.value || 0))}</span>
                     </div>
                     <div className="mt-2.5 h-[3px] overflow-hidden rounded-full bg-white/[0.045]">
-                      <div
-                        className="h-full rounded-full bg-[#a5bdc8]/55"
-                        style={{ width: `${Math.max(3, (Number(row.value || 0) / max) * 100)}%` }}
-                      />
+                      <div className="h-full rounded-full bg-[#a5bdc8]/55" style={{ width: `${Math.max(3, (Number(row.value || 0) / max) * 100)}%` }} />
                     </div>
                   </div>
                 </div>
@@ -164,9 +184,7 @@ function Ranking({
             ))}
           </div>
         ) : (
-          <div className="grid min-h-52 place-items-center text-center text-[10px] text-white/20">
-            No activity has been synced yet.
-          </div>
+          <div className="grid min-h-52 place-items-center text-center text-[10px] text-white/20">No activity has been synced yet.</div>
         )}
       </div>
     </section>
@@ -175,40 +193,36 @@ function Ranking({
 
 function GuildDashboardHome() {
   const { guildId } = Route.useParams();
-  const [period, setPeriod] = useState<1 | 7 | 30>(7);
+  const [range, setRange] = useState<RangeKey>("7d");
 
   const { data: server } = useSuspenseQuery({
     queryKey: ["ticketPanel", guildId],
     queryFn: () => getTicketPanel({ data: { guildId } }),
   });
-
   const { data: analytics } = useSuspenseQuery({
     queryKey: ["guildAnalytics", guildId],
     queryFn: () => getGuildAnalytics({ data: { guildId } }),
-    refetchInterval: 60_000,
+    refetchInterval: 30_000,
   });
 
   const payload = analytics.payload;
-  const allDays = useMemo(
-    () => [...(payload?.days ?? [])].sort((a, b) => a.date.localeCompare(b.date)),
-    [payload?.days],
-  );
-  const days = allDays.slice(-period);
+  const allDays = useMemo(() => [...(payload?.days ?? [])].sort((a, b) => a.date.localeCompare(b.date)), [payload?.days]);
+  const selectedDays = useMemo(() => filterDays(allDays, range), [allDays, range]);
+  const chartData = useMemo(() => bucketDays(selectedDays, range), [selectedDays, range]);
 
   const selectedTotals = useMemo(
-    () =>
-      days.reduce(
-        (acc, day) => ({
-          messages: acc.messages + Number(day.messages || 0),
-          reactions: acc.reactions + Number(day.reactions || 0),
-          voice_seconds: acc.voice_seconds + Number(day.voice_seconds || 0),
-          joins: acc.joins + Number(day.joins || 0),
-          leaves: acc.leaves + Number(day.leaves || 0),
-          commands: acc.commands + Number(day.commands || 0),
-        }),
-        { messages: 0, reactions: 0, voice_seconds: 0, joins: 0, leaves: 0, commands: 0 },
-      ),
-    [days],
+    () => selectedDays.reduce(
+      (acc, day) => ({
+        messages: acc.messages + Number(day.messages || 0),
+        reactions: acc.reactions + Number(day.reactions || 0),
+        voice_seconds: acc.voice_seconds + Number(day.voice_seconds || 0),
+        joins: acc.joins + Number(day.joins || 0),
+        leaves: acc.leaves + Number(day.leaves || 0),
+        commands: acc.commands + Number(day.commands || 0),
+      }),
+      { messages: 0, reactions: 0, voice_seconds: 0, joins: 0, leaves: 0, commands: 0 },
+    ),
+    [selectedDays],
   );
 
   const totalEngagement = selectedTotals.messages + selectedTotals.reactions + selectedTotals.commands;
@@ -217,11 +231,7 @@ function GuildDashboardHome() {
   const syncedLabel = syncedAt && !Number.isNaN(syncedAt.getTime())
     ? syncedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
     : "waiting";
-
-  const chartData = days.map((day) => ({ ...day, label: shortDate(day.date) }));
-  const topMessages = payload?.top_message_channels ?? [];
-  const topVoice = payload?.top_voice_channels ?? [];
-  const topCommands = payload?.top_commands ?? [];
+  const rangeLabel = RANGES.find((item) => item.key === range)?.label ?? "7D";
 
   return (
     <DashboardShell guild={server.guild} guildId={guildId} active="home">
@@ -236,170 +246,88 @@ function GuildDashboardHome() {
                 {analytics.connected ? `Live telemetry · synced ${syncedLabel}` : "Waiting for Ware telemetry"}
               </div>
               <div className="mt-3 flex items-center gap-3">
-                {server.guild.iconUrl ? (
-                  <img src={server.guild.iconUrl} alt="" className="h-10 w-10 rounded-[12px] object-cover" />
-                ) : (
-                  <div className="grid h-10 w-10 place-items-center rounded-[12px] border border-white/[0.06] bg-white/[0.025]">
-                    <Server className="h-4 w-4 text-white/35" />
-                  </div>
+                {server.guild.iconUrl ? <img src={server.guild.iconUrl} alt="" className="h-10 w-10 rounded-[12px] object-cover" /> : (
+                  <div className="grid h-10 w-10 place-items-center rounded-[12px] border border-white/[0.06] bg-white/[0.025]"><Server className="h-4 w-4 text-white/35" /></div>
                 )}
                 <div>
-                  <h1 className="text-[25px] font-semibold tracking-[-0.04em] text-white/94 md:text-[30px]">
-                    {server.guild.name}
-                  </h1>
+                  <h1 className="text-[25px] font-semibold tracking-[-0.04em] text-white/94 md:text-[30px]">{server.guild.name}</h1>
                   <p className="mt-0.5 text-[10px] text-white/27">Server overview and live Ware activity</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex rounded-[11px] border border-white/[0.06] bg-black/20 p-1">
-              {([
-                [1, "24H"],
-                [7, "7D"],
-                [30, "30D"],
-              ] as const).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setPeriod(value)}
-                  className={`rounded-[8px] px-3.5 py-2 text-[9px] font-medium transition-colors ${
-                    period === value ? "bg-white/[0.08] text-white/75" : "text-white/25 hover:text-white/50"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
+            <div className="max-w-full overflow-x-auto rounded-[11px] border border-white/[0.06] bg-black/20 p-1">
+              <div className="flex min-w-max">
+                {RANGES.map((item) => (
+                  <button key={item.key} type="button" onClick={() => setRange(item.key)} className={`rounded-[8px] px-3.5 py-2 text-[9px] font-medium transition-colors ${range === item.key ? "bg-white/[0.08] text-white/78" : "text-white/25 hover:text-white/50"}`}>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        {!analytics.connected ? (
-          <div className="mb-4 rounded-[14px] border border-amber-300/15 bg-amber-300/[0.035] px-4 py-3 text-[10px] text-amber-100/55">
-            Ware has not delivered an analytics snapshot for this server yet.
-          </div>
-        ) : null}
-
-        <div className="grid gap-3 lg:grid-cols-[1.65fr_.35fr]">
-          <section className="overflow-hidden rounded-[20px] border border-white/[0.06] bg-[#0f1111]">
-            <div className="flex flex-wrap items-start justify-between gap-4 px-5 pt-5 md:px-6">
-              <div>
-                <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.13em] text-white/25">
-                  <Zap className="h-3 w-3 text-[#9ebac5]" /> Engagement
-                </div>
-                <div className="mt-2 text-[32px] font-semibold tracking-[-0.055em] text-white/92">{number(totalEngagement)}</div>
-                <p className="mt-1 text-[9px] text-white/24">Messages, reactions and command activity</p>
-              </div>
-              <div className="flex gap-4 pt-1 text-[8px] text-white/30">
-                <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#a9c1cb]" />Messages</span>
-                <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/30" />Reactions</span>
-              </div>
-            </div>
-
-            <div className="h-[310px] px-2 pb-3 pt-4 md:px-4">
-              {chartData.length ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 12, right: 16, left: -18, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="messageFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#a9c1cb" stopOpacity={0.20} />
-                        <stop offset="100%" stopColor="#a9c1cb" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.04)" strokeDasharray="2 6" />
-                    <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.22)", fontSize: 8 }} dy={9} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.16)", fontSize: 8 }} width={46} />
-                    <Tooltip
-                      cursor={{ stroke: "rgba(255,255,255,.09)", strokeDasharray: "3 3" }}
-                      contentStyle={{ background: "#151717", border: "1px solid rgba(255,255,255,.08)", borderRadius: 11, fontSize: 10, color: "rgba(255,255,255,.8)" }}
-                      labelStyle={{ color: "rgba(255,255,255,.4)", marginBottom: 5 }}
-                    />
-                    <Area type="monotone" dataKey="messages" name="Messages" stroke="#a9c1cb" strokeWidth={1.8} fill="url(#messageFill)" dot={false} />
-                    <Area type="monotone" dataKey="reactions" name="Reactions" stroke="rgba(255,255,255,.32)" strokeWidth={1.2} fill="transparent" strokeDasharray="3 3" dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="grid h-full place-items-center text-[10px] text-white/18">Analytics will appear after the first bot sync.</div>
-              )}
-            </div>
-          </section>
-
-          <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="rounded-[20px] border border-white/[0.06] bg-[#0f1111] p-5">
-              <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.12em] text-white/25">
-                <UsersRound className="h-3.5 w-3.5" /> Members
-              </div>
-              <div className="mt-3 text-[31px] font-semibold tracking-[-0.05em] text-white/90">{number(payload?.member_count ?? 0)}</div>
-              <div className="mt-4 flex items-center justify-between border-t border-white/[0.05] pt-3 text-[9px]">
-                <span className="text-white/25">Net movement</span>
-                <span className={netGrowth >= 0 ? "text-emerald-300/60" : "text-rose-300/60"}>{signedNumber(netGrowth)}</span>
-              </div>
-            </div>
-            <div className="rounded-[20px] border border-white/[0.06] bg-[#0f1111] p-5">
-              <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.12em] text-white/25">
-                <TrendingUp className="h-3.5 w-3.5" /> Voice
-              </div>
-              <div className="mt-3 text-[31px] font-semibold tracking-[-0.05em] text-white/90">{hours(selectedTotals.voice_seconds)}</div>
-              <div className="mt-4 border-t border-white/[0.05] pt-3 text-[9px] text-white/25">Completed voice sessions</div>
-            </div>
-          </section>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCard label="Messages" value={number(selectedTotals.messages)} detail={`${rangeLabel} message activity`} icon={MessageSquare} />
+          <MetricCard label="Reactions" value={number(selectedTotals.reactions)} detail="Reaction events captured by Ware" icon={Heart} />
+          <MetricCard label="Voice" value={hours(selectedTotals.voice_seconds)} detail="Completed voice session time" icon={Mic2} />
+          <MetricCard label="Members" value={number(payload?.member_count ?? 0)} detail="Current Discord member count" icon={UsersRound} />
         </div>
+
+        <section className="mt-3 overflow-hidden rounded-[20px] border border-white/[0.06] bg-[#0f1111]">
+          <div className="flex flex-wrap items-start justify-between gap-4 px-5 pt-5 md:px-6">
+            <div>
+              <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.13em] text-white/25"><Zap className="h-3 w-3 text-[#9ebac5]" /> Engagement · {rangeLabel}</div>
+              <div className="mt-2 text-[32px] font-semibold tracking-[-0.055em] text-white/92">{number(totalEngagement)}</div>
+              <p className="mt-1 text-[9px] text-white/24">Messages + reactions + successful commands</p>
+            </div>
+            <div className="flex gap-4 pt-1 text-[8px] text-white/30">
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#a9c1cb]" />Messages</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/30" />Reactions</span>
+            </div>
+          </div>
+          <div className="h-[360px] px-2 pb-3 pt-4 md:px-4">
+            {chartData.length ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 12, right: 16, left: -18, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="messageFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a9c1cb" stopOpacity={0.22} /><stop offset="100%" stopColor="#a9c1cb" stopOpacity={0} /></linearGradient>
+                    <linearGradient id="reactionFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ffffff" stopOpacity={0.07} /><stop offset="100%" stopColor="#ffffff" stopOpacity={0} /></linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.04)" strokeDasharray="2 6" />
+                  <XAxis dataKey="label" axisLine={false} tickLine={false} minTickGap={28} tick={{ fill: "rgba(255,255,255,.22)", fontSize: 8 }} dy={9} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.16)", fontSize: 8 }} width={46} />
+                  <Tooltip cursor={{ stroke: "rgba(255,255,255,.09)", strokeDasharray: "3 3" }} contentStyle={{ background: "#151717", border: "1px solid rgba(255,255,255,.08)", borderRadius: 11, fontSize: 10, color: "rgba(255,255,255,.8)" }} labelStyle={{ color: "rgba(255,255,255,.4)", marginBottom: 5 }} />
+                  <Area type="monotone" dataKey="messages" name="Messages" stroke="#a9c1cb" strokeWidth={1.9} fill="url(#messageFill)" activeDot={{ r: 4, fill: "#d5e1e6", stroke: "#0f1111", strokeWidth: 2 }} />
+                  <Area type="monotone" dataKey="reactions" name="Reactions" stroke="rgba(255,255,255,.30)" strokeWidth={1.25} fill="url(#reactionFill)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : <div className="grid h-full place-items-center text-[10px] text-white/18">No analytics in this range yet.</div>}
+          </div>
+        </section>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label="Messages" value={number(selectedTotals.messages)} detail={`${period === 1 ? "Today" : `Last ${period} days`} of message activity`} icon={MessageSquare} />
-          <MetricCard label="Reactions" value={number(selectedTotals.reactions)} detail="Reaction events captured by Ware" icon={Heart} />
           <MetricCard label="Commands" value={number(selectedTotals.commands)} detail="Successful prefix command invocations" icon={Command} />
-          <MetricCard label="Voice Activity" value={hours(selectedTotals.voice_seconds)} detail="Time spent in completed voice sessions" icon={Mic2} />
-        </div>
-
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <MetricCard label="Members Joined" value={number(selectedTotals.joins)} detail="Join events in selected period" icon={UserPlus} />
-          <MetricCard label="Members Left" value={number(selectedTotals.leaves)} detail="Leave events in selected period" icon={UserMinus} />
+          <MetricCard label="Joined" value={number(selectedTotals.joins)} detail={`Join events in ${rangeLabel}`} icon={UserPlus} />
+          <MetricCard label="Left" value={number(selectedTotals.leaves)} detail={`Leave events in ${rangeLabel}`} icon={UserMinus} />
           <MetricCard label="Net Growth" value={signedNumber(netGrowth)} detail={netGrowth >= 0 ? "Positive member movement" : "Negative member movement"} icon={Activity} />
         </div>
 
         <div className="mt-4 grid gap-4 xl:grid-cols-2">
-          <Ranking
-            title="Top Message Channels"
-            subtitle="Channels generating the most messages during the analytics window."
-            rows={topMessages}
-            suffix={(value) => `${number(value)} messages`}
-            showIds
-          />
-          <Ranking
-            title="Top Voice Channels"
-            subtitle="Voice channels with the most completed session time."
-            rows={topVoice}
-            suffix={(value) => hours(value)}
-            showIds
-          />
+          <Ranking title="Top Message Channels" subtitle="Most active text channels in Ware's stored analytics window." rows={payload?.top_message_channels ?? []} suffix={(value) => `${number(value)} messages`} channels />
+          <Ranking title="Top Voice Channels" subtitle="Voice channels with the most completed session time." rows={payload?.top_voice_channels ?? []} suffix={(value) => hours(value)} channels />
         </div>
 
-        <div className="mt-4 grid gap-4 xl:grid-cols-[1.35fr_.65fr]">
-          <Ranking
-            title="Top Commands"
-            subtitle="Most-used Ware commands in the current analytics history."
-            rows={topCommands}
-            suffix={(value) => `${number(value)} uses`}
-          />
-
+        <div className="mt-4 grid gap-4 xl:grid-cols-[1.4fr_.6fr]">
+          <Ranking title="Top Commands" subtitle="Most-used Ware commands in the current analytics snapshot." rows={payload?.top_commands ?? []} suffix={(value) => `${number(value)} uses`} />
           <section className="rounded-[19px] border border-white/[0.06] bg-[#0f1111] p-5">
-            <div className="flex items-center gap-2">
-              <Hash className="h-3.5 w-3.5 text-[#a8bec7]" />
-              <h2 className="text-[12px] font-semibold text-white/75">Telemetry Status</h2>
-            </div>
-            <div className="mt-5 space-y-2">
-              <div className="flex items-center justify-between rounded-[11px] bg-white/[0.022] px-3 py-3 text-[9px]">
-                <span className="text-white/27">Bot connected</span>
-                <span className={analytics.connected ? "text-emerald-300/70" : "text-amber-300/70"}>{analytics.connected ? "Live" : "Waiting"}</span>
-              </div>
-              <div className="flex items-center justify-between rounded-[11px] bg-white/[0.022] px-3 py-3 text-[9px]">
-                <span className="text-white/27">Last snapshot</span>
-                <span className="text-white/50">{syncedLabel}</span>
-              </div>
-              <div className="flex items-center justify-between rounded-[11px] bg-white/[0.022] px-3 py-3 text-[9px]">
-                <span className="text-white/27">Server ID</span>
-                <span className="font-mono text-white/40">{guildId}</span>
-              </div>
+            <div className="text-[9px] uppercase tracking-[0.13em] text-white/25">Telemetry</div>
+            <div className="mt-3 flex items-center gap-2 text-[12px] font-semibold text-white/75"><span className={`h-2 w-2 rounded-full ${analytics.connected ? "bg-emerald-400" : "bg-amber-300"}`} />{analytics.connected ? "Connected" : "Waiting"}</div>
+            <div className="mt-4 space-y-2 text-[9px] text-white/28">
+              <div className="flex justify-between gap-3"><span>Last sync</span><span className="text-white/48">{syncedLabel}</span></div>
+              <div className="flex justify-between gap-3"><span>Stored history</span><span className="text-white/48">{allDays.length} days</span></div>
+              <div className="flex justify-between gap-3"><span>Selected range</span><span className="text-white/48">{rangeLabel}</span></div>
             </div>
           </section>
         </div>
