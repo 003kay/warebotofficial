@@ -17,12 +17,24 @@ export const getDashboardSettings = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { guild } = await requireGuildManager(data.guildId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await (supabaseAdmin as any)
-      .from("guild_dashboard_settings")
-      .select("settings,updated_at")
-      .eq("guild_id", data.guildId)
-      .maybeSingle();
+    const { fetchGuildChannels } = await import("@/lib/discord-bot.server");
+
+    const [{ data: row, error }, channels] = await Promise.all([
+      (supabaseAdmin as any)
+        .from("guild_dashboard_settings")
+        .select("settings,updated_at")
+        .eq("guild_id", data.guildId)
+        .maybeSingle(),
+      fetchGuildChannels(data.guildId).catch(() => null),
+    ]);
+
     if (error) console.warn("Dashboard settings lookup failed", error.message);
+
+    const textChannels = (channels ?? [])
+      .filter((channel) => channel.type === 0 || channel.type === 5)
+      .sort((a, b) => a.position - b.position)
+      .map((channel) => ({ id: String(channel.id), name: String(channel.name), parentId: channel.parent_id ? String(channel.parent_id) : null }));
+
     return {
       guild: {
         id: guild.id,
@@ -31,6 +43,8 @@ export const getDashboardSettings = createServerFn({ method: "GET" })
       },
       settings: (row?.settings ?? {}) as Record<string, unknown>,
       updatedAt: row?.updated_at ? String(row.updated_at) : null,
+      botInGuild: channels !== null,
+      textChannels,
     };
   });
 
@@ -45,10 +59,12 @@ export const saveDashboardSettings = createServerFn({ method: "POST" })
       .select("settings")
       .eq("guild_id", data.guildId)
       .maybeSingle();
+
     const settings = {
       ...((current?.settings ?? {}) as Record<string, unknown>),
       [data.section]: data.values,
     };
+
     const { error } = await (supabaseAdmin as any).from("guild_dashboard_settings").upsert(
       {
         guild_id: data.guildId,
