@@ -2,7 +2,7 @@ import { ArrowUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 const WARE_AVATAR = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
-const DISCORD_URL = "https://discord.gg/wept";
+const DISCORD_URL = "https://discord.gg/warebot";
 
 export function Footer() {
   return (
