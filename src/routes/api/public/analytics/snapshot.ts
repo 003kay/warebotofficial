@@ -7,8 +7,18 @@ function safeEqual(a: string, b: string) {
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
+function analyticsSecret() {
+  return (
+    process.env.WARE_ANALYTICS_SECRET ||
+    process.env.DISCORD_BOT_TOKEN ||
+    process.env.BOT_TOKEN ||
+    process.env.DISCORD_TOKEN ||
+    ""
+  ).trim().replace(/^Bot\s+/i, "");
+}
+
 function verifyRequest(request: Request, body: string) {
-  const secret = process.env.WARE_ANALYTICS_SECRET?.trim();
+  const secret = analyticsSecret();
   if (!secret) return false;
 
   const timestampText = request.headers.get("x-ware-timestamp") || "";
