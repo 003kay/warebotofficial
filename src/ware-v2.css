@@ -1,0 +1,99 @@
+/* Ware V2 — global visual system */
+:root{
+  --ware-bg:#050606;
+  --ware-surface:#0a0b0b;
+  --ware-surface-2:#0e1010;
+  --ware-line:rgba(255,255,255,.085);
+  --ware-line-strong:rgba(255,255,255,.15);
+  --ware-text:#f6f7f7;
+  --ware-muted:rgba(255,255,255,.46);
+  --ware-soft:rgba(255,255,255,.025);
+  --ware-radius:22px;
+  --ware-ease:cubic-bezier(.2,.8,.2,1);
+}
+html{background:var(--ware-bg);scroll-behavior:smooth}
+body{background:var(--ware-bg)!important;color:var(--ware-text);font-synthesis:none;text-rendering:geometricPrecision;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(255,255,255,.18);color:white}
+*{scrollbar-color:rgba(255,255,255,.16) transparent}
+
+/* Make the site feel crisp at rest: no blur/faded cards that only become clear on hover. */
+.hero-console,.modern-feature-card,.stats-panel,article,[class*="rounded-"],[class*="border-"]{filter:none!important}
+.hero-console,.modern-feature-card,.stats-panel{opacity:1!important}
+
+/* Unified surfaces */
+main section[class*="border"],main div[class*="border"][class*="bg-"],aside[class*="border"],form[class*="border"]{
+  border-color:var(--ware-line)!important;
+}
+main section[class*="rounded"],main article[class*="rounded"]{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 28px 80px -58px rgba(0,0,0,.95);
+}
+
+/* Navbar */
+header{backdrop-filter:none}
+header>a:first-child,header button,header a[href*="auth/discord"]{
+  border-color:var(--ware-line)!important;
+  background:rgba(9,10,10,.78)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 14px 40px -28px rgba(0,0,0,.95)!important;
+}
+@media(hover:hover){header>a:first-child:hover,header button:hover,header a[href*="auth/discord"]:hover{border-color:var(--ware-line-strong)!important;background:#101212!important;transform:translateY(-2px)}}
+
+/* Homepage hero */
+.hero-console{background:#080909!important;border-color:rgba(255,255,255,.12)!important;box-shadow:0 42px 120px -65px rgba(255,255,255,.15),0 30px 90px -55px #000!important}
+.hero-console>div{background:#070808!important}
+.hero-console .grid a{border-color:rgba(255,255,255,.085)!important;background:linear-gradient(180deg,rgba(255,255,255,.026),rgba(255,255,255,.012))!important}
+@media(hover:hover){.hero-console .grid a:hover{transform:translateY(-3px)!important;border-color:rgba(255,255,255,.18)!important;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02))!important}}
+.stats-panel{background:linear-gradient(145deg,#0c0e0e,#080909)!important;border-color:rgba(255,255,255,.09)!important}
+.modern-feature-card{background:linear-gradient(145deg,#0d0f0f,#080909)!important;border-color:rgba(255,255,255,.085)!important}
+
+/* Buttons */
+button,a[class*="button"]{outline:none}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid rgba(255,255,255,.65);outline-offset:2px}
+button:not(:disabled),select{cursor:pointer}
+.premium-button,.glass-button{border:1px solid rgba(255,255,255,.12)!important;background:#0b0c0c!important;color:white!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 45px -34px #000!important}
+@media(hover:hover){.premium-button:hover,.glass-button:hover{background:#141616!important;border-color:rgba(255,255,255,.23)!important;transform:translateY(-2px)!important}}
+
+/* Dashboard/settings cards */
+body:has([href*="/dashboard/"]) main,body:has(aside) main{background:transparent}
+body:has(aside) aside{background:#070808!important;border-color:rgba(255,255,255,.07)!important}
+body:has(aside) aside a{border-radius:12px!important;transition:background .18s ease,color .18s ease,transform .18s var(--ware-ease)}
+@media(hover:hover){body:has(aside) aside a:hover{background:rgba(255,255,255,.055)!important;transform:translateX(2px)}}
+body:has(aside) main [class*="rounded-"][class*="border"]{background-color:#0b0d0d}
+body:has(aside) input,body:has(aside) textarea,body:has(aside) select{background:#070808!important;border-color:rgba(255,255,255,.095)!important;color:white!important}
+body:has(aside) input:hover,body:has(aside) textarea:hover,body:has(aside) select:hover{border-color:rgba(255,255,255,.16)!important}
+
+/* Toggle affordance — visibly interactive even before hover */
+button[role="switch"],[data-state="checked"],[data-state="unchecked"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);transition:transform .16s var(--ware-ease),box-shadow .16s ease,filter .16s ease!important}
+@media(hover:hover){button[role="switch"]:hover,[data-state="checked"]:hover,[data-state="unchecked"]:hover{transform:scale(1.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.24),0 0 0 4px rgba(255,255,255,.035)}}
+
+/* Commands */
+article[id^="command-"],.command-detail-card{background:linear-gradient(145deg,#0d0f0f,#090a0a)!important;border-color:rgba(255,255,255,.09)!important;border-radius:20px!important}
+article[id^="command-"] p,.command-detail-card p{color:rgba(255,255,255,.52)!important}
+.command-category-button{background:#0c0e0e!important;border-color:rgba(255,255,255,.085)!important}
+.command-category-button.is-active{background:#f4f5f5!important;color:#050606!important;border-color:#fff!important}
+
+/* Tables and analytics */
+table{border-collapse:separate;border-spacing:0;width:100%}
+thead{background:rgba(255,255,255,.018)}
+th{color:rgba(255,255,255,.42)!important;font-size:10px!important;text-transform:uppercase;letter-spacing:.1em}
+td,th{border-color:rgba(255,255,255,.065)!important}
+tbody tr{transition:background .16s ease}
+@media(hover:hover){tbody tr:hover{background:rgba(255,255,255,.025)}}
+
+/* Dropdowns and menus */
+[role="menu"],[role="listbox"],[data-radix-popper-content-wrapper]>div{background:#0b0d0d!important;border-color:rgba(255,255,255,.11)!important;box-shadow:0 28px 80px -35px #000!important}
+
+/* Micro-motion: premium but not distracting */
+@keyframes ware-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+main>section,main>div{animation:ware-enter .28s var(--ware-ease) both}
+main>section:nth-child(2),main>div:nth-child(2){animation-delay:.035s}
+main>section:nth-child(3),main>div:nth-child(3){animation-delay:.07s}
+
+/* Mobile */
+@media(max-width:767px){
+  :root{--ware-radius:18px}
+  main{padding-left:14px!important;padding-right:14px!important}
+  .hero-console{border-radius:22px!important}
+  body:has(aside) aside{box-shadow:20px 0 60px -40px #000}
+}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
