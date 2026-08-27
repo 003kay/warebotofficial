@@ -21,11 +21,27 @@ body {
 }
 
 .hero-console {
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  will-change: auto !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
   box-shadow:
     0 34px 120px -58px rgba(117,130,255,.22),
     0 28px 80px -45px rgba(0,0,0,.95),
     inset 0 1px 0 rgba(255,255,255,.04) !important;
 }
+
+.hero-console *,
+.hero-console *::before,
+.hero-console *::after {
+  filter: none !important;
+}
+
+/* The old floating anti-nuke pill and hero status/count pill are intentionally removed. */
+.floating-chip { display: none !important; }
+section:has(.hero-console) > div.grid > div:first-child > div:first-child { display: none !important; }
 
 .modern-feature-card,
 .stats-panel {
