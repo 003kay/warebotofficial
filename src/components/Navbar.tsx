@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ExternalLink, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const WARE_AVATAR = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
+const WARE_AVATAR = "/ware-logo.svg";
 const DISCORD_URL = "https://discord.gg/warebot";
 const DASHBOARD_LOGIN = "/auth/discord/login";
 const DASHBOARD_LOGOUT = "/auth/discord/logout";
@@ -30,7 +30,7 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
   return <>
     <header className="relative z-40 flex items-center justify-between px-6 py-6 md:px-10 md:py-7">
       <Link to="/" aria-label="Ware home" className="group relative h-12 w-12 overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.025] shadow-[0_12px_40px_-24px_rgba(255,255,255,.32),inset_0_1px_0_rgba(255,255,255,.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.05]">
-        <img src={WARE_AVATAR} alt="Ware bot" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <img src={WARE_AVATAR} alt="Ware bot" className="h-full w-full object-contain p-1.5 transition-transform duration-500 group-hover:scale-105" />
       </Link>
 
       <div className="flex items-center gap-2.5 sm:gap-3">
