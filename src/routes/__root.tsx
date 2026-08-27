@@ -4,10 +4,11 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import polishCss from "../site-polish.css?url";
@@ -78,60 +79,30 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function CommandTransition() {
-  const router = useRouter();
+  const pathname = useRouterState({ select: state => state.location.pathname });
   const [phase, setPhase] = useState<"idle" | "enter" | "leave">("idle");
-  const runningRef = useRef(false);
-  const timersRef = useRef<number[]>([]);
 
   useEffect(() => {
-    const clearTimers = () => {
-      timersRef.current.forEach((timer) => window.clearTimeout(timer));
-      timersRef.current = [];
-    };
+    if (pathname !== "/commands") {
+      setPhase("idle");
+      return;
+    }
 
-    const start = () => {
-      if (runningRef.current || window.location.pathname === "/commands") return;
-      runningRef.current = true;
-      clearTimers();
-      setPhase("enter");
+    let shouldPlay = false;
+    try {
+      shouldPlay = sessionStorage.getItem("ware-command-entry") === "1";
+      sessionStorage.removeItem("ware-command-entry");
+    } catch {}
+    if (!shouldPlay) return;
 
-      const navigateTimer = window.setTimeout(async () => {
-        try {
-          await router.navigate({ to: "/commands" });
-          const leaveTimer = window.setTimeout(() => setPhase("leave"), 180);
-          const finishTimer = window.setTimeout(() => {
-            setPhase("idle");
-            runningRef.current = false;
-          }, 1500);
-          timersRef.current.push(leaveTimer, finishTimer);
-        } catch (error) {
-          console.error("Commands navigation failed", error);
-          setPhase("leave");
-          const failSafe = window.setTimeout(() => {
-            setPhase("idle");
-            runningRef.current = false;
-            window.location.href = "/commands";
-          }, 1050);
-          timersRef.current.push(failSafe);
-        }
-      }, 1050);
-
-      const hardFailSafe = window.setTimeout(() => {
-        if (!runningRef.current) return;
-        setPhase("idle");
-        runningRef.current = false;
-      }, 4500);
-
-      timersRef.current.push(navigateTimer, hardFailSafe);
-    };
-
-    window.addEventListener("ware:navigate-commands", start);
+    setPhase("enter");
+    const leaveTimer = window.setTimeout(() => setPhase("leave"), 1050);
+    const finishTimer = window.setTimeout(() => setPhase("idle"), 2200);
     return () => {
-      window.removeEventListener("ware:navigate-commands", start);
-      clearTimers();
-      runningRef.current = false;
+      window.clearTimeout(leaveTimer);
+      window.clearTimeout(finishTimer);
     };
-  }, [router]);
+  }, [pathname]);
 
   if (phase === "idle") return null;
   return <div className={`ware-command-transition ${phase === "leave" ? "is-leaving" : "is-entering"}`} aria-label="Loading commands">
