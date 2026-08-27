@@ -26,7 +26,7 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
     setMenuOpen(false);
     setCommandLoading(true);
     try { sessionStorage.setItem("ware-command-reveal", "1"); } catch {}
-    window.setTimeout(() => { window.location.href = "/commands"; }, 420);
+    window.setTimeout(() => { window.location.href = "/commands"; }, 560);
   };
 
   const accountHref = dashboardMode ? DASHBOARD_LOGOUT : DASHBOARD_LOGIN;
@@ -34,16 +34,31 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
   return <>
     {commandLoading ? (
       <div className="ware-command-loader fixed inset-0 z-[220] grid place-items-center bg-[#030404]" aria-label="Loading commands">
-        <div className="ware-command-loader-core"><div className="ware-command-loader-ring"/><img src={WARE_AVATAR} alt="Ware" className="ware-command-loader-logo"/><div className="ware-command-loader-glow"/></div>
+        <div className="ware-command-loader-core">
+          <div className="ware-command-loader-halo"/>
+          <img src={WARE_AVATAR} alt="Ware" className="ware-command-loader-logo"/>
+        </div>
       </div>
     ) : null}
 
-    <header className="relative z-40 flex items-center justify-between px-6 py-6 md:px-10 md:py-7">
+    <header className="relative z-40 grid grid-cols-[auto_1fr_auto] items-center px-6 py-6 md:px-10 md:py-7">
       <Link to="/" aria-label="Ware home" className="group grid h-12 w-12 place-items-center rounded-2xl border border-white/[.09] bg-black/55 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[.035]">
         <img src={WARE_AVATAR} alt="Ware bot" className="h-9 w-9 object-contain transition duration-500 group-hover:scale-105"/>
       </Link>
 
-      <div className="flex items-center gap-2.5">
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-[18px] border border-white/[.07] bg-[#090a0a]/80 p-1.5 shadow-[0_18px_55px_-38px_rgba(0,0,0,.95)] backdrop-blur-2xl md:flex">
+        <a href="/commands" onClick={openCommands} className="group inline-flex h-9 items-center gap-2 rounded-xl px-3.5 text-[12px] font-medium text-white/58 transition hover:bg-white/[.055] hover:text-white">
+          <Command className="h-3.5 w-3.5 text-white/38 transition group-hover:text-white/70"/>Commands
+        </a>
+        <Link to="/documentation" className="group inline-flex h-9 items-center gap-2 rounded-xl px-3.5 text-[12px] font-medium text-white/58 transition hover:bg-white/[.055] hover:text-white">
+          <BookOpen className="h-3.5 w-3.5 text-white/38 transition group-hover:text-white/70"/>Docs
+        </Link>
+        <div className="inline-flex h-9 items-center gap-2 rounded-xl px-3.5 text-[12px] font-medium text-white/48">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,.55)]"/>Status
+        </div>
+      </nav>
+
+      <div className="col-start-3 flex items-center gap-2.5">
         <a href={accountHref} className={dashboardMode
           ? "group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-red-500/30 bg-red-500/[.10] px-4 text-red-100 transition duration-300 hover:-translate-y-0.5 hover:border-red-400/55 hover:bg-red-500/[.18] hover:text-white"
           : "group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-white/[.10] bg-[#0a0b0b]/90 px-4 text-white/90 shadow-[0_12px_34px_-26px_rgba(255,255,255,.4)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/[.22] hover:bg-white/[.055] hover:text-white"}>
