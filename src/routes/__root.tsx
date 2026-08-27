@@ -18,7 +18,8 @@ import securitySaveCss from "../security-save.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CategoryRailEnhancer } from "../components/CategoryRailEnhancer";
 
-const WARE_LOGO = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
+const WARE_LOGO = "/ware-logo.svg?v=3";
+const WARE_FAVICON = "/favicon.svg?v=3";
 
 function NotFoundComponent() {
   return (
@@ -100,8 +101,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: WARE_LOGO },
     ],
     links: [
-      { rel: "icon", type: "image/png", href: WARE_LOGO },
-      { rel: "shortcut icon", type: "image/png", href: WARE_LOGO },
+      { rel: "icon", type: "image/svg+xml", href: WARE_FAVICON },
+      { rel: "shortcut icon", type: "image/svg+xml", href: WARE_FAVICON },
       { rel: "apple-touch-icon", href: WARE_LOGO },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
