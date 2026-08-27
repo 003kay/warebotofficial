@@ -25,10 +25,10 @@ export function Hero() {
   return <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-16 pt-10 md:px-10 md:pb-20 md:pt-14">
     <style>{`
       @keyframes wareSilverShine { 0% { background-position: 180% 50%; } 100% { background-position: -80% 50%; } }
-      @keyframes wareCommandFloat { 0%,100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(0,-16px,0); } }
+      @keyframes wareCommandFloat { 0%,100% { transform: translate3d(0,10px,0); } 50% { transform: translate3d(0,-18px,0); } }
       .ware-silver-shine { color: transparent; background-image: linear-gradient(105deg,#66686d 0%,#b5b8bd 24%,#fff 43%,#a6a9af 59%,#5f6166 80%,#c6c8cc 100%); background-size:240% 100%; background-position:180% 50%; -webkit-background-clip:text; background-clip:text; animation:wareSilverShine 4.2s cubic-bezier(.4,0,.2,1) infinite; }
-      .ware-command-center-float { animation: wareCommandFloat 4.6s ease-in-out infinite !important; will-change: transform; }
-      @media(prefers-reduced-motion:reduce){.ware-silver-shine,.ware-command-center-float{animation:none!important}}
+      .ware-command-center-float { animation: wareCommandFloat 7.2s cubic-bezier(.45,0,.55,1) infinite !important; will-change: transform; transform: translateZ(0); }
+      @media(prefers-reduced-motion:reduce){.ware-silver-shine{animation:none!important}}
     `}</style>
     <div className="hero-orb hero-orb-a"/><div className="hero-orb hero-orb-b"/><div className="hero-beam"/>
     <div className="relative z-10 max-w-[960px] text-left animate-[soft-rise_.7s_ease_both]">
