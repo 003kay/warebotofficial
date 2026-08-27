@@ -33,7 +33,7 @@ function DashboardIndex() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       <Starfield />
-      <Navbar />
+      <Navbar dashboardMode />
       <main className="relative z-10 mx-auto max-w-6xl px-6 py-10">
         <div className="mb-10">
           <h1 className="text-3xl font-bold tracking-tight">Your servers</h1>
