@@ -26,14 +26,14 @@ export function Hero() {
     <style>{`
       @keyframes wareSilverShine { 0% { background-position: 180% 50%; } 100% { background-position: -80% 50%; } }
       @keyframes wareCommandFloat { 0%,100% { transform: translate3d(0,10px,0); } 50% { transform: translate3d(0,-18px,0); } }
-      .ware-silver-shine { color: transparent; background-image: linear-gradient(105deg,#66686d 0%,#b5b8bd 24%,#fff 43%,#a6a9af 59%,#5f6166 80%,#c6c8cc 100%); background-size:240% 100%; background-position:180% 50%; -webkit-background-clip:text; background-clip:text; animation:wareSilverShine 4.2s cubic-bezier(.4,0,.2,1) infinite; }
+      .ware-silver-shine { color: transparent; background-image: linear-gradient(105deg,#777a7f 0%,#c6c9cd 26%,#f4f5f6 45%,#b5b8bc 62%,#686b70 82%,#d4d6d9 100%); background-size:240% 100%; background-position:180% 50%; -webkit-background-clip:text; background-clip:text; animation:wareSilverShine 4.2s cubic-bezier(.4,0,.2,1) infinite; }
       .ware-command-center-float { animation: wareCommandFloat 7.2s cubic-bezier(.45,0,.55,1) infinite !important; will-change: transform; transform: translateZ(0); }
       @media(prefers-reduced-motion:reduce){.ware-silver-shine{animation:none!important}}
     `}</style>
     <div className="hero-orb hero-orb-a"/><div className="hero-orb hero-orb-b"/><div className="hero-beam"/>
-    <div className="relative z-10 max-w-[960px] text-left animate-[soft-rise_.7s_ease_both]">
-      <h1 className="text-[3.6rem] font-bold leading-[.9] tracking-[-.075em] text-white sm:text-7xl md:text-[5.8rem] xl:text-[6.8rem]">Your server.<br/><span className="ware-silver-shine">Under control.</span></h1>
-      <p className="mt-8 max-w-2xl text-base leading-7 text-white/56 md:text-lg">Protection, moderation, tickets, music, utilities, automation, and server management — all through Ware.</p>
+    <div className="relative z-10 max-w-[980px] text-left animate-[soft-rise_.7s_ease_both]">
+      <h1 className="max-w-[940px] text-[3.35rem] font-bold leading-[1.02] tracking-[-.065em] text-white sm:text-6xl md:text-[5.15rem] xl:text-[5.8rem]">Ware is the all-in-one Discord app <span className="ware-silver-shine">built to run your server.</span></h1>
+      <p className="mt-7 max-w-[760px] text-[16px] leading-8 text-white/62 md:text-[18px] md:leading-8">One place for protection, moderation, tickets, music, utilities, automation, and everyday server management. Less clutter, fewer bots, and more control for your community.</p>
       <div className="mt-9 flex flex-wrap gap-3"><a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold"><DiscordLogo/>Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a><a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a></div>
     </div>
 
