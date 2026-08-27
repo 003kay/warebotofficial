@@ -99,15 +99,20 @@ function CommandReveal() {
   const [leaving,setLeaving]=useState(false);
   useEffect(()=>{
     let shouldShow=false;
-    try{shouldShow=window.location.pathname==="/commands"&&sessionStorage.getItem("ware-command-reveal")==="1";sessionStorage.removeItem("ware-command-reveal")}catch{}
+    try {
+      shouldShow=window.location.pathname==="/commands"&&sessionStorage.getItem("ware-command-reveal")==="1";
+      sessionStorage.removeItem("ware-command-reveal");
+    } catch {}
     if(!shouldShow)return;
     setVisible(true);
-    const fade=window.setTimeout(()=>setLeaving(true),520);
-    const done=window.setTimeout(()=>setVisible(false),980);
-    return()=>{window.clearTimeout(fade);window.clearTimeout(done)};
+    const reverse=window.setTimeout(()=>setLeaving(true),360);
+    const done=window.setTimeout(()=>setVisible(false),1080);
+    return()=>{window.clearTimeout(reverse);window.clearTimeout(done)};
   },[]);
   if(!visible)return null;
-  return <div className={`ware-command-reveal fixed inset-0 z-[250] grid place-items-center bg-[#030404] ${leaving?"is-leaving":""}`}><div className="ware-command-loader-core"><div className="ware-command-loader-ring"/><img src={WARE_LOGO} alt="Ware" className="ware-command-loader-logo"/><div className="ware-command-loader-glow"/></div></div>;
+  return <div className={`ware-command-reveal fixed inset-0 z-[250] grid place-items-center bg-[#030404] ${leaving?"is-leaving":""}`}>
+    <div className="ware-command-loader-core"><div className="ware-command-loader-halo"/><img src={WARE_LOGO} alt="Ware" className="ware-command-loader-logo"/></div>
+  </div>;
 }
 
 function RootComponent() {
