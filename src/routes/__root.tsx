@@ -4,11 +4,10 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import polishCss from "../site-polish.css?url";
@@ -78,40 +77,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return <html lang="en"><head><HeadContent /></head><body>{children}<Scripts /></body></html>;
 }
 
-function CommandTransition() {
-  const pathname = useRouterState({ select: state => state.location.pathname });
-  const [phase, setPhase] = useState<"idle" | "enter" | "leave">("idle");
-
-  useEffect(() => {
-    if (pathname !== "/commands") {
-      setPhase("idle");
-      return;
-    }
-
-    let shouldPlay = false;
-    try {
-      shouldPlay = sessionStorage.getItem("ware-command-entry") === "1";
-      sessionStorage.removeItem("ware-command-entry");
-    } catch {}
-    if (!shouldPlay) return;
-
-    setPhase("enter");
-    const leaveTimer = window.setTimeout(() => setPhase("leave"), 1450);
-    const finishTimer = window.setTimeout(() => setPhase("idle"), 2850);
-    return () => {
-      window.clearTimeout(leaveTimer);
-      window.clearTimeout(finishTimer);
-    };
-  }, [pathname]);
-
-  if (phase === "idle") return null;
-  return <div className={`ware-command-transition ${phase === "leave" ? "is-leaving" : "is-entering"}`} aria-label="Loading commands">
-    <div className="ware-command-transition-glow"/>
-    <img src={WARE_LOGO} alt="Ware" className="ware-command-transition-logo"/>
-  </div>;
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  return <QueryClientProvider client={queryClient}><CommandTransition/><CategoryRailEnhancer/><Outlet/></QueryClientProvider>;
+  return <QueryClientProvider client={queryClient}><CategoryRailEnhancer/><Outlet/></QueryClientProvider>;
 }
