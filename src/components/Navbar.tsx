@@ -2,19 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 
-const WARE_AVATAR = "/ware-logo.svg?v=4";
 const DISCORD_URL = "https://discord.gg/warebot";
 const DASHBOARD_LOGIN = "/auth/discord/login";
 const DASHBOARD_LOGOUT = "/auth/discord/logout";
 const COMMAND_COUNT = 836;
 
 type NavbarProps = { dashboardMode?: boolean };
-
 const menuRow = "ware-menu-entry group flex min-h-[76px] items-center rounded-[18px] border border-white/[.075] bg-[#0c0d0d] px-5 py-4 text-left transition duration-300 hover:-translate-y-0.5 hover:border-white/[.16] hover:bg-[#121414] hover:shadow-[0_16px_45px_-32px_rgba(255,255,255,.25)]";
 
 export function Navbar({ dashboardMode = false }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [commandLoading, setCommandLoading] = useState(false);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -26,18 +23,14 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
   const openCommands = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     setMenuOpen(false);
-    setCommandLoading(true);
-    try { sessionStorage.setItem("ware-command-reveal", "1"); } catch {}
-    window.setTimeout(() => { window.location.href = "/commands"; }, 560);
+    window.dispatchEvent(new CustomEvent("ware:navigate-commands"));
   };
 
   const accountHref = dashboardMode ? DASHBOARD_LOGOUT : DASHBOARD_LOGIN;
 
   return <>
-    {commandLoading ? <div className="ware-command-loader fixed inset-0 z-[220] grid place-items-center bg-[#030404]" aria-label="Loading commands"><div className="ware-command-loader-core"><div className="ware-command-loader-halo"/><img src={WARE_AVATAR} alt="Ware" className="ware-command-loader-logo"/></div></div> : null}
-
     <header className="relative z-40 grid grid-cols-[auto_1fr_auto] items-center px-6 py-6 md:px-10 md:py-7">
-      <Link to="/" aria-label="Ware home" className="group grid h-12 w-12 place-items-center rounded-2xl border border-white/[.09] bg-black/55 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[.035]"><img src={WARE_AVATAR} alt="Ware bot" className="h-9 w-9 object-contain transition duration-500 group-hover:scale-105"/></Link>
+      <Link to="/" aria-label="Ware home" className="group grid h-12 w-12 place-items-center rounded-2xl border border-white/[.09] bg-black/55 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[.035]"><img src="/ware-logo.svg?v=4" alt="Ware bot" className="h-9 w-9 object-contain transition duration-500 group-hover:scale-105"/></Link>
 
       <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-11 md:flex">
         <a href="/commands" onClick={openCommands} className="text-[16px] font-semibold tracking-[-.02em] text-white/74 transition duration-200 hover:text-white">Commands</a>
