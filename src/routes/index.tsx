@@ -6,28 +6,21 @@ import { Stats } from "@/components/Stats";
 import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
 
-const WARE_LOGO = "/6ef1b8a8-6882-4b66-a59f-22f2bf408ca8.png";
+const WARE_LOGO = "/ware-logo.svg?v=4";
+const WARE_FAVICON = "/favicon.svg?v=4";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "ware" },
-      {
-        name: "description",
-        content: "@003kay on instagram\nhttps://discord.gg/GEMMS5pxQs",
-      },
-      {
-        property: "og:title",
-        content: "Run your entire server from one bot.",
-      },
-      {
-        property: "og:description",
-        content: "@003kay on instagram\nhttps://discord.gg/GEMMS5pxQs",
-      },
+      { name: "description", content: "Protection, moderation, tickets, music, utilities and more — powered by Ware." },
+      { property: "og:title", content: "Run your entire server from one bot." },
+      { property: "og:description", content: "Protection, moderation, tickets, music, utilities and more — powered by Ware." },
+      { property: "og:image", content: WARE_LOGO },
     ],
     links: [
-      { rel: "icon", type: "image/png", href: WARE_LOGO },
-      { rel: "shortcut icon", type: "image/png", href: WARE_LOGO },
+      { rel: "icon", type: "image/svg+xml", href: WARE_FAVICON },
+      { rel: "shortcut icon", type: "image/svg+xml", href: WARE_FAVICON },
       { rel: "apple-touch-icon", href: WARE_LOGO },
     ],
   }),
