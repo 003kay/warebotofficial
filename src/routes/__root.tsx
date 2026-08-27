@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -88,12 +89,13 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
     const glow = glowRef.current;
     if (!overlay || !logo || !glow) return;
 
-    const duration = 1450;
+    const duration = 1800;
 
     const overlayAnimation = overlay.animate(
       [
         { opacity: 1, offset: 0 },
-        { opacity: 1, offset: 0.64 },
+        { opacity: 1, offset: 0.66 },
+        { opacity: 0.82, offset: 0.78 },
         { opacity: 0, offset: 1 },
       ],
       { duration, easing: "linear", fill: "forwards" },
@@ -101,23 +103,27 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
 
     const logoAnimation = logo.animate(
       [
-        { transform: "scale(.55)", opacity: 0, filter: "blur(12px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 0 },
-        { transform: "scale(1.11)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 38px rgba(255,255,255,.22))", offset: 0.2 },
-        { transform: "scale(1)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 24px rgba(255,255,255,.15))", offset: 0.43 },
-        { transform: "scale(.98)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 20px rgba(255,255,255,.12))", offset: 0.61 },
-        { transform: "scale(.74)", opacity: 0, filter: "blur(10px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 1 },
+        { transform: "scale(.2)", opacity: 0, filter: "blur(18px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 0 },
+        { transform: "scale(.72)", opacity: .5, filter: "blur(7px) drop-shadow(0 0 12px rgba(255,255,255,.08))", offset: 0.1 },
+        { transform: "scale(1.24)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 46px rgba(255,255,255,.28))", offset: 0.24 },
+        { transform: "scale(.98)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 24px rgba(255,255,255,.15))", offset: 0.42 },
+        { transform: "scale(1.03)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 24px rgba(255,255,255,.15))", offset: 0.56 },
+        { transform: "scale(.92)", opacity: .95, filter: "blur(1px) drop-shadow(0 0 16px rgba(255,255,255,.10))", offset: 0.68 },
+        { transform: "scale(.54)", opacity: .38, filter: "blur(9px) drop-shadow(0 0 4px rgba(255,255,255,.04))", offset: 0.84 },
+        { transform: "scale(.28)", opacity: 0, filter: "blur(16px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 1 },
       ],
-      { duration, easing: "cubic-bezier(.2,.78,.2,1)", fill: "forwards" },
+      { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" },
     );
 
     const glowAnimation = glow.animate(
       [
-        { transform: "scale(.5)", opacity: 0, offset: 0 },
-        { transform: "scale(1.12)", opacity: .72, offset: .22 },
-        { transform: "scale(1)", opacity: .5, offset: .6 },
-        { transform: "scale(.68)", opacity: 0, offset: 1 },
+        { transform: "scale(.25)", opacity: 0, offset: 0 },
+        { transform: "scale(1.35)", opacity: .85, offset: .25 },
+        { transform: "scale(1.08)", opacity: .55, offset: .58 },
+        { transform: "scale(.72)", opacity: .18, offset: .82 },
+        { transform: "scale(.38)", opacity: 0, offset: 1 },
       ],
-      { duration, easing: "cubic-bezier(.2,.78,.2,1)", fill: "forwards" },
+      { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" },
     );
 
     let finished = false;
@@ -128,7 +134,7 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
     };
 
     Promise.allSettled([overlayAnimation.finished, logoAnimation.finished, glowAnimation.finished]).then(finish);
-    const fallback = window.setTimeout(finish, duration + 80);
+    const fallback = window.setTimeout(finish, duration + 120);
 
     return () => {
       window.clearTimeout(fallback);
@@ -146,16 +152,17 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
     >
       <div
         ref={glowRef}
-        className="absolute h-[250px] w-[250px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.10),rgba(255,255,255,.025)_42%,transparent_72%)] blur-[24px]"
+        className="absolute h-[290px] w-[290px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.12),rgba(255,255,255,.03)_40%,transparent_72%)] blur-[26px]"
       />
-      <img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[124px] w-[124px] object-contain" />
+      <img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[132px] w-[132px] object-contain" />
     </div>
   );
 }
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const previousPathRef = useRef<string | null>(null);
   const [transitionRun, setTransitionRun] = useState(0);
   const [transitionVisible, setTransitionVisible] = useState(false);
 
@@ -167,33 +174,13 @@ function RootComponent() {
   }, []);
 
   useEffect(() => {
-    const onClickCapture = (event: MouseEvent) => {
-      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const previousPath = previousPathRef.current;
+    previousPathRef.current = pathname;
 
-      const target = event.target as Element | null;
-      const anchor = target?.closest?.("a") as HTMLAnchorElement | null;
-      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
-
-      let url: URL;
-      try {
-        url = new URL(anchor.href, window.location.origin);
-      } catch {
-        return;
-      }
-
-      if (url.origin !== window.location.origin || url.pathname !== "/commands") return;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      const category = url.searchParams.get("category") || undefined;
+    if (pathname === "/commands" && previousPath !== "/commands") {
       playCommandsTransition();
-      void router.navigate({ to: "/commands", search: { category } });
-    };
-
-    document.addEventListener("click", onClickCapture, true);
-    return () => document.removeEventListener("click", onClickCapture, true);
-  }, [playCommandsTransition, router]);
+    }
+  }, [pathname, playCommandsTransition]);
 
   return (
     <QueryClientProvider client={queryClient}>
