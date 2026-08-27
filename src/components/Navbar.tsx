@@ -1,17 +1,85 @@
 import { Link } from "@tanstack/react-router";
-import { ExternalLink, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { ArrowRight, BookOpen, Command, ExternalLink, LayoutDashboard, LogOut, Menu, Radio, X } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
-const WARE_AVATAR="/ware-logo.svg?v=4",DISCORD_URL="https://discord.gg/warebot",DASHBOARD_LOGIN="/auth/discord/login",DASHBOARD_LOGOUT="/auth/discord/logout";const COMMAND_COUNT=836;
-const itemClass="ware-menu-item group flex min-h-18 items-center justify-between rounded-2xl border border-white/[0.07] bg-[#0b0d0d] px-5 text-lg font-medium text-white/82 transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.16] hover:bg-[#121414] hover:text-white sm:min-h-20 sm:px-6 sm:text-xl";
-type NavbarProps={dashboardMode?:boolean};
-export function Navbar({dashboardMode=false}:NavbarProps){
-  const[menuOpen,setMenuOpen]=useState(false);
-  const[commandLoading,setCommandLoading]=useState(false);
-  useEffect(()=>{if(!menuOpen)return;const p=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{document.body.style.overflow=p}},[menuOpen]);
-  const accountHref=dashboardMode?DASHBOARD_LOGOUT:DASHBOARD_LOGIN;
-  const openCommands=(event:MouseEvent<HTMLAnchorElement>)=>{event.preventDefault();setMenuOpen(false);setCommandLoading(true);try{sessionStorage.setItem("ware-command-reveal","1")}catch{}window.setTimeout(()=>{window.location.href="/commands"},520)};
+
+const WARE_AVATAR = "/ware-logo.svg?v=4";
+const DISCORD_URL = "https://discord.gg/warebot";
+const DASHBOARD_LOGIN = "/auth/discord/login";
+const DASHBOARD_LOGOUT = "/auth/discord/logout";
+const COMMAND_COUNT = 836;
+
+type NavbarProps = { dashboardMode?: boolean };
+
+export function Navbar({ dashboardMode = false }: NavbarProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [commandLoading, setCommandLoading] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [menuOpen]);
+
+  const openCommands = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    setMenuOpen(false);
+    setCommandLoading(true);
+    try { sessionStorage.setItem("ware-command-reveal", "1"); } catch {}
+    window.setTimeout(() => { window.location.href = "/commands"; }, 420);
+  };
+
+  const accountHref = dashboardMode ? DASHBOARD_LOGOUT : DASHBOARD_LOGIN;
+
   return <>
-    {commandLoading?<div className="ware-command-loader fixed inset-0 z-[220] grid place-items-center bg-[#030404]" aria-label="Loading commands"><div className="ware-command-loader-core"><div className="ware-command-loader-ring"/><img src={WARE_AVATAR} alt="Ware" className="ware-command-loader-logo"/><div className="ware-command-loader-glow"/></div></div>:null}
-    <header className="relative z-40 flex items-center justify-between px-6 py-6 md:px-10 md:py-7"><Link to="/" aria-label="Ware home" className="group grid h-12 w-12 place-items-center rounded-2xl border border-white/[.09] bg-black/50 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/20"><img src={WARE_AVATAR} alt="Ware bot" className="h-9 w-9 object-contain transition duration-500 group-hover:rotate-[-5deg] group-hover:scale-110"/></Link><div className="flex items-center gap-2.5"><a href={accountHref} className={dashboardMode?"group flex min-h-12 items-center gap-3 rounded-2xl border border-red-500/30 bg-red-500/[.10] px-4 py-2.5 text-red-100 shadow-[0_12px_35px_-22px_rgba(239,68,68,.8)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-red-400/55 hover:bg-red-500/[.18] hover:text-white":"group flex min-h-12 items-center gap-3 rounded-2xl border border-white/[.11] bg-white/[.045] px-4 py-2.5 text-white shadow-[0_12px_35px_-24px_rgba(255,255,255,.35)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/[.24] hover:bg-white/[.08]"}>{dashboardMode?<LogOut className="h-4 w-4"/>:<LayoutDashboard className="h-4 w-4"/>}<span><span className="block text-sm font-semibold">{dashboardMode?"Log out":"Dashboard"}</span><span className={"mt-0.5 block text-[8px] uppercase tracking-[.16em] "+(dashboardMode?"text-red-200/55":"text-white/40")}>{dashboardMode?"Switch account":"Manage servers"}</span></span></a><button aria-label="Open menu" onClick={()=>setMenuOpen(true)} className="grid h-12 w-12 place-items-center rounded-2xl border border-white/[.08] bg-black/45 text-white/65 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/[.16] hover:bg-white/[.045] hover:text-white active:scale-95"><Menu className="h-5 w-5"/></button></div></header>
-    {menuOpen&&<div className="ware-menu-backdrop fixed inset-0 z-[100] overflow-y-auto bg-black/75 px-4 pb-8 pt-20 backdrop-blur-xl" onMouseDown={e=>{if(e.currentTarget===e.target)setMenuOpen(false)}}><div className="ware-menu-panel mx-auto w-full max-w-2xl rounded-[2rem] border border-white/10 bg-[#090a0a]/95 p-5 shadow-[0_35px_120px_rgba(0,0,0,.75)] sm:p-7"><div className="mb-6 flex items-center justify-between"><div><div className="text-[10px] uppercase tracking-[.22em] text-white/35">ware</div><h2 className="mt-1 text-3xl font-semibold tracking-[-.045em] text-white">Navigate</h2></div><button onClick={()=>setMenuOpen(false)} className="grid h-11 w-11 place-items-center rounded-xl border border-white/[.08] bg-white/[.025] text-white/55 transition hover:rotate-90 hover:bg-white/[.06] hover:text-white"><X className="h-6 w-6"/></button></div><nav className="grid gap-3"><a href="/commands" onClick={openCommands} className={itemClass}><span>Commands</span><span className="font-mono text-xs text-white/32">{COMMAND_COUNT}</span></a><div className="ware-menu-item flex min-h-18 items-center justify-between rounded-2xl border border-white/[.07] bg-[#0b0d0d] px-5 text-lg text-white/62"><span>Status</span><span className="inline-flex items-center gap-2 text-xs text-emerald-300"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400"/>Online</span></div><a href={DISCORD_URL} target="_blank" rel="noreferrer" className={itemClass}><span>Discord</span><ExternalLink className="h-5 w-5 text-white/30"/></a><Link to="/documentation" onClick={()=>setMenuOpen(false)} className={itemClass}><span>Documentation</span></Link></nav></div></div>}
-  </>}
+    {commandLoading ? (
+      <div className="ware-command-loader fixed inset-0 z-[220] grid place-items-center bg-[#030404]" aria-label="Loading commands">
+        <div className="ware-command-loader-core"><div className="ware-command-loader-ring"/><img src={WARE_AVATAR} alt="Ware" className="ware-command-loader-logo"/><div className="ware-command-loader-glow"/></div>
+      </div>
+    ) : null}
+
+    <header className="relative z-40 flex items-center justify-between px-6 py-6 md:px-10 md:py-7">
+      <Link to="/" aria-label="Ware home" className="group grid h-12 w-12 place-items-center rounded-2xl border border-white/[.09] bg-black/55 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[.035]">
+        <img src={WARE_AVATAR} alt="Ware bot" className="h-9 w-9 object-contain transition duration-500 group-hover:scale-105"/>
+      </Link>
+
+      <div className="flex items-center gap-2.5">
+        <a href={accountHref} className={dashboardMode
+          ? "group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-red-500/30 bg-red-500/[.10] px-4 text-red-100 transition duration-300 hover:-translate-y-0.5 hover:border-red-400/55 hover:bg-red-500/[.18] hover:text-white"
+          : "group inline-flex h-12 items-center gap-2.5 rounded-2xl border border-white/[.10] bg-[#0a0b0b]/90 px-4 text-white/90 shadow-[0_12px_34px_-26px_rgba(255,255,255,.4)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/[.22] hover:bg-white/[.055] hover:text-white"}>
+          {dashboardMode ? <LogOut className="h-4 w-4"/> : <LayoutDashboard className="h-4 w-4 text-white/65"/>}
+          <span className="text-sm font-semibold">{dashboardMode ? "Log out" : "Dashboard"}</span>
+          {!dashboardMode ? <ArrowRight className="h-3.5 w-3.5 text-white/35 transition-transform group-hover:translate-x-0.5"/> : null}
+        </a>
+
+        <button aria-label="Open menu" onClick={() => setMenuOpen(true)} className="grid h-12 w-12 place-items-center rounded-2xl border border-white/[.08] bg-black/55 text-white/65 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/[.17] hover:bg-white/[.045] hover:text-white active:scale-95">
+          <Menu className="h-5 w-5"/>
+        </button>
+      </div>
+    </header>
+
+    {menuOpen ? (
+      <div className="ware-menu-backdrop fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-black/78 px-4 py-8 backdrop-blur-xl" onMouseDown={event => { if (event.currentTarget === event.target) setMenuOpen(false); }}>
+        <div className="ware-menu-panel w-full max-w-[620px] overflow-hidden rounded-[28px] border border-white/[.10] bg-[#080909]/[.98] shadow-[0_40px_140px_rgba(0,0,0,.78)]">
+          <div className="flex items-center justify-between border-b border-white/[.06] px-5 py-4 sm:px-6">
+            <div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl border border-white/[.07] bg-black/60"><img src={WARE_AVATAR} alt="Ware" className="h-7 w-7 object-contain"/></span><div><div className="text-[11px] font-semibold text-white/85">Ware</div><div className="mt-0.5 text-[8px] uppercase tracking-[.18em] text-white/25">Menu</div></div></div>
+            <button aria-label="Close menu" onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[.07] bg-white/[.025] text-white/45 transition duration-200 hover:rotate-90 hover:border-white/[.13] hover:bg-white/[.06] hover:text-white"><X className="h-5 w-5"/></button>
+          </div>
+
+          <nav className="grid gap-2.5 p-4 sm:p-5">
+            <a href="/commands" onClick={openCommands} className="ware-menu-entry group flex items-center gap-4 rounded-2xl border border-white/[.065] bg-white/[.022] p-4 text-left transition duration-300 hover:-translate-y-0.5 hover:border-white/[.14] hover:bg-white/[.05]">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/[.07] bg-black/35"><Command className="h-5 w-5 text-white/65"/></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-white/88">Commands</span><span className="mt-1 block text-[10px] text-white/30">Browse all {COMMAND_COUNT} Ware command paths</span></span><ArrowRight className="h-4 w-4 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-white/55"/>
+            </a>
+            <Link to="/documentation" onClick={() => setMenuOpen(false)} className="ware-menu-entry group flex items-center gap-4 rounded-2xl border border-white/[.065] bg-white/[.022] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-white/[.14] hover:bg-white/[.05]">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/[.07] bg-black/35"><BookOpen className="h-5 w-5 text-white/60"/></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-white/88">Documentation</span><span className="mt-1 block text-[10px] text-white/30">Setup guides, features, and references</span></span><ArrowRight className="h-4 w-4 text-white/25 transition-transform group-hover:translate-x-1 group-hover:text-white/55"/>
+            </Link>
+            <a href={DISCORD_URL} target="_blank" rel="noreferrer" className="ware-menu-entry group flex items-center gap-4 rounded-2xl border border-white/[.065] bg-white/[.022] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-white/[.14] hover:bg-white/[.05]">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/[.07] bg-black/35"><ExternalLink className="h-5 w-5 text-white/60"/></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-white/88">Discord</span><span className="mt-1 block text-[10px] text-white/30">Support, updates, and the Ware community</span></span><ExternalLink className="h-4 w-4 text-white/25 transition group-hover:text-white/55"/>
+            </a>
+            <div className="ware-menu-entry flex items-center gap-4 rounded-2xl border border-white/[.055] bg-black/20 p-4"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-emerald-400/[.08] bg-emerald-400/[.035]"><Radio className="h-5 w-5 text-emerald-300/65"/></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-white/70">Systems operational</span><span className="mt-1 block text-[10px] text-white/25">Ware services are online</span></span><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.55)]"/></div>
+          </nav>
+        </div>
+      </div>
+    ) : null}
+  </>;
+}
