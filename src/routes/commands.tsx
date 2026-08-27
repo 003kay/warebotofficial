@@ -30,6 +30,50 @@ type CategoryEntry = {
   commands: CommandEntry[];
 };
 
+const latestBotCommands: CategoryEntry[] = [
+  {
+    slug: "latest",
+    name: "Latest",
+    description: "Newest command paths synced from the current bot.py build.",
+    commands: [
+      { name: "restrictcommand", description: "Restrict a command so only members with a selected role can use it.", usage: ",restrictcommand (command) (role)", example: ",restrictcommand image Owner", aliases: ["rc"], permission: "Manage Guild" },
+      { name: "boosterrole", description: "Create or manage a personal booster role.", usage: ",boosterrole (color) (second color) (name)", example: ",boosterrole ff0000 000001 cute", aliases: ["br"] },
+      { name: "boosterrole create", description: "Create your personal booster role.", usage: ",boosterrole create", example: ",br create" },
+      { name: "boosterrole remove", description: "Delete your personal booster role.", usage: ",boosterrole remove", example: ",br remove", aliases: ["delete"] },
+      { name: "steal-sticker", description: "Steal stickers from a Discord message link and add them to this server.", usage: ",steal-sticker (message link)", example: ",steal-sticker https://discord.com/channels/123/456/789", aliases: ["stealsticker", "stickersteal"], permission: "Manage Expressions" },
+      { name: "security setup", description: "Install and repair Ware's complete security configuration.", usage: ",security setup", example: ",security setup", permission: "Manage Guild" },
+      { name: "security panic", description: "Immediately place the server into Ware's emergency protection mode.", usage: ",security panic", example: ",security panic", permission: "Manage Guild" },
+      { name: "security recover", description: "Recover the server from security panic mode.", usage: ",security recover", example: ",security recover", aliases: ["unpanic"], permission: "Manage Guild" },
+      { name: "security quarantine", description: "Quarantine a member using Ware security controls.", usage: ",security quarantine (member)", example: ",security quarantine @user", aliases: ["isolate"], permission: "Manage Guild" },
+      { name: "security release", description: "Release a member from Ware security quarantine.", usage: ",security release (member)", example: ",security release @user", aliases: ["unquarantine"], permission: "Manage Guild" },
+      { name: "security joingate", description: "Configure Join Gate security protections.", usage: ",security joingate", example: ",security joingate", aliases: ["gate"], permission: "Manage Guild" },
+      { name: "security heat", description: "Configure Ware's security heat system.", usage: ",security heat", example: ",security heat", permission: "Manage Guild" },
+      { name: "security raid", description: "Configure Ware's raid protection controls.", usage: ",security raid", example: ",security raid", permission: "Manage Guild" },
+      { name: "security backup", description: "Create or manage Ware security backups.", usage: ",security backup", example: ",security backup", permission: "Manage Guild" },
+      { name: "security score", description: "Audit the server's current security configuration.", usage: ",security score", example: ",security score", aliases: ["audit"], permission: "Manage Guild" },
+      { name: "customize", description: "Customize Ware's server-facing bot profile.", usage: ",customize", example: ",customize", permission: "Manage Guild" },
+      { name: "customize avatar", description: "Change Ware's server avatar customization.", usage: ",customize avatar", example: ",customize avatar", permission: "Manage Guild" },
+      { name: "customize banner", description: "Change Ware's server banner customization.", usage: ",customize banner", example: ",customize banner", permission: "Manage Guild" },
+      { name: "customize bio", description: "Change Ware's server bio customization.", usage: ",customize bio", example: ",customize bio", permission: "Manage Guild" },
+      { name: "scam", description: "Configure Ware's anti-scam protection.", usage: ",scam", example: ",scam", aliases: ["antiscam"], permission: "Manage Guild" },
+      { name: "scam on", description: "Enable anti-scam protection.", usage: ",scam on", example: ",scam on", aliases: ["enable"], permission: "Manage Guild" },
+      { name: "scam off", description: "Disable anti-scam protection.", usage: ",scam off", example: ",scam off", aliases: ["disable"], permission: "Manage Guild" },
+      { name: "scam whitelist add", description: "Add an entry to the anti-scam whitelist.", usage: ",scam whitelist add (value)", example: ",scam whitelist add example.com", permission: "Manage Guild" },
+      { name: "scam whitelist remove", description: "Remove an entry from the anti-scam whitelist.", usage: ",scam whitelist remove (value)", example: ",scam whitelist remove example.com", aliases: ["rm"], permission: "Manage Guild" },
+      { name: "selfrole", description: "Create and manage self-assignable role panels.", usage: ",selfrole", example: ",selfrole", aliases: ["selfroles", "sr"], permission: "Manage Roles" },
+      { name: "selfrole create", description: "Create a new self-role panel.", usage: ",selfrole create", example: ",selfrole create", permission: "Manage Roles" },
+      { name: "selfrole add", description: "Add a role to a self-role panel.", usage: ",selfrole add (role)", example: ",selfrole add Member", permission: "Manage Roles" },
+      { name: "selfrole remove", description: "Remove a role from a self-role panel.", usage: ",selfrole remove (role)", example: ",selfrole remove Member", aliases: ["rm"], permission: "Manage Roles" },
+      { name: "selfrole send", description: "Send the configured self-role panel.", usage: ",selfrole send", example: ",selfrole send", aliases: ["panel", "post"], permission: "Manage Roles" },
+      { name: "ticket unclaim", description: "Unclaim a claimed support ticket.", usage: ",ticket unclaim", example: ",ticket unclaim", aliases: ["ucl"] },
+      { name: "ticket reopen", description: "Reopen a closed support ticket.", usage: ",ticket reopen", example: ",ticket reopen" },
+      { name: "ticket delete", description: "Delete the current support ticket.", usage: ",ticket delete", example: ",ticket delete" },
+      { name: "ticket info", description: "View information about the current support ticket.", usage: ",ticket info", example: ",ticket info" },
+      { name: "fm", description: "Show the compact Last.fm now-playing card.", usage: ",fm", example: ",fm" },
+    ],
+  },
+];
+
 function mergeCategories(...groups: CategoryEntry[][]): CategoryEntry[] {
   const merged = new Map<string, CategoryEntry>();
   for (const list of groups) {
@@ -52,13 +96,15 @@ function mergeCategories(...groups: CategoryEntry[][]): CategoryEntry[] {
 }
 
 const categories = mergeCategories(
+  latestBotCommands,
   [...commandCategories, lastFmCategory] as unknown as CategoryEntry[],
   referenceCommandCategories as unknown as CategoryEntry[],
 );
 
-const WARE_COMMAND_TOTAL = 1008;
+const WARE_COMMAND_TOTAL = 822;
 
 const iconBySlug: Record<string, typeof Layers3> = {
+  latest: Sparkles,
   home: Layers3,
   moderation: Gavel,
   "channels-roles": Settings2,
@@ -127,16 +173,28 @@ function CommandsPage() {
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   const all = useMemo(
-    () => categories.flatMap(group => group.commands.map(command => ({
-      ...command,
-      category: group.name,
-      categorySlug: group.slug,
-    }))),
+    () => {
+      const seen = new Set<string>();
+      return categories.flatMap(group => group.commands.map(command => ({
+        ...command,
+        category: group.name,
+        categorySlug: group.slug,
+      }))).filter(command => {
+        const key = command.name.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    },
     [],
   );
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
+    if (category === "latest") {
+      const latest = latestBotCommands[0].commands.map(command => ({ ...command, category: "Latest", categorySlug: "latest" }));
+      return latest.filter(command => !q || command.name.toLowerCase().includes(q) || command.description.toLowerCase().includes(q) || command.usage.toLowerCase().includes(q) || (command.aliases ?? []).some(alias => alias.toLowerCase().includes(q)));
+    }
     return all.filter(command =>
       (category === "all" || command.categorySlug === category) &&
       (!q ||
