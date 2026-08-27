@@ -9,11 +9,7 @@ function DiscordLogo() {
 }
 
 function LastFmLogo() {
-  return (
-    <svg viewBox="0 0 24 24" aria-label="Last.fm" className="h-4 w-4 fill-current">
-      <path d="M10.584 17.21l-.88-2.392s-1.43 1.594-3.573 1.594c-1.897 0-3.244-1.649-3.244-4.288 0-3.382 1.704-4.591 3.381-4.591 2.42 0 3.189 1.567 3.849 3.574l.88 2.749c.88 2.666 2.529 4.81 7.285 4.81 3.409 0 5.718-1.044 5.718-3.793 0-2.227-1.265-3.381-3.63-3.931l-1.758-.385c-1.21-.275-1.567-.77-1.567-1.595 0-.934.742-1.484 1.952-1.484 1.32 0 2.034.495 2.144 1.677l2.749-.33c-.22-2.474-1.924-3.492-4.729-3.492-2.474 0-4.893.935-4.893 3.932 0 1.87.907 3.051 3.189 3.601l1.87.44c1.402.33 1.869.907 1.869 1.704 0 1.017-.99 1.43-2.86 1.43-2.776 0-3.93-1.457-4.59-3.464l-.907-2.75c-1.155-3.573-2.997-4.893-6.653-4.893C2.144 5.333 0 7.89 0 12.233c0 4.18 2.144 6.434 5.993 6.434 3.106 0 4.591-1.457 4.591-1.457z" />
-    </svg>
-  );
+  return <svg viewBox="0 0 24 24" aria-label="Last.fm" className="h-4 w-4 fill-current"><path d="M10.584 17.21l-.88-2.392s-1.43 1.594-3.573 1.594c-1.897 0-3.244-1.649-3.244-4.288 0-3.382 1.704-4.591 3.381-4.591 2.42 0 3.189 1.567 3.849 3.574l.88 2.749c.88 2.666 2.529 4.81 7.285 4.81 3.409 0 5.718-1.044 5.718-3.793 0-2.227-1.265-3.381-3.63-3.931l-1.758-.385c-1.21-.275-1.567-.77-1.567-1.595 0-.934.742-1.484 1.952-1.484 1.32 0 2.034.495 2.144 1.677l2.749-.33c-.22-2.474-1.924-3.492-4.729-3.492-2.474 0-4.893.935-4.893 3.932 0 1.87.907 3.051 3.189 3.601l1.87.44c1.402.33 1.869.907 1.869 1.704 0 1.017-.99 1.43-2.86 1.43-2.776 0-3.93-1.457-4.59-3.464l-.907-2.75c-1.155-3.573-2.997-4.893-6.653-4.893C2.144 5.333 0 7.89 0 12.233c0 4.18 2.144 6.434 5.993 6.434 3.106 0 4.591-1.457 4.591-1.457z" /></svg>;
 }
 
 const categories = [
@@ -26,102 +22,27 @@ const categories = [
 ] as const;
 
 export function Hero() {
-  return (
-    <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-16 pt-10 md:px-10 md:pb-20 md:pt-14">
-      <style>{`
-        @keyframes wareSilverShine {
-          0% { background-position: 180% 50%; }
-          100% { background-position: -80% 50%; }
-        }
-        .ware-silver-shine {
-          color: transparent;
-          background-image: linear-gradient(105deg, #5f6064 0%, #9b9da2 22%, #f4f5f6 42%, #a7a9ae 57%, #66686d 78%, #b8bac0 100%);
-          background-size: 240% 100%;
-          background-position: 180% 50%;
-          -webkit-background-clip: text;
-          background-clip: text;
-          animation: wareSilverShine 4.2s cubic-bezier(.4,0,.2,1) infinite;
-          filter: drop-shadow(0 0 18px rgba(255,255,255,.055));
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .ware-silver-shine { animation: none; background-position: 50% 50%; }
-        }
-      `}</style>
+  return <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-16 pt-10 md:px-10 md:pb-20 md:pt-14">
+    <style>{`
+      @keyframes wareSilverShine { 0% { background-position: 180% 50%; } 100% { background-position: -80% 50%; } }
+      .ware-silver-shine { color: transparent; background-image: linear-gradient(105deg,#66686d 0%,#b5b8bd 24%,#fff 43%,#a6a9af 59%,#5f6166 80%,#c6c8cc 100%); background-size:240% 100%; background-position:180% 50%; -webkit-background-clip:text; background-clip:text; animation:wareSilverShine 4.2s cubic-bezier(.4,0,.2,1) infinite; }
+      @media(prefers-reduced-motion:reduce){.ware-silver-shine{animation:none;background-position:50% 50%}}
+    `}</style>
+    <div className="hero-orb hero-orb-a"/><div className="hero-orb hero-orb-b"/><div className="hero-beam"/>
+    <div className="relative z-10 max-w-[960px] text-left animate-[soft-rise_.7s_ease_both]">
+      <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/[.08] bg-white/[.025] px-3 py-1.5 text-[9px] uppercase tracking-[.18em] text-white/40"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400"/>Built for serious Discord servers</div>
+      <h1 className="text-[3.6rem] font-bold leading-[.9] tracking-[-.075em] text-white sm:text-7xl md:text-[5.8rem] xl:text-[6.8rem]">Your server.<br/><span className="ware-silver-shine">Under control.</span></h1>
+      <p className="mt-8 max-w-2xl text-base leading-7 text-white/50 md:text-lg">Protection, moderation, tickets, music, utilities, automation, and server management — all through Ware.</p>
+      <div className="mt-9 flex flex-wrap gap-3"><a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold"><DiscordLogo/>Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a><a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a></div>
+    </div>
 
-      <div className="hero-orb hero-orb-a" />
-      <div className="hero-orb hero-orb-b" />
-      <div className="hero-beam" />
-
-      <div className="relative z-10 max-w-[900px] text-left animate-[soft-rise_.7s_ease_both]">
-        <h1 className="text-[3.6rem] font-bold leading-[.9] tracking-[-.075em] text-white sm:text-7xl md:text-[5.8rem] xl:text-[6.8rem]">
-          One bot.<br /><span className="ware-silver-shine">Every advantage.</span>
-        </h1>
-        <p className="mt-8 max-w-2xl text-base leading-7 text-white/46 md:text-lg">
-          A complete Discord command system built for servers that want serious control without stacking ten different bots.
-        </p>
-        <div className="mt-9 flex flex-wrap gap-3">
-          <a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold">
-            <DiscordLogo />Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </a>
-          <a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">
-            Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative mx-auto mt-14 w-full max-w-[1120px] animate-[hero-card-in_.8s_cubic-bezier(.16,1,.3,1)_.12s_both] md:mt-16">
-        <div className="pointer-events-none absolute -inset-16 -z-10 rounded-full bg-white/[.025] blur-[100px]" />
-        <div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 shadow-[0_55px_150px_-70px_rgba(255,255,255,.22)] backdrop-blur-2xl">
-          <div className="hero-console-sheen" />
-          <div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
-            <div className="flex items-center justify-between border-b border-white/[.07] px-5 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20" /><i className="h-2 w-2 rounded-full bg-white/12" /><i className="h-2 w-2 rounded-full bg-white/7" /></div>
-                <span className="font-mono text-[10px] text-white/30">ware / command center</span>
-              </div>
-              <span className="flex items-center gap-1.5 font-mono text-[9px] text-emerald-300/70"><Activity className="h-3 w-3" />LIVE</span>
-            </div>
-
-            <div className="p-4 sm:p-5 md:p-6">
-              <div className="mb-5 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4 transition duration-300 hover:border-white/[.14] hover:bg-white/[.045]">
-                <div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-black/40">
-                  <img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 object-contain" />
-                  <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#090a0a] bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.55)]" />
-                </div>
-                <div><div className="text-sm font-semibold text-white">Ware is ready</div><div className="mt-1 text-xs text-white/35">{COMMAND_COUNT} commands. One command center.</div></div>
-              </div>
-
-              <div className="mb-3 flex items-center justify-between px-1">
-                <span className="text-[9px] font-semibold uppercase tracking-[.2em] text-white/28">Command modules</span>
-                <a href="/commands" className="text-[10px] text-white/38 transition hover:text-white">View all →</a>
-              </div>
-
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {categories.map((c) => {
-                  const Icon = "icon" in c ? c.icon : null;
-                  return (
-                    <a key={c.title} href={c.href} className={`group relative flex min-h-[118px] flex-col overflow-hidden rounded-2xl border p-4 transition duration-300 hover:-translate-y-1 ${"accent" in c && c.accent ? "border-[#d9232e]/25 bg-[#d9232e]/[.035] hover:border-[#ff4651]/40" : "border-white/[.07] bg-white/[.018] hover:border-white/[.15] hover:bg-white/[.04]"}`}>
-                      <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]" />
-                      <div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${"accent" in c && c.accent ? "border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff4b55]" : "border-white/10 bg-white/[.035] text-white/70"}`}>
-                        {"lastfm" in c && c.lastfm ? <LastFmLogo /> : Icon ? <Icon className="h-4 w-4" /> : null}
-                      </div>
-                      <div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-sm font-medium text-white/88">{c.title}<ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70" /></div><div className="mt-1 text-[10px] leading-4 text-white/32">{c.description}</div></div>
-                    </a>
-                  );
-                })}
-              </div>
-
-              <a href="/commands" className="group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5 transition duration-300 hover:border-white/[.14] hover:bg-white/[.025]">
-                <Terminal className="h-4 w-4 text-white/45" /><span className="font-mono text-[11px] text-white/35">$ ware commands --all</span><span className="animate-cursor h-4 w-px bg-white/50" /><ArrowRight className="ml-auto h-3.5 w-3.5 text-white/25 transition group-hover:translate-x-1" />
-              </a>
-            </div>
-
-            <div className="grid grid-cols-3 divide-x divide-white/[.07] border-t border-white/[.07]">
-              {[["99.99%", "uptime"], [String(COMMAND_COUNT), "commands"], ["24/7", "protection"]].map(([v, l]) => <div key={l} className="px-3 py-4 text-center"><div className="text-sm font-semibold text-white">{v}</div><div className="mt-1 text-[8px] uppercase tracking-[.16em] text-white/27">{l}</div></div>)}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+    <div className="relative mx-auto mt-14 w-full max-w-[1120px] animate-[hero-card-in_.8s_cubic-bezier(.16,1,.3,1)_.12s_both] md:mt-16"><div className="pointer-events-none absolute -inset-16 -z-10 rounded-full bg-white/[.025] blur-[100px]"/><div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 shadow-[0_55px_150px_-70px_rgba(255,255,255,.22)] backdrop-blur-2xl"><div className="hero-console-sheen"/><div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
+      <div className="flex items-center justify-between border-b border-white/[.07] px-5 py-4"><div className="flex items-center gap-3"><div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20"/><i className="h-2 w-2 rounded-full bg-white/12"/><i className="h-2 w-2 rounded-full bg-white/7"/></div><span className="font-mono text-[10px] text-white/30">ware / command center</span></div><span className="flex items-center gap-1.5 font-mono text-[9px] text-emerald-300/70"><Activity className="h-3 w-3"/>LIVE</span></div>
+      <div className="p-4 sm:p-5 md:p-6"><div className="mb-5 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4 transition duration-300 hover:border-white/[.14]"><div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-black/40"><img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 object-contain"/><span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#090a0a] bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.55)]"/></div><div><div className="text-sm font-semibold text-white">Ware is ready</div><div className="mt-1 text-xs text-white/35">{COMMAND_COUNT} commands. One command center.</div></div></div>
+      <div className="mb-3 flex items-center justify-between px-1"><span className="text-[9px] font-semibold uppercase tracking-[.2em] text-white/28">Command modules</span><a href="/commands" className="text-[10px] text-white/38 transition hover:text-white">View all →</a></div>
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{categories.map(c=>{const Icon="icon" in c?c.icon:null;return <a key={c.title} href={c.href} className={`group relative flex min-h-[118px] flex-col overflow-hidden rounded-2xl border p-4 transition duration-300 hover:-translate-y-1 ${"accent" in c&&c.accent?"border-[#d9232e]/25 bg-[#d9232e]/[.035] hover:border-[#ff4651]/40":"border-white/[.07] bg-white/[.018] hover:border-white/[.15] hover:bg-white/[.04]"}`}><div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]"/><div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${"accent" in c&&c.accent?"border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff4b55]":"border-white/10 bg-white/[.035] text-white/70"}`}>{"lastfm" in c&&c.lastfm?<LastFmLogo/>:Icon?<Icon className="h-4 w-4"/>:null}</div><div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-sm font-medium text-white/88">{c.title}<ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70"/></div><div className="mt-1 text-[10px] leading-4 text-white/32">{c.description}</div></div></a>})}</div>
+      <a href="/commands" className="group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5 transition duration-300 hover:border-white/[.14] hover:bg-white/[.025]"><Terminal className="h-4 w-4 text-white/45"/><span className="font-mono text-[11px] text-white/35">$ ware commands --all</span><span className="animate-cursor h-4 w-px bg-white/50"/><ArrowRight className="ml-auto h-3.5 w-3.5 text-white/25 transition group-hover:translate-x-1"/></a></div>
+      <div className="grid grid-cols-3 divide-x divide-white/[.07] border-t border-white/[.07]">{[["99.99%","uptime"],[String(COMMAND_COUNT),"commands"],["24/7","protection"]].map(([v,l])=><div key={l} className="px-3 py-4 text-center"><div className="text-sm font-semibold text-white">{v}</div><div className="mt-1 text-[8px] uppercase tracking-[.16em] text-white/27">{l}</div></div>)}</div>
+    </div></div></div>
+  </section>;
 }
