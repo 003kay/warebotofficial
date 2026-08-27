@@ -28,18 +28,38 @@ const categories = [
 export function Hero() {
   return (
     <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-16 pt-10 md:px-10 md:pb-20 md:pt-14">
+      <style>{`
+        @keyframes wareSilverShine {
+          0% { background-position: 180% 50%; }
+          100% { background-position: -80% 50%; }
+        }
+        .ware-silver-shine {
+          color: transparent;
+          background-image: linear-gradient(105deg, #5f6064 0%, #9b9da2 22%, #f4f5f6 42%, #a7a9ae 57%, #66686d 78%, #b8bac0 100%);
+          background-size: 240% 100%;
+          background-position: 180% 50%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          animation: wareSilverShine 4.2s cubic-bezier(.4,0,.2,1) infinite;
+          filter: drop-shadow(0 0 18px rgba(255,255,255,.055));
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ware-silver-shine { animation: none; background-position: 50% 50%; }
+        }
+      `}</style>
+
       <div className="hero-orb hero-orb-a" />
       <div className="hero-orb hero-orb-b" />
       <div className="hero-beam" />
 
-      <div className="relative z-10 mx-auto max-w-5xl text-center animate-[soft-rise_.7s_ease_both]">
+      <div className="relative z-10 max-w-[900px] text-left animate-[soft-rise_.7s_ease_both]">
         <h1 className="text-[3.6rem] font-bold leading-[.9] tracking-[-.075em] text-white sm:text-7xl md:text-[5.8rem] xl:text-[6.8rem]">
-          One bot.<br /><span className="hero-gradient-text">Every advantage.</span>
+          One bot.<br /><span className="ware-silver-shine">Every advantage.</span>
         </h1>
-        <p className="mx-auto mt-8 max-w-2xl text-base leading-7 text-white/46 md:text-lg">
+        <p className="mt-8 max-w-2xl text-base leading-7 text-white/46 md:text-lg">
           A complete Discord command system built for servers that want serious control without stacking ten different bots.
         </p>
-        <div className="mt-9 flex flex-wrap justify-center gap-3">
+        <div className="mt-9 flex flex-wrap gap-3">
           <a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold">
             <DiscordLogo />Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
