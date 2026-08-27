@@ -16,6 +16,7 @@ import categoryRailCss from "../category-rail.css?url";
 import commandPremiumCss from "../command-premium.css?url";
 import securitySaveCss from "../security-save.css?url";
 import wareV2Css from "../ware-v2.css?url";
+import refreshCss from "../ware-refresh.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CategoryRailEnhancer } from "../components/CategoryRailEnhancer";
 
@@ -80,6 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: commandPremiumCss },
       { rel: "stylesheet", href: securitySaveCss },
       { rel: "stylesheet", href: wareV2Css },
+      { rel: "stylesheet", href: refreshCss },
     ],
   }),
   shellComponent: RootShell,
