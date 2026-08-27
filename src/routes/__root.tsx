@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import polishCss from "../site-polish.css?url";
@@ -77,7 +77,129 @@ function RootShell({ children }: { children: ReactNode }) {
   return <html lang="en"><head><HeadContent /></head><body>{children}<Scripts /></body></html>;
 }
 
+function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () => void }) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const overlay = overlayRef.current;
+    const logo = logoRef.current;
+    const glow = glowRef.current;
+    if (!overlay || !logo || !glow) return;
+
+    const duration = 1450;
+
+    const overlayAnimation = overlay.animate(
+      [
+        { opacity: 1, offset: 0 },
+        { opacity: 1, offset: 0.64 },
+        { opacity: 0, offset: 1 },
+      ],
+      { duration, easing: "linear", fill: "forwards" },
+    );
+
+    const logoAnimation = logo.animate(
+      [
+        { transform: "scale(.55)", opacity: 0, filter: "blur(12px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 0 },
+        { transform: "scale(1.11)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 38px rgba(255,255,255,.22))", offset: 0.2 },
+        { transform: "scale(1)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 24px rgba(255,255,255,.15))", offset: 0.43 },
+        { transform: "scale(.98)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 20px rgba(255,255,255,.12))", offset: 0.61 },
+        { transform: "scale(.74)", opacity: 0, filter: "blur(10px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 1 },
+      ],
+      { duration, easing: "cubic-bezier(.2,.78,.2,1)", fill: "forwards" },
+    );
+
+    const glowAnimation = glow.animate(
+      [
+        { transform: "scale(.5)", opacity: 0, offset: 0 },
+        { transform: "scale(1.12)", opacity: .72, offset: .22 },
+        { transform: "scale(1)", opacity: .5, offset: .6 },
+        { transform: "scale(.68)", opacity: 0, offset: 1 },
+      ],
+      { duration, easing: "cubic-bezier(.2,.78,.2,1)", fill: "forwards" },
+    );
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      onDone();
+    };
+
+    Promise.allSettled([overlayAnimation.finished, logoAnimation.finished, glowAnimation.finished]).then(finish);
+    const fallback = window.setTimeout(finish, duration + 80);
+
+    return () => {
+      window.clearTimeout(fallback);
+      overlayAnimation.cancel();
+      logoAnimation.cancel();
+      glowAnimation.cancel();
+    };
+  }, [runId, onDone]);
+
+  return (
+    <div
+      ref={overlayRef}
+      className="pointer-events-none fixed inset-0 z-[1000] grid place-items-center bg-black"
+      aria-hidden
+    >
+      <div
+        ref={glowRef}
+        className="absolute h-[250px] w-[250px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.10),rgba(255,255,255,.025)_42%,transparent_72%)] blur-[24px]"
+      />
+      <img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[124px] w-[124px] object-contain" />
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  return <QueryClientProvider client={queryClient}><CategoryRailEnhancer/><Outlet/></QueryClientProvider>;
+  const router = useRouter();
+  const [transitionRun, setTransitionRun] = useState(0);
+  const [transitionVisible, setTransitionVisible] = useState(false);
+
+  const finishTransition = useCallback(() => setTransitionVisible(false), []);
+
+  const playCommandsTransition = useCallback(() => {
+    setTransitionRun(current => current + 1);
+    setTransitionVisible(true);
+  }, []);
+
+  useEffect(() => {
+    const onClickCapture = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const target = event.target as Element | null;
+      const anchor = target?.closest?.("a") as HTMLAnchorElement | null;
+      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+
+      let url: URL;
+      try {
+        url = new URL(anchor.href, window.location.origin);
+      } catch {
+        return;
+      }
+
+      if (url.origin !== window.location.origin || url.pathname !== "/commands") return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const category = url.searchParams.get("category") || undefined;
+      playCommandsTransition();
+      void router.navigate({ to: "/commands", search: { category } });
+    };
+
+    document.addEventListener("click", onClickCapture, true);
+    return () => document.removeEventListener("click", onClickCapture, true);
+  }, [playCommandsTransition, router]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {transitionVisible ? <CommandsClickTransition key={transitionRun} runId={transitionRun} onDone={finishTransition} /> : null}
+      <CategoryRailEnhancer />
+      <Outlet />
+    </QueryClientProvider>
+  );
 }
