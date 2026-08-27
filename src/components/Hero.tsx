@@ -1,46 +1,115 @@
-import { ArrowRight, Bot, Gavel, Headphones, MessageSquare, ShieldCheck, Terminal, Users, Music2, Wrench, Zap, Activity } from "lucide-react";
+import { ArrowRight, Bot, Gavel, Headphones, MessageSquare, ShieldCheck, Terminal, Users, Music2, Wrench, Activity } from "lucide-react";
 import { INVITE_URL } from "@/lib/links";
 
 const WARE_AVATAR = "/ware-logo.svg?v=4";
 const COMMAND_COUNT = 836;
 
-function DiscordLogo(){return <svg viewBox="0 0 127.14 96.36" aria-hidden="true" className="h-4 w-4 fill-current"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0 105.89 105.89 0 0 0 19.39 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69Z"/></svg>}
+function DiscordLogo() {
+  return <svg viewBox="0 0 127.14 96.36" aria-hidden="true" className="h-4 w-4 fill-current"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0 105.89 105.89 0 0 0 19.39 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69Z" /></svg>;
+}
 
-const categories=[
- {title:"Protection",description:"Anti-nuke, raid defense & security",icon:ShieldCheck,href:"/commands?category=antinuke"},
- {title:"Moderation",description:"Powerful staff and server controls",icon:Gavel,href:"/commands?category=moderation"},
- {title:"Tickets",description:"Support panels, flows & transcripts",icon:MessageSquare,href:"/commands?category=tickets"},
- {title:"Community",description:"Economy, giveaways, levels & more",icon:Users,href:"/commands?category=utility"},
- {title:"Last.fm",description:"Scrobbles, music stats & profiles",icon:Music2,href:"/commands?category=lastfm",accent:true},
- {title:"Utility",description:"Tools, embeds, lookups & automation",icon:Wrench,href:"/commands?category=utility"},
+const categories = [
+  { title: "Protection", description: "Anti-nuke, raid defense & security", icon: ShieldCheck, href: "/commands?category=antinuke" },
+  { title: "Moderation", description: "Powerful staff and server controls", icon: Gavel, href: "/commands?category=moderation" },
+  { title: "Tickets", description: "Support panels, flows & transcripts", icon: MessageSquare, href: "/commands?category=tickets" },
+  { title: "Community", description: "Economy, giveaways, levels & more", icon: Users, href: "/commands?category=utility" },
+  { title: "Last.fm", description: "Scrobbles, music stats & profiles", icon: Music2, href: "/commands?category=lastfm", accent: true },
+  { title: "Utility", description: "Tools, embeds, lookups & automation", icon: Wrench, href: "/commands?category=utility" },
 ] as const;
-const chips=[{icon:ShieldCheck,label:"Protection"},{icon:Headphones,label:"Voice"},{icon:Music2,label:"Last.fm"},{icon:Bot,label:"Automation"}] as const;
 
-export function Hero(){return <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-28 pt-8 md:px-10 md:pb-36 md:pt-12">
- <div className="hero-orb hero-orb-a"/><div className="hero-orb hero-orb-b"/><div className="hero-beam"/>
- <div className="grid items-center gap-16 lg:grid-cols-[1fr_1.02fr] xl:gap-24">
-  <div className="hero-copy relative z-10">
-   <div className="hero-eyebrow mb-7 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[.035] px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.18em] text-white/50 backdrop-blur-xl"><span className="relative flex h-2 w-2"><span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-40"/><span className="relative h-2 w-2 rounded-full bg-emerald-400"/></span>Ware systems online <span className="h-3 w-px bg-white/10"/> {COMMAND_COUNT} commands</div>
-   <h1 className="hero-title max-w-4xl text-[3.55rem] font-bold leading-[.88] tracking-[-.075em] text-white sm:text-7xl md:text-[5.6rem] xl:text-[6.65rem]">One bot.<br/><span className="hero-gradient-text">Every advantage.</span></h1>
-   <p className="hero-sub mt-8 max-w-xl text-base leading-7 text-white/46 md:text-lg">A complete Discord command system built for servers that want serious control without stacking ten different bots.</p>
-   <div className="hero-actions mt-9 flex flex-wrap gap-3"><a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold"><DiscordLogo/>Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a><a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a></div>
-   <div className="hero-chips mt-11 grid max-w-xl grid-cols-2 gap-2 sm:grid-cols-4">{chips.map((item,i)=><div key={item.label} style={{animationDelay:`${.55+i*.08}s`}} className="hero-chip group flex items-center gap-2 rounded-xl border border-white/[.07] bg-white/[.025] px-3 py-2.5 text-xs text-white/55 backdrop-blur"><item.icon className="h-3.5 w-3.5 text-white/70"/>{item.label}</div>)}</div>
-  </div>
-  <div className="hero-stage relative">
-   <div className="hero-ring hero-ring-one"/><div className="hero-ring hero-ring-two"/>
-   <div className="floating-chip absolute -left-7 top-20 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-black/80 px-3.5 py-2 text-[11px] text-white/65 shadow-2xl backdrop-blur-xl sm:flex"><ShieldCheck className="h-3.5 w-3.5"/>Security active</div>
-   <div className="floating-chip-delayed absolute -right-5 bottom-24 z-20 hidden items-center gap-2 rounded-full border border-white/10 bg-black/80 px-3.5 py-2 text-[11px] text-white/65 shadow-2xl backdrop-blur-xl sm:flex"><Zap className="h-3.5 w-3.5"/>Instant response</div>
-   <div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/70 p-2 shadow-[0_50px_130px_-50px_rgba(255,255,255,.18)] backdrop-blur-2xl">
-    <div className="hero-console-sheen"/><div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
-     <div className="flex items-center justify-between border-b border-white/[.07] px-5 py-4"><div className="flex items-center gap-3"><div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20"/><i className="h-2 w-2 rounded-full bg-white/12"/><i className="h-2 w-2 rounded-full bg-white/7"/></div><span className="font-mono text-[10px] text-white/30">ware / command center</span></div><span className="flex items-center gap-1.5 font-mono text-[9px] text-emerald-300/70"><Activity className="h-3 w-3"/>LIVE</span></div>
-     <div className="p-4 sm:p-5"><div className="console-row mb-4 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4"><div className="relative grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-black/40"><img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 object-contain"/><span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#090a0a] bg-emerald-400"/></div><div><div className="text-sm font-semibold text-white">Ware is ready</div><div className="mt-1 text-xs text-white/35">{COMMAND_COUNT} commands. One command center.</div></div></div>
-      <div className="mb-3 flex items-center justify-between px-1"><span className="text-[9px] font-semibold uppercase tracking-[.2em] text-white/28">Command modules</span><a href="/commands" className="text-[10px] text-white/38 transition hover:text-white">View all →</a></div>
-      <div className="grid gap-2 sm:grid-cols-2">{categories.map((c,i)=><a key={c.title} href={c.href} style={{animationDelay:`${.35+i*.07}s`}} className={`console-row group relative flex min-h-[108px] flex-col overflow-hidden rounded-2xl border p-4 ${c.accent?"border-red-500/15 bg-red-500/[.025]":"border-white/[.07] bg-white/[.018]"}`}><div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]"/><div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${c.accent?"border-red-500/20 bg-red-500/[.08] text-red-400":"border-white/10 bg-white/[.035] text-white/70"}`}><c.icon className="h-4 w-4"/></div><div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-sm font-medium text-white/88">{c.title}<ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70"/></div><div className="mt-1 text-[10px] leading-4 text-white/32">{c.description}</div></div></a>)}</div>
-      <a href="/commands" className="console-row group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5"><Terminal className="h-4 w-4 text-white/45"/><span className="font-mono text-[11px] text-white/35">$ ware commands --all</span><span className="animate-cursor h-4 w-px bg-white/50"/><ArrowRight className="ml-auto h-3.5 w-3.5 text-white/25 transition group-hover:translate-x-1"/></a>
-     </div>
-     <div className="grid grid-cols-3 divide-x divide-white/[.07] border-t border-white/[.07]">{[["99.99%","uptime"],[String(COMMAND_COUNT),"commands"],["24/7","protection"]].map(([v,l])=><div key={l} className="px-3 py-4 text-center"><div className="text-sm font-semibold text-white">{v}</div><div className="mt-1 text-[8px] uppercase tracking-[.16em] text-white/27">{l}</div></div>)}</div>
-    </div>
-   </div>
-  </div>
- </div>
- </section>}
+const chips = [
+  { icon: ShieldCheck, label: "Protection" },
+  { icon: Headphones, label: "Voice" },
+  { icon: Music2, label: "Last.fm" },
+  { icon: Bot, label: "Automation" },
+] as const;
+
+export function Hero() {
+  return (
+    <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-28 pt-8 md:px-10 md:pb-36 md:pt-12">
+      <div className="hero-orb hero-orb-a" />
+      <div className="hero-orb hero-orb-b" />
+      <div className="hero-beam" />
+
+      <div className="relative z-10 mx-auto max-w-5xl text-center animate-[soft-rise_.7s_ease_both]">
+        <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[.035] px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.18em] text-white/50 backdrop-blur-xl">
+          <span className="relative flex h-2 w-2"><span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-40" /><span className="relative h-2 w-2 rounded-full bg-emerald-400" /></span>
+          Ware systems online <span className="h-3 w-px bg-white/10" /> {COMMAND_COUNT} commands
+        </div>
+
+        <h1 className="text-[3.6rem] font-bold leading-[.9] tracking-[-.075em] text-white sm:text-7xl md:text-[5.8rem] xl:text-[6.8rem]">
+          One bot.<br /><span className="hero-gradient-text">Every advantage.</span>
+        </h1>
+        <p className="mx-auto mt-8 max-w-2xl text-base leading-7 text-white/46 md:text-lg">
+          A complete Discord command system built for servers that want serious control without stacking ten different bots.
+        </p>
+
+        <div className="mt-9 flex flex-wrap justify-center gap-3">
+          <a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold">
+            <DiscordLogo />Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </a>
+          <a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">
+            Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </a>
+        </div>
+
+        <div className="mx-auto mt-10 grid max-w-2xl grid-cols-2 gap-2 sm:grid-cols-4">
+          {chips.map((item, i) => (
+            <div key={item.label} style={{ animationDelay: `${.12 + i * .08}s` }} className="group flex items-center justify-center gap-2 rounded-xl border border-white/[.07] bg-white/[.025] px-3 py-2.5 text-xs text-white/55 backdrop-blur animate-[soft-rise_.55s_ease_both] transition duration-300 hover:-translate-y-1 hover:border-white/[.15] hover:bg-white/[.05] hover:text-white">
+              <item.icon className="h-3.5 w-3.5 text-white/70 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />{item.label}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative mx-auto mt-16 max-w-[1120px] animate-[hero-card-in_.8s_cubic-bezier(.16,1,.3,1)_.15s_both] md:mt-20">
+        <div className="pointer-events-none absolute -inset-16 -z-10 rounded-full bg-white/[.025] blur-[100px]" />
+        <div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 shadow-[0_55px_150px_-70px_rgba(255,255,255,.22)] backdrop-blur-2xl">
+          <div className="hero-console-sheen" />
+          <div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
+            <div className="flex items-center justify-between border-b border-white/[.07] px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20" /><i className="h-2 w-2 rounded-full bg-white/12" /><i className="h-2 w-2 rounded-full bg-white/7" /></div>
+                <span className="font-mono text-[10px] text-white/30">ware / command center</span>
+              </div>
+              <span className="flex items-center gap-1.5 font-mono text-[9px] text-emerald-300/70"><Activity className="h-3 w-3" />LIVE</span>
+            </div>
+
+            <div className="p-4 sm:p-5 md:p-6">
+              <div className="mb-5 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4 transition duration-300 hover:border-white/[.14] hover:bg-white/[.045]">
+                <div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-black/40">
+                  <img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 object-contain" />
+                  <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#090a0a] bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.55)]" />
+                </div>
+                <div><div className="text-sm font-semibold text-white">Ware is ready</div><div className="mt-1 text-xs text-white/35">{COMMAND_COUNT} commands. One command center.</div></div>
+              </div>
+
+              <div className="mb-3 flex items-center justify-between px-1">
+                <span className="text-[9px] font-semibold uppercase tracking-[.2em] text-white/28">Command modules</span>
+                <a href="/commands" className="text-[10px] text-white/38 transition hover:text-white">View all →</a>
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {categories.map((c, i) => (
+                  <a key={c.title} href={c.href} style={{ animationDelay: `${.22 + i * .07}s` }} className={`group relative flex min-h-[118px] flex-col overflow-hidden rounded-2xl border p-4 opacity-100 animate-[soft-rise_.55s_ease_both] transition duration-300 hover:-translate-y-1 ${c.accent ? "border-red-500/15 bg-red-500/[.025] hover:border-red-400/30" : "border-white/[.07] bg-white/[.018] hover:border-white/[.15] hover:bg-white/[.04]"}`}>
+                    <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]" />
+                    <div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${c.accent ? "border-red-500/20 bg-red-500/[.08] text-red-400" : "border-white/10 bg-white/[.035] text-white/70"}`}><c.icon className="h-4 w-4" /></div>
+                    <div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-sm font-medium text-white/88">{c.title}<ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70" /></div><div className="mt-1 text-[10px] leading-4 text-white/32">{c.description}</div></div>
+                  </a>
+                ))}
+              </div>
+
+              <a href="/commands" className="group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5 transition duration-300 hover:border-white/[.14] hover:bg-white/[.025]">
+                <Terminal className="h-4 w-4 text-white/45" /><span className="font-mono text-[11px] text-white/35">$ ware commands --all</span><span className="animate-cursor h-4 w-px bg-white/50" /><ArrowRight className="ml-auto h-3.5 w-3.5 text-white/25 transition group-hover:translate-x-1" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-3 divide-x divide-white/[.07] border-t border-white/[.07]">
+              {[["99.99%", "uptime"], [String(COMMAND_COUNT), "commands"], ["24/7", "protection"]].map(([v, l]) => <div key={l} className="px-3 py-4 text-center"><div className="text-sm font-semibold text-white">{v}</div><div className="mt-1 text-[8px] uppercase tracking-[.16em] text-white/27">{l}</div></div>)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
