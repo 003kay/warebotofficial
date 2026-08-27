@@ -1,4 +1,4 @@
-import { ArrowRight, Gavel, MessageSquare, ShieldCheck, Terminal, Users, Music2, Wrench, Activity } from "lucide-react";
+import { ArrowRight, Gavel, MessageSquare, ShieldCheck, Terminal, Users, Wrench, Activity } from "lucide-react";
 import { INVITE_URL } from "@/lib/links";
 
 const WARE_AVATAR = "/ware-logo.svg?v=4";
@@ -8,12 +8,20 @@ function DiscordLogo() {
   return <svg viewBox="0 0 127.14 96.36" aria-hidden="true" className="h-4 w-4 fill-current"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0 105.89 105.89 0 0 0 19.39 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69Z" /></svg>;
 }
 
+function LastFmLogo() {
+  return (
+    <svg viewBox="0 0 24 24" aria-label="Last.fm" className="h-4 w-4 fill-current">
+      <path d="M10.584 17.21l-.88-2.392s-1.43 1.594-3.573 1.594c-1.897 0-3.244-1.649-3.244-4.288 0-3.382 1.704-4.591 3.381-4.591 2.42 0 3.189 1.567 3.849 3.574l.88 2.749c.88 2.666 2.529 4.81 7.285 4.81 3.409 0 5.718-1.044 5.718-3.793 0-2.227-1.265-3.381-3.63-3.931l-1.758-.385c-1.21-.275-1.567-.77-1.567-1.595 0-.934.742-1.484 1.952-1.484 1.32 0 2.034.495 2.144 1.677l2.749-.33c-.22-2.474-1.924-3.492-4.729-3.492-2.474 0-4.893.935-4.893 3.932 0 1.87.907 3.051 3.189 3.601l1.87.44c1.402.33 1.869.907 1.869 1.704 0 1.017-.99 1.43-2.86 1.43-2.776 0-3.93-1.457-4.59-3.464l-.907-2.75c-1.155-3.573-2.997-4.893-6.653-4.893C2.144 5.333 0 7.89 0 12.233c0 4.18 2.144 6.434 5.993 6.434 3.106 0 4.591-1.457 4.591-1.457z" />
+    </svg>
+  );
+}
+
 const categories = [
   { title: "Protection", description: "Anti-nuke, raid defense & security", icon: ShieldCheck, href: "/commands?category=antinuke" },
   { title: "Moderation", description: "Powerful staff and server controls", icon: Gavel, href: "/commands?category=moderation" },
   { title: "Tickets", description: "Support panels, flows & transcripts", icon: MessageSquare, href: "/commands?category=tickets" },
   { title: "Community", description: "Economy, giveaways, levels & more", icon: Users, href: "/commands?category=utility" },
-  { title: "Last.fm", description: "Scrobbles, music stats & profiles", icon: Music2, href: "/commands?category=lastfm", accent: true },
+  { title: "Last.fm", description: "Scrobbles, music stats & profiles", href: "/commands?category=lastfm", accent: true, lastfm: true },
   { title: "Utility", description: "Tools, embeds, lookups & automation", icon: Wrench, href: "/commands?category=utility" },
 ] as const;
 
@@ -24,7 +32,7 @@ export function Hero() {
       <div className="hero-orb hero-orb-b" />
       <div className="hero-beam" />
 
-      <div className="grid items-center gap-14 lg:grid-cols-[.92fr_1.08fr] lg:gap-14 xl:gap-20">
+      <div className="grid items-center gap-14 lg:grid-cols-[1.02fr_.98fr] lg:gap-16 xl:gap-24">
         <div className="relative z-10 animate-[soft-rise_.7s_ease_both]">
           <h1 className="max-w-4xl text-[3.55rem] font-bold leading-[.89] tracking-[-.075em] text-white sm:text-7xl md:text-[5.5rem] xl:text-[6.35rem]">
             One bot.<br /><span className="hero-gradient-text">Every advantage.</span>
@@ -43,7 +51,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative animate-[hero-card-in_.8s_cubic-bezier(.16,1,.3,1)_.12s_both]">
+        <div className="relative w-full max-w-[650px] justify-self-end animate-[hero-card-in_.8s_cubic-bezier(.16,1,.3,1)_.12s_both] lg:mt-12 xl:mt-16">
           <div className="pointer-events-none absolute -inset-16 -z-10 rounded-full bg-white/[.025] blur-[100px]" />
           <div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 shadow-[0_55px_150px_-70px_rgba(255,255,255,.22)] backdrop-blur-2xl">
             <div className="hero-console-sheen" />
@@ -71,13 +79,18 @@ export function Hero() {
                 </div>
 
                 <div className="grid gap-2 sm:grid-cols-2">
-                  {categories.map((c) => (
-                    <a key={c.title} href={c.href} className={`group relative flex min-h-[108px] flex-col overflow-hidden rounded-2xl border p-4 transition duration-300 hover:-translate-y-1 ${c.accent ? "border-red-500/15 bg-red-500/[.025] hover:border-red-400/30" : "border-white/[.07] bg-white/[.018] hover:border-white/[.15] hover:bg-white/[.04]"}`}>
-                      <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]" />
-                      <div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${c.accent ? "border-red-500/20 bg-red-500/[.08] text-red-400" : "border-white/10 bg-white/[.035] text-white/70"}`}><c.icon className="h-4 w-4" /></div>
-                      <div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-sm font-medium text-white/88">{c.title}<ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70" /></div><div className="mt-1 text-[10px] leading-4 text-white/32">{c.description}</div></div>
-                    </a>
-                  ))}
+                  {categories.map((c) => {
+                    const Icon = "icon" in c ? c.icon : null;
+                    return (
+                      <a key={c.title} href={c.href} className={`group relative flex min-h-[108px] flex-col overflow-hidden rounded-2xl border p-4 transition duration-300 hover:-translate-y-1 ${"accent" in c && c.accent ? "border-[#d9232e]/25 bg-[#d9232e]/[.035] hover:border-[#ff4651]/40" : "border-white/[.07] bg-white/[.018] hover:border-white/[.15] hover:bg-white/[.04]"}`}>
+                        <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]" />
+                        <div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${"accent" in c && c.accent ? "border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff4b55]" : "border-white/10 bg-white/[.035] text-white/70"}`}>
+                          {"lastfm" in c && c.lastfm ? <LastFmLogo /> : Icon ? <Icon className="h-4 w-4" /> : null}
+                        </div>
+                        <div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-sm font-medium text-white/88">{c.title}<ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70" /></div><div className="mt-1 text-[10px] leading-4 text-white/32">{c.description}</div></div>
+                      </a>
+                    );
+                  })}
                 </div>
 
                 <a href="/commands" className="group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5 transition duration-300 hover:border-white/[.14] hover:bg-white/[.025]">
