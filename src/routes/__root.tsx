@@ -4,7 +4,6 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -79,14 +78,10 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function CommandTransition() {
-  const pathname = useRouterState({ select: state => state.location.pathname });
   const [phase, setPhase] = useState<"idle" | "enter" | "leave">("idle");
 
   useEffect(() => {
-    if (pathname !== "/commands") {
-      setPhase("idle");
-      return;
-    }
+    if (window.location.pathname !== "/commands") return;
 
     let shouldPlay = false;
     try {
@@ -96,13 +91,13 @@ function CommandTransition() {
     if (!shouldPlay) return;
 
     setPhase("enter");
-    const leaveTimer = window.setTimeout(() => setPhase("leave"), 1050);
-    const finishTimer = window.setTimeout(() => setPhase("idle"), 2200);
+    const leaveTimer = window.setTimeout(() => setPhase("leave"), 1250);
+    const finishTimer = window.setTimeout(() => setPhase("idle"), 2550);
     return () => {
       window.clearTimeout(leaveTimer);
       window.clearTimeout(finishTimer);
     };
-  }, [pathname]);
+  }, []);
 
   if (phase === "idle") return null;
   return <div className={`ware-command-transition ${phase === "leave" ? "is-leaving" : "is-entering"}`} aria-label="Loading commands">
