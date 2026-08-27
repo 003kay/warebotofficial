@@ -27,80 +27,77 @@ const categories = [
 
 export function Hero() {
   return (
-    <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-28 pt-10 md:px-10 md:pb-36 md:pt-14">
+    <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-16 pt-10 md:px-10 md:pb-20 md:pt-14">
       <div className="hero-orb hero-orb-a" />
       <div className="hero-orb hero-orb-b" />
       <div className="hero-beam" />
 
-      <div className="grid items-center gap-14 lg:grid-cols-[1.02fr_.98fr] lg:gap-16 xl:gap-24">
-        <div className="relative z-10 animate-[soft-rise_.7s_ease_both]">
-          <h1 className="max-w-4xl text-[3.55rem] font-bold leading-[.89] tracking-[-.075em] text-white sm:text-7xl md:text-[5.5rem] xl:text-[6.35rem]">
-            One bot.<br /><span className="hero-gradient-text">Every advantage.</span>
-          </h1>
-          <p className="mt-8 max-w-xl text-base leading-7 text-white/46 md:text-lg">
-            A complete Discord command system built for servers that want serious control without stacking ten different bots.
-          </p>
-
-          <div className="mt-9 flex flex-wrap gap-3">
-            <a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold">
-              <DiscordLogo />Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </a>
-            <a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">
-              Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </a>
-          </div>
+      <div className="relative z-10 mx-auto max-w-5xl text-center animate-[soft-rise_.7s_ease_both]">
+        <h1 className="text-[3.6rem] font-bold leading-[.9] tracking-[-.075em] text-white sm:text-7xl md:text-[5.8rem] xl:text-[6.8rem]">
+          One bot.<br /><span className="hero-gradient-text">Every advantage.</span>
+        </h1>
+        <p className="mx-auto mt-8 max-w-2xl text-base leading-7 text-white/46 md:text-lg">
+          A complete Discord command system built for servers that want serious control without stacking ten different bots.
+        </p>
+        <div className="mt-9 flex flex-wrap justify-center gap-3">
+          <a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold">
+            <DiscordLogo />Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </a>
+          <a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">
+            Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </a>
         </div>
+      </div>
 
-        <div className="relative w-full max-w-[650px] justify-self-end animate-[hero-card-in_.8s_cubic-bezier(.16,1,.3,1)_.12s_both] lg:mt-12 xl:mt-16">
-          <div className="pointer-events-none absolute -inset-16 -z-10 rounded-full bg-white/[.025] blur-[100px]" />
-          <div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 shadow-[0_55px_150px_-70px_rgba(255,255,255,.22)] backdrop-blur-2xl">
-            <div className="hero-console-sheen" />
-            <div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
-              <div className="flex items-center justify-between border-b border-white/[.07] px-5 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20" /><i className="h-2 w-2 rounded-full bg-white/12" /><i className="h-2 w-2 rounded-full bg-white/7" /></div>
-                  <span className="font-mono text-[10px] text-white/30">ware / command center</span>
+      <div className="relative mx-auto mt-14 w-full max-w-[1120px] animate-[hero-card-in_.8s_cubic-bezier(.16,1,.3,1)_.12s_both] md:mt-16">
+        <div className="pointer-events-none absolute -inset-16 -z-10 rounded-full bg-white/[.025] blur-[100px]" />
+        <div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 shadow-[0_55px_150px_-70px_rgba(255,255,255,.22)] backdrop-blur-2xl">
+          <div className="hero-console-sheen" />
+          <div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
+            <div className="flex items-center justify-between border-b border-white/[.07] px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20" /><i className="h-2 w-2 rounded-full bg-white/12" /><i className="h-2 w-2 rounded-full bg-white/7" /></div>
+                <span className="font-mono text-[10px] text-white/30">ware / command center</span>
+              </div>
+              <span className="flex items-center gap-1.5 font-mono text-[9px] text-emerald-300/70"><Activity className="h-3 w-3" />LIVE</span>
+            </div>
+
+            <div className="p-4 sm:p-5 md:p-6">
+              <div className="mb-5 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4 transition duration-300 hover:border-white/[.14] hover:bg-white/[.045]">
+                <div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-black/40">
+                  <img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 object-contain" />
+                  <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#090a0a] bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.55)]" />
                 </div>
-                <span className="flex items-center gap-1.5 font-mono text-[9px] text-emerald-300/70"><Activity className="h-3 w-3" />LIVE</span>
+                <div><div className="text-sm font-semibold text-white">Ware is ready</div><div className="mt-1 text-xs text-white/35">{COMMAND_COUNT} commands. One command center.</div></div>
               </div>
 
-              <div className="p-4 sm:p-5">
-                <div className="mb-4 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4 transition duration-300 hover:border-white/[.14] hover:bg-white/[.045]">
-                  <div className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/10 bg-black/40">
-                    <img src={WARE_AVATAR} alt="Ware" className="h-9 w-9 object-contain" />
-                    <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#090a0a] bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.55)]" />
-                  </div>
-                  <div><div className="text-sm font-semibold text-white">Ware is ready</div><div className="mt-1 text-xs text-white/35">{COMMAND_COUNT} commands. One command center.</div></div>
-                </div>
-
-                <div className="mb-3 flex items-center justify-between px-1">
-                  <span className="text-[9px] font-semibold uppercase tracking-[.2em] text-white/28">Command modules</span>
-                  <a href="/commands" className="text-[10px] text-white/38 transition hover:text-white">View all →</a>
-                </div>
-
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {categories.map((c) => {
-                    const Icon = "icon" in c ? c.icon : null;
-                    return (
-                      <a key={c.title} href={c.href} className={`group relative flex min-h-[108px] flex-col overflow-hidden rounded-2xl border p-4 transition duration-300 hover:-translate-y-1 ${"accent" in c && c.accent ? "border-[#d9232e]/25 bg-[#d9232e]/[.035] hover:border-[#ff4651]/40" : "border-white/[.07] bg-white/[.018] hover:border-white/[.15] hover:bg-white/[.04]"}`}>
-                        <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]" />
-                        <div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${"accent" in c && c.accent ? "border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff4b55]" : "border-white/10 bg-white/[.035] text-white/70"}`}>
-                          {"lastfm" in c && c.lastfm ? <LastFmLogo /> : Icon ? <Icon className="h-4 w-4" /> : null}
-                        </div>
-                        <div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-sm font-medium text-white/88">{c.title}<ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70" /></div><div className="mt-1 text-[10px] leading-4 text-white/32">{c.description}</div></div>
-                      </a>
-                    );
-                  })}
-                </div>
-
-                <a href="/commands" className="group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5 transition duration-300 hover:border-white/[.14] hover:bg-white/[.025]">
-                  <Terminal className="h-4 w-4 text-white/45" /><span className="font-mono text-[11px] text-white/35">$ ware commands --all</span><span className="animate-cursor h-4 w-px bg-white/50" /><ArrowRight className="ml-auto h-3.5 w-3.5 text-white/25 transition group-hover:translate-x-1" />
-                </a>
+              <div className="mb-3 flex items-center justify-between px-1">
+                <span className="text-[9px] font-semibold uppercase tracking-[.2em] text-white/28">Command modules</span>
+                <a href="/commands" className="text-[10px] text-white/38 transition hover:text-white">View all →</a>
               </div>
 
-              <div className="grid grid-cols-3 divide-x divide-white/[.07] border-t border-white/[.07]">
-                {[["99.99%", "uptime"], [String(COMMAND_COUNT), "commands"], ["24/7", "protection"]].map(([v, l]) => <div key={l} className="px-3 py-4 text-center"><div className="text-sm font-semibold text-white">{v}</div><div className="mt-1 text-[8px] uppercase tracking-[.16em] text-white/27">{l}</div></div>)}
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {categories.map((c) => {
+                  const Icon = "icon" in c ? c.icon : null;
+                  return (
+                    <a key={c.title} href={c.href} className={`group relative flex min-h-[118px] flex-col overflow-hidden rounded-2xl border p-4 transition duration-300 hover:-translate-y-1 ${"accent" in c && c.accent ? "border-[#d9232e]/25 bg-[#d9232e]/[.035] hover:border-[#ff4651]/40" : "border-white/[.07] bg-white/[.018] hover:border-white/[.15] hover:bg-white/[.04]"}`}>
+                      <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]" />
+                      <div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${"accent" in c && c.accent ? "border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff4b55]" : "border-white/10 bg-white/[.035] text-white/70"}`}>
+                        {"lastfm" in c && c.lastfm ? <LastFmLogo /> : Icon ? <Icon className="h-4 w-4" /> : null}
+                      </div>
+                      <div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-sm font-medium text-white/88">{c.title}<ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70" /></div><div className="mt-1 text-[10px] leading-4 text-white/32">{c.description}</div></div>
+                    </a>
+                  );
+                })}
               </div>
+
+              <a href="/commands" className="group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5 transition duration-300 hover:border-white/[.14] hover:bg-white/[.025]">
+                <Terminal className="h-4 w-4 text-white/45" /><span className="font-mono text-[11px] text-white/35">$ ware commands --all</span><span className="animate-cursor h-4 w-px bg-white/50" /><ArrowRight className="ml-auto h-3.5 w-3.5 text-white/25 transition group-hover:translate-x-1" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-3 divide-x divide-white/[.07] border-t border-white/[.07]">
+              {[["99.99%", "uptime"], [String(COMMAND_COUNT), "commands"], ["24/7", "protection"]].map(([v, l]) => <div key={l} className="px-3 py-4 text-center"><div className="text-sm font-semibold text-white">{v}</div><div className="mt-1 text-[8px] uppercase tracking-[.16em] text-white/27">{l}</div></div>)}
             </div>
           </div>
         </div>
