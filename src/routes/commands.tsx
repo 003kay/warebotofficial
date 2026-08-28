@@ -6,7 +6,6 @@ import {
   Gavel,
   Info,
   Heart,
-  Music2,
   Wrench,
   Settings2,
   Volume2,
@@ -21,6 +20,16 @@ import {
   ChevronLeft,
   ChevronRight,
   Terminal,
+  Bitcoin,
+  ListChecks,
+  Timer,
+  Hash,
+  BellRing,
+  Gift,
+  User,
+  Image,
+  ScrollText,
+  Radio,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
@@ -120,18 +129,15 @@ const displayCategories = [
   ...sourceCategories.filter(category => !featuredSourceSlugs.has(category.slug)),
 ];
 
-const WARE_LOGO = "/ware-logo.svg?v=4";
-
 const iconBySlug: Record<string, typeof Layers3> = {
   server: Server,
   moderation: Gavel,
   information: Info,
   roleplay: Heart,
-  lastfm: Music2,
   miscellaneous: Wrench,
   "channels-roles": Settings2,
   voicemaster: Volume2,
-  "config-logs": Settings2,
+  "config-logs": ScrollText,
   antinuke: ShieldCheck,
   antiraid: ShieldCheck,
   economy: WalletCards,
@@ -140,7 +146,48 @@ const iconBySlug: Record<string, typeof Layers3> = {
   utility: Wrench,
   tickets: Ticket,
   premium: Crown,
+  crypto: Bitcoin,
+  snipe: Layers3,
+  counters: ListChecks,
+  timers: Timer,
+  logs: ScrollText,
+  "bump-reminder": BellRing,
+  giveaways: Gift,
+  leveling: Radio,
+  user: User,
+  images: Image,
+  security: ShieldCheck,
+  welcome: Info,
+  ai: Sparkles,
 };
+
+const brandLogoBySlug: Record<string, string> = {
+  spotify: "https://cdn.simpleicons.org/spotify/bdbdbd",
+  lastfm: "https://cdn.simpleicons.org/lastdotfm/bdbdbd",
+  kick: "https://cdn.simpleicons.org/kick/bdbdbd",
+  twitch: "https://cdn.simpleicons.org/twitch/bdbdbd",
+  youtube: "https://cdn.simpleicons.org/youtube/bdbdbd",
+  twitter: "https://cdn.simpleicons.org/x/bdbdbd",
+  reddit: "https://cdn.simpleicons.org/reddit/bdbdbd",
+  soundcloud: "https://cdn.simpleicons.org/soundcloud/bdbdbd",
+  roblox: "https://cdn.simpleicons.org/roblox/bdbdbd",
+  fortnite: "https://cdn.simpleicons.org/fortnite/bdbdbd",
+};
+
+function CategoryIcon({ slug, selected }: { slug: string; selected: boolean }) {
+  const brandLogo = brandLogoBySlug[slug];
+  const Icon = iconBySlug[slug] ?? Layers3;
+
+  return (
+    <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-[9px] border transition ${selected ? "border-white/[.11] bg-white/[.08]" : "border-white/[.055] bg-white/[.025]"}`}>
+      {brandLogo ? (
+        <img src={brandLogo} alt="" className={`h-[17px] w-[17px] object-contain transition ${selected ? "opacity-100" : "opacity-70"}`} />
+      ) : (
+        <Icon className={`h-[17px] w-[17px] transition ${selected ? "text-white/90" : "text-white/55"}`} />
+      )}
+    </span>
+  );
+}
 
 function getArguments(usage: string) {
   const matches = usage.match(/[([][^\])]+[\])]/g) ?? [];
@@ -165,49 +212,6 @@ export const Route = createFileRoute("/commands")({
   }),
   component: CommandsPage,
 });
-
-function CommandsIntro() {
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setVisible(false), 1420);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  if (!visible) return null;
-
-  return (
-    <div className="ware-command-enter fixed inset-0 z-[500] grid place-items-center bg-black" aria-hidden>
-      <img src={WARE_LOGO} alt="" className="ware-command-enter-logo h-[116px] w-[116px] object-contain" />
-      <style>{`
-        .ware-command-enter {
-          pointer-events: none;
-          animation: wareCommandOverlay 1.36s linear both;
-          will-change: opacity;
-        }
-        .ware-command-enter-logo {
-          animation: wareCommandPopBack 1.36s cubic-bezier(.2,.78,.2,1) both;
-          will-change: transform, opacity, filter;
-        }
-        @keyframes wareCommandPopBack {
-          0% { transform: scale(.68); opacity: 0; filter: blur(10px); }
-          18% { transform: scale(1.10); opacity: 1; filter: blur(0); }
-          40% { transform: scale(1); opacity: 1; filter: blur(0); }
-          56% { transform: scale(.98); opacity: 1; filter: blur(0); }
-          100% { transform: scale(.78); opacity: 0; filter: blur(9px); }
-        }
-        @keyframes wareCommandOverlay {
-          0%, 62% { opacity: 1; }
-          100% { opacity: 0; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .ware-command-enter { animation-duration: .45s; }
-          .ware-command-enter-logo { animation: none; opacity: 1; transform: scale(1); filter: none; }
-        }
-      `}</style>
-    </div>
-  );
-}
 
 function CommandsPage() {
   const search = Route.useSearch();
@@ -278,24 +282,23 @@ function CommandsPage() {
 
   return (
     <div className="min-h-screen bg-[#090a0a] text-white">
-      <CommandsIntro />
       <Navbar />
 
-      <main className="mx-auto max-w-[1120px] px-4 pb-24 pt-4 sm:px-6 md:pt-6">
-        <div className="flex min-h-[108px] items-center justify-between gap-6">
+      <main className="mx-auto max-w-[1160px] px-4 pb-24 pt-4 sm:px-6 md:pt-6">
+        <div className="flex min-h-[112px] items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="grid h-12 w-12 place-items-center rounded-full border border-white/[.08] bg-[#171818] text-white/68">
+            <div className="grid h-12 w-12 place-items-center rounded-full border border-white/[.08] bg-[#171818] text-white/72">
               <Terminal className="h-5 w-5" />
             </div>
-            <h1 className="text-[31px] font-semibold tracking-[-.045em] text-white sm:text-[34px]">Commands</h1>
+            <h1 className="text-[33px] font-semibold tracking-[-.045em] text-white sm:text-[36px]">Commands</h1>
           </div>
 
           <div className="flex min-w-0 items-end justify-end">
             {searchOpen ? (
-              <div className="w-[245px] max-w-[48vw]">
-                <div className="mb-1.5 text-right text-[11px] lowercase tracking-wide text-white/35">search</div>
-                <div className="flex h-11 items-center gap-2.5 rounded-xl border border-white/[.10] bg-[#141515] px-3.5 focus-within:border-white/[.22]">
-                  <Search className="h-4 w-4 shrink-0 text-white/38" />
+              <div className="w-[270px] max-w-[52vw]">
+                <div className="mb-1.5 text-right text-[12px] lowercase tracking-wide text-white/38">search</div>
+                <div className="flex h-12 items-center gap-2.5 rounded-xl border border-white/[.11] bg-[#141515] px-3.5 focus-within:border-white/[.24]">
+                  <Search className="h-[17px] w-[17px] shrink-0 text-white/42" />
                   <input
                     autoFocus
                     value={query}
@@ -307,19 +310,19 @@ function CommandsPage() {
                       }
                     }}
                     placeholder="Search commands..."
-                    className="min-w-0 flex-1 bg-transparent text-[13px] text-white/85 outline-none placeholder:text-white/25"
+                    className="min-w-0 flex-1 bg-transparent text-[14px] text-white/88 outline-none placeholder:text-white/28"
                   />
-                  {query ? <span className="text-[10px] text-white/35">{shown.length}</span> : null}
+                  {query ? <span className="text-[11px] text-white/38">{shown.length}</span> : null}
                 </div>
               </div>
             ) : (
               <div className="text-right">
-                <div className="mb-1.5 text-[11px] lowercase tracking-wide text-white/35">search</div>
+                <div className="mb-1.5 text-[12px] lowercase tracking-wide text-white/38">search</div>
                 <button
                   type="button"
                   onClick={() => setSearchOpen(true)}
                   aria-label="Search commands"
-                  className="grid h-12 w-12 place-items-center rounded-xl border border-white/[.09] bg-[#151616] text-white/62 transition hover:border-white/[.18] hover:bg-[#1b1c1c] hover:text-white"
+                  className="grid h-12 w-12 place-items-center rounded-xl border border-white/[.10] bg-[#151616] text-white/68 transition hover:border-white/[.20] hover:bg-[#1d1e1e] hover:text-white"
                 >
                   <Search className="h-5 w-5" />
                 </button>
@@ -328,21 +331,20 @@ function CommandsPage() {
           </div>
         </div>
 
-        <div className="mt-5 flex h-[59px] items-stretch overflow-hidden rounded-[16px] border border-white/[.085] bg-[#121313]">
+        <div className="mt-5 flex items-center gap-2 rounded-[18px] border border-white/[.075] bg-[#0d0e0e] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.018)]">
           <button
             type="button"
             aria-label="Scroll categories left"
             onClick={() => moveRail("left")}
             disabled={!canScrollLeft}
-            className="grid w-11 shrink-0 place-items-center border-r border-white/[.065] bg-[#101111] text-white/36 transition hover:bg-[#1a1b1b] hover:text-white/72 disabled:opacity-20"
+            className="grid h-12 w-10 shrink-0 place-items-center rounded-xl border border-transparent text-white/35 transition hover:border-white/[.06] hover:bg-[#171818] hover:text-white/75 disabled:opacity-15"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
 
           <div ref={railRef} className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <div className="flex h-full w-max min-w-full items-stretch">
+            <div className="flex h-[52px] w-max min-w-full items-center gap-1.5">
               {displayCategories.map(group => {
-                const Icon = iconBySlug[group.slug] ?? Layers3;
                 const selected = category === group.slug;
                 return (
                   <button
@@ -352,11 +354,11 @@ function CommandsPage() {
                       setCategory(group.slug);
                       setQuery("");
                     }}
-                    className={`flex min-w-[154px] items-center gap-2.5 border-r border-white/[.06] px-4 text-left transition ${selected ? "bg-[#232424] text-white" : "bg-transparent text-white/58 hover:bg-[#191a1a] hover:text-white/90"}`}
+                    className={`flex h-12 min-w-[158px] items-center gap-2.5 rounded-[12px] border px-3.5 text-left transition ${selected ? "border-white/[.11] bg-[#242525] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.035)]" : "border-transparent bg-transparent text-white/58 hover:border-white/[.055] hover:bg-[#171818] hover:text-white/92"}`}
                   >
-                    <Icon className="h-[18px] w-[18px] shrink-0 opacity-80" />
-                    <span className="truncate text-[13px] font-medium">{group.name}</span>
-                    <span className={`ml-auto rounded-md px-2 py-1 text-[10px] ${selected ? "bg-[#343535] text-white/72" : "bg-[#202121] text-white/42"}`}>
+                    <CategoryIcon slug={group.slug} selected={selected} />
+                    <span className="truncate text-[13.5px] font-medium tracking-[-.01em]">{group.name}</span>
+                    <span className={`ml-auto rounded-full px-2 py-1 text-[10px] font-medium ${selected ? "bg-white/[.09] text-white/72" : "bg-white/[.045] text-white/38"}`}>
                       {group.commands.length}
                     </span>
                   </button>
@@ -370,7 +372,7 @@ function CommandsPage() {
             aria-label="Scroll categories right"
             onClick={() => moveRail("right")}
             disabled={!canScrollRight}
-            className="grid w-11 shrink-0 place-items-center border-l border-white/[.065] bg-[#101111] text-white/36 transition hover:bg-[#1a1b1b] hover:text-white/72 disabled:opacity-20"
+            className="grid h-12 w-10 shrink-0 place-items-center rounded-xl border border-transparent text-white/35 transition hover:border-white/[.06] hover:bg-[#171818] hover:text-white/75 disabled:opacity-15"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -384,35 +386,36 @@ function CommandsPage() {
             const isCopied = copied === key;
 
             return (
-              <article key={key} className="min-h-[268px] overflow-hidden rounded-[22px] border border-[#2a2b2b] bg-[#101111] transition-colors duration-150 hover:border-[#3b3c3c] hover:bg-[#121313]">
-                <div className="flex min-h-[120px] items-start justify-between gap-4 px-6 py-5.5">
-                  <div className="min-w-0">
-                    <div className="text-[17px] font-semibold tracking-[-.02em] text-white/95">{command.name}</div>
-                    <p className="mt-2.5 text-[13px] leading-5.5 text-white/48">{command.description}</p>
+              <article key={key} className="min-h-[286px] overflow-hidden rounded-[22px] border border-[#2b2c2c] bg-[#101111] transition duration-150 hover:-translate-y-px hover:border-[#414242] hover:bg-[#131414]">
+                <div className="flex min-h-[130px] items-start justify-between gap-4 px-6 py-6">
+                  <div className="min-w-0 pr-1">
+                    <div className="text-[19px] font-semibold tracking-[-.025em] text-white/96">{command.name}</div>
+                    <p className="mt-2.5 text-[14px] leading-[1.65] text-white/54">{command.description}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => copyCommand(command.usage, key)}
                     title={isCopied ? "Copied" : "Copy command"}
-                    className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/[.07] bg-[#141515] text-white/36 transition hover:border-white/[.16] hover:bg-[#1d1e1e] hover:text-white"
+                    aria-label={isCopied ? "Copied command" : `Copy ${command.name} command`}
+                    className={`grid h-10 w-10 shrink-0 place-items-center rounded-[11px] border transition duration-150 ${isCopied ? "border-white/[.20] bg-[#222323] text-white" : "border-white/[.14] bg-[#1a1b1b] text-white/68 hover:-translate-y-px hover:border-white/[.26] hover:bg-[#242525] hover:text-white"}`}
                   >
-                    {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {isCopied ? <Check className="h-[18px] w-[18px]" /> : <Copy className="h-[18px] w-[18px]" />}
                   </button>
                 </div>
 
-                <div className="min-h-[148px] border-t border-[#292a2a] bg-[#0e0f0f] px-6 py-5">
-                  <div className="text-[11px] font-medium lowercase tracking-[.01em] text-white/52">arguments</div>
-                  <div className="mt-3 flex min-h-7 flex-wrap gap-2">
+                <div className="min-h-[156px] border-t border-[#2a2b2b] bg-[#0e0f0f] px-6 py-5">
+                  <div className="text-[12.5px] font-medium lowercase tracking-[.01em] text-white/58">arguments</div>
+                  <div className="mt-3 flex min-h-8 flex-wrap gap-2">
                     {args.length ? args.map((arg, argIndex) => (
-                      <span key={`${arg}-${argIndex}`} className="rounded-lg bg-[#1c1d1d] px-3 py-1.5 text-[11px] italic text-white/72">{arg}</span>
-                    )) : <span className="text-[11px] text-white/35">none</span>}
+                      <span key={`${arg}-${argIndex}`} className="rounded-lg border border-white/[.055] bg-[#1c1d1d] px-3 py-1.5 text-[12px] italic text-white/76">{arg}</span>
+                    )) : <span className="text-[12px] text-white/40">none</span>}
                   </div>
 
-                  <div className="mt-4 text-[11px] font-medium lowercase tracking-[.01em] text-white/52">permissions</div>
-                  <div className="mt-3 min-h-7">
+                  <div className="mt-4 text-[12.5px] font-medium lowercase tracking-[.01em] text-white/58">permissions</div>
+                  <div className="mt-3 min-h-8">
                     {permission.toLowerCase() === "none"
-                      ? <span className="text-[11px] text-white/35">none</span>
-                      : <span className="inline-flex rounded-lg bg-[#1c1d1d] px-3 py-1.5 text-[11px] text-white/72">{permission}</span>}
+                      ? <span className="text-[12px] text-white/40">none</span>
+                      : <span className="inline-flex rounded-lg border border-white/[.055] bg-[#1c1d1d] px-3 py-1.5 text-[12px] text-white/76">{permission}</span>}
                   </div>
                 </div>
               </article>
