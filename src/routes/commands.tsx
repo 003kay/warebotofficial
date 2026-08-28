@@ -179,11 +179,11 @@ function CategoryIcon({ slug, selected }: { slug: string; selected: boolean }) {
   const Icon = iconBySlug[slug] ?? Layers3;
 
   return (
-    <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-[9px] border transition ${selected ? "border-white/[.11] bg-white/[.08]" : "border-white/[.055] bg-white/[.025]"}`}>
+    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl border transition duration-200 ${selected ? "border-white/[.14] bg-white/[.085] shadow-[inset_0_1px_0_rgba(255,255,255,.04)]" : "border-white/[.06] bg-black/25"}`}>
       {brandLogo ? (
-        <img src={brandLogo} alt="" className={`h-[17px] w-[17px] object-contain transition ${selected ? "opacity-100" : "opacity-70"}`} />
+        <img src={brandLogo} alt="" className={`h-[18px] w-[18px] object-contain transition duration-200 ${selected ? "opacity-100" : "opacity-68"}`} />
       ) : (
-        <Icon className={`h-[17px] w-[17px] transition ${selected ? "text-white/90" : "text-white/55"}`} />
+        <Icon className={`h-[18px] w-[18px] transition duration-200 ${selected ? "text-white/92" : "text-white/52"}`} />
       )}
     </span>
   );
@@ -331,19 +331,19 @@ function CommandsPage() {
           </div>
         </div>
 
-        <div className="mt-5 flex items-center gap-2 rounded-[18px] border border-white/[.075] bg-[#0d0e0e] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.018)]">
+        <div className="mt-6 flex items-center gap-3">
           <button
             type="button"
             aria-label="Scroll categories left"
             onClick={() => moveRail("left")}
             disabled={!canScrollLeft}
-            className="grid h-12 w-10 shrink-0 place-items-center rounded-xl border border-transparent text-white/35 transition hover:border-white/[.06] hover:bg-[#171818] hover:text-white/75 disabled:opacity-15"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/[.08] bg-[#111212] text-white/36 shadow-[inset_0_1px_0_rgba(255,255,255,.025)] transition duration-200 hover:border-white/[.16] hover:bg-[#181919] hover:text-white/80 disabled:opacity-15"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
 
           <div ref={railRef} className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <div className="flex h-[52px] w-max min-w-full items-center gap-1.5">
+            <div className="flex h-[66px] w-max min-w-full items-center gap-2.5 px-0.5">
               {displayCategories.map(group => {
                 const selected = category === group.slug;
                 return (
@@ -354,13 +354,14 @@ function CommandsPage() {
                       setCategory(group.slug);
                       setQuery("");
                     }}
-                    className={`flex h-12 min-w-[158px] items-center gap-2.5 rounded-[12px] border px-3.5 text-left transition ${selected ? "border-white/[.11] bg-[#242525] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.035)]" : "border-transparent bg-transparent text-white/58 hover:border-white/[.055] hover:bg-[#171818] hover:text-white/92"}`}
+                    className={`relative flex h-[58px] min-w-[166px] items-center gap-2.5 overflow-hidden rounded-[16px] border px-3.5 text-left transition duration-200 ${selected ? "border-white/[.16] bg-[linear-gradient(180deg,#242626,#1b1d1d)] text-white shadow-[0_10px_30px_-24px_rgba(255,255,255,.35),inset_0_1px_0_rgba(255,255,255,.05)]" : "border-white/[.065] bg-[#111212] text-white/58 hover:-translate-y-px hover:border-white/[.12] hover:bg-[#171919] hover:text-white/92"}`}
                   >
                     <CategoryIcon slug={group.slug} selected={selected} />
-                    <span className="truncate text-[13.5px] font-medium tracking-[-.01em]">{group.name}</span>
-                    <span className={`ml-auto rounded-full px-2 py-1 text-[10px] font-medium ${selected ? "bg-white/[.09] text-white/72" : "bg-white/[.045] text-white/38"}`}>
+                    <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium tracking-[-.012em]">{group.name}</span>
+                    <span className={`grid min-w-[25px] place-items-center rounded-full px-1.5 py-1 text-[10px] font-medium ${selected ? "bg-white/[.10] text-white/78" : "bg-black/30 text-white/38"}`}>
                       {group.commands.length}
                     </span>
+                    {selected ? <span className="absolute inset-x-7 bottom-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" /> : null}
                   </button>
                 );
               })}
@@ -372,7 +373,7 @@ function CommandsPage() {
             aria-label="Scroll categories right"
             onClick={() => moveRail("right")}
             disabled={!canScrollRight}
-            className="grid h-12 w-10 shrink-0 place-items-center rounded-xl border border-transparent text-white/35 transition hover:border-white/[.06] hover:bg-[#171818] hover:text-white/75 disabled:opacity-15"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/[.08] bg-[#111212] text-white/36 shadow-[inset_0_1px_0_rgba(255,255,255,.025)] transition duration-200 hover:border-white/[.16] hover:bg-[#181919] hover:text-white/80 disabled:opacity-15"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
