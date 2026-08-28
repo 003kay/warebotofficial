@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const DISCORD_URL = "https://discord.gg/warebot";
 const DASHBOARD_LOGIN = "/auth/discord/login";
@@ -14,6 +14,7 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const closingRef = useRef(false);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -24,6 +25,7 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
 
   useEffect(() => {
     if (!menuOpen) return;
+    closingRef.current = false;
     const backdrop = backdropRef.current;
     const panel = panelRef.current;
     if (!backdrop || !panel) return;
@@ -31,39 +33,83 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
     const backdropAnimation = backdrop.animate(
       [
         { opacity: 0, backdropFilter: "blur(0px)" },
-        { opacity: 1, backdropFilter: "blur(18px)" },
+        { opacity: 1, backdropFilter: "blur(16px)" },
       ],
-      { duration: 360, easing: "cubic-bezier(.2,.8,.2,1)", fill: "both" },
+      { duration: 440, easing: "cubic-bezier(.22,.72,.18,1)", fill: "both" },
     );
 
     const panelAnimation = panel.animate(
       [
-        { opacity: 0, transform: "translateY(18px) scale(.78)", filter: "blur(10px)" },
-        { opacity: 1, transform: "translateY(-4px) scale(1.025)", filter: "blur(0px)", offset: .72 },
+        { opacity: 0, transform: "translateY(16px) scale(.94)", filter: "blur(7px)" },
+        { opacity: .72, transform: "translateY(5px) scale(.982)", filter: "blur(2px)", offset: .44 },
         { opacity: 1, transform: "translateY(0) scale(1)", filter: "blur(0px)" },
       ],
-      { duration: 610, easing: "cubic-bezier(.16,1,.3,1)", fill: "both" },
+      { duration: 620, easing: "cubic-bezier(.16,1,.3,1)", fill: "both" },
     );
 
     const itemAnimations = Array.from(panel.querySelectorAll<HTMLElement>(".ware-menu-item")).map((item, index) =>
       item.animate(
         [
-          { opacity: 0, transform: "translateY(12px) scale(.975)" },
-          { opacity: 1, transform: "translateY(0) scale(1)" },
+          { opacity: 0, transform: "translateY(9px)", filter: "blur(3px)" },
+          { opacity: 1, transform: "translateY(0)", filter: "blur(0px)" },
         ],
-        { duration: 420, delay: 130 + index * 55, easing: "cubic-bezier(.16,1,.3,1)", fill: "both" },
+        { duration: 430, delay: 120 + index * 42, easing: "cubic-bezier(.16,1,.3,1)", fill: "both" },
       ),
     );
 
     return () => {
+      if (closingRef.current) return;
       backdropAnimation.cancel();
       panelAnimation.cancel();
       itemAnimations.forEach(animation => animation.cancel());
     };
   }, [menuOpen]);
 
+  const closeMenu = useCallback(() => {
+    if (!menuOpen || closingRef.current) return;
+    const backdrop = backdropRef.current;
+    const panel = panelRef.current;
+    if (!backdrop || !panel) {
+      setMenuOpen(false);
+      return;
+    }
+
+    closingRef.current = true;
+    const items = Array.from(panel.querySelectorAll<HTMLElement>(".ware-menu-item"));
+    items.forEach((item, index) => {
+      item.animate(
+        [
+          { opacity: 1, transform: "translateY(0)" },
+          { opacity: 0, transform: "translateY(5px)" },
+        ],
+        { duration: 170, delay: index * 12, easing: "ease-in", fill: "forwards" },
+      );
+    });
+
+    panel.animate(
+      [
+        { opacity: 1, transform: "translateY(0) scale(1)", filter: "blur(0px)" },
+        { opacity: 0, transform: "translateY(10px) scale(.965)", filter: "blur(5px)" },
+      ],
+      { duration: 300, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" },
+    );
+
+    const backdropAnimation = backdrop.animate(
+      [
+        { opacity: 1, backdropFilter: "blur(16px)" },
+        { opacity: 0, backdropFilter: "blur(0px)" },
+      ],
+      { duration: 330, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" },
+    );
+
+    const done = () => {
+      closingRef.current = false;
+      setMenuOpen(false);
+    };
+    backdropAnimation.finished.then(done).catch(done);
+  }, [menuOpen]);
+
   const markCommandsTransition = () => {
-    setMenuOpen(false);
     try { sessionStorage.setItem("ware-command-entry", "1"); } catch {}
   };
 
@@ -84,16 +130,16 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
       </div>
     </header>
 
-    {menuOpen ? <div ref={backdropRef} className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-black/78 px-4 py-8" onMouseDown={e=>{if(e.currentTarget===e.target)setMenuOpen(false);}}>
+    {menuOpen ? <div ref={backdropRef} className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-black/78 px-4 py-8" onMouseDown={e=>{if(e.currentTarget===e.target)closeMenu();}}>
       <div ref={panelRef} className="w-full max-w-[620px] overflow-hidden rounded-[26px] border border-white/[.11] bg-[#080909]/[.99] shadow-[0_40px_140px_rgba(0,0,0,.82)]">
         <div className="flex items-center justify-between border-b border-white/[.065] px-6 py-5">
           <div><div className="text-[17px] font-semibold tracking-[-.025em] text-white/92">Ware menu</div><div className="mt-1 text-[12px] text-white/36">Quick access</div></div>
-          <button aria-label="Close menu" onClick={()=>setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[.08] bg-white/[.03] text-white/50 transition duration-200 hover:rotate-90 hover:border-white/[.15] hover:bg-white/[.07] hover:text-white"><X className="h-5 w-5"/></button>
+          <button aria-label="Close menu" onClick={closeMenu} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[.08] bg-white/[.03] text-white/50 transition duration-200 hover:rotate-90 hover:border-white/[.15] hover:bg-white/[.07] hover:text-white"><X className="h-5 w-5"/></button>
         </div>
         <nav className="grid gap-3 p-5">
-          <Link to="/commands" onClick={markCommandsTransition} className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Commands</span><span className="mt-1.5 block text-[12px] text-white/38">Browse all {COMMAND_COUNT} Ware command paths</span></span><ArrowRight className="h-4 w-4 text-white/30 group-hover:translate-x-1"/></Link>
-          <Link to="/documentation" onClick={()=>setMenuOpen(false)} className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Documentation</span><span className="mt-1.5 block text-[12px] text-white/38">Setup guides, features, and references</span></span><ArrowRight className="h-4 w-4 text-white/30 group-hover:translate-x-1"/></Link>
-          <Link to="/faq" onClick={()=>setMenuOpen(false)} className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">FAQ</span><span className="mt-1.5 block text-[12px] text-white/38">Answers to common Ware questions</span></span><ArrowRight className="h-4 w-4 text-white/30 group-hover:translate-x-1"/></Link>
+          <Link to="/commands" onClick={markCommandsTransition} className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Commands</span><span className="mt-1.5 block text-[12px] text-white/38">Browse all {COMMAND_COUNT} Ware command paths</span></span><ArrowRight className="h-4 w-4 text-white/30 transition-transform group-hover:translate-x-1"/></Link>
+          <Link to="/documentation" className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Documentation</span><span className="mt-1.5 block text-[12px] text-white/38">Setup guides, features, and references</span></span><ArrowRight className="h-4 w-4 text-white/30 transition-transform group-hover:translate-x-1"/></Link>
+          <Link to="/faq" className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">FAQ</span><span className="mt-1.5 block text-[12px] text-white/38">Answers to common Ware questions</span></span><ArrowRight className="h-4 w-4 text-white/30 transition-transform group-hover:translate-x-1"/></Link>
           <a href={DISCORD_URL} target="_blank" rel="noreferrer" className={`${menuRow} gap-4`}><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[.08] bg-black/40"><ExternalLink className="h-4 w-4 text-white/65"/></span><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Discord</span><span className="mt-1.5 block text-[12px] text-white/38">Support, updates, and the Ware community</span></span><ExternalLink className="h-4 w-4 text-white/30"/></a>
           <div className="ware-menu-item flex min-h-[76px] items-center rounded-[18px] border border-white/[.065] bg-[#0a0c0c] px-5 py-4"><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/82">Systems operational</span><span className="mt-1.5 block text-[12px] text-white/35">Ware services are online</span></span><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.65)]"/></div>
         </nav>
