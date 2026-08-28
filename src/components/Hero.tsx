@@ -25,10 +25,20 @@ export function Hero() {
   return <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-16 pt-10 md:px-10 md:pb-20 md:pt-14">
     <style>{`
       @keyframes wareSilverShine { 0% { background-position: 180% 50%; } 100% { background-position: -80% 50%; } }
-      @keyframes wareCommandFloat { 0%,100% { transform: translate3d(0,10px,0); } 50% { transform: translate3d(0,-18px,0); } }
+      @keyframes wareCommandDrift {
+        0%,100% { transform: perspective(1400px) translate3d(-3px,8px,0) rotateX(.22deg) rotateZ(-.10deg); }
+        26% { transform: perspective(1400px) translate3d(2px,-5px,9px) rotateX(-.16deg) rotateZ(.08deg); }
+        52% { transform: perspective(1400px) translate3d(4px,-12px,13px) rotateX(-.28deg) rotateZ(.12deg); }
+        76% { transform: perspective(1400px) translate3d(-1px,-3px,6px) rotateX(.10deg) rotateZ(-.04deg); }
+      }
+      @keyframes wareConsoleBreath {
+        0%,100% { box-shadow: 0 52px 145px -72px rgba(255,255,255,.18), 0 30px 90px -55px rgba(0,0,0,.95); }
+        50% { box-shadow: 0 64px 170px -70px rgba(255,255,255,.25), 0 38px 110px -54px rgba(0,0,0,.98); }
+      }
       .ware-silver-shine { color: transparent; background-image: linear-gradient(105deg,#808388 0%,#c8cbd0 28%,#f3f4f5 46%,#b4b7bc 64%,#72757a 82%,#d5d7da 100%); background-size:240% 100%; background-position:180% 50%; -webkit-background-clip:text; background-clip:text; animation:wareSilverShine 4.6s cubic-bezier(.4,0,.2,1) infinite; }
-      .ware-command-center-float { animation: wareCommandFloat 7.2s cubic-bezier(.45,0,.55,1) infinite !important; will-change: transform; transform: translateZ(0); }
-      @media(prefers-reduced-motion:reduce){.ware-silver-shine{animation:none!important}}
+      .ware-command-center-float { animation: wareCommandDrift 10.5s cubic-bezier(.45,.05,.55,.95) infinite !important; will-change: transform; transform-origin: 50% 50%; }
+      .ware-command-center-float .hero-console { animation: wareConsoleBreath 8s ease-in-out infinite; }
+      @media(prefers-reduced-motion:reduce){.ware-silver-shine,.ware-command-center-float,.ware-command-center-float .hero-console{animation:none!important}}
     `}</style>
     <div className="hero-orb hero-orb-a"/><div className="hero-orb hero-orb-b"/><div className="hero-beam"/>
     <div className="relative z-10 max-w-[900px] text-left animate-[soft-rise_.7s_ease_both]">
@@ -37,7 +47,7 @@ export function Hero() {
       <div className="mt-9 flex flex-wrap gap-3"><a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold"><DiscordLogo/>Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a><a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a></div>
     </div>
 
-    <div className="ware-command-center-float relative mx-auto mt-16 w-full max-w-[1120px] md:mt-20"><div className="pointer-events-none absolute -inset-16 -z-10 rounded-full bg-white/[.025] blur-[100px]"/><div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 shadow-[0_55px_150px_-70px_rgba(255,255,255,.22)] backdrop-blur-2xl"><div className="hero-console-sheen"/><div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
+    <div className="ware-command-center-float relative mx-auto mt-16 w-full max-w-[1120px] md:mt-20"><div className="pointer-events-none absolute -inset-20 -z-10 rounded-full bg-white/[.028] blur-[110px]"/><div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 backdrop-blur-2xl"><div className="hero-console-sheen"/><div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
       <div className="border-b border-white/[.07] px-5 py-4"><div className="flex items-center gap-3"><div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20"/><i className="h-2 w-2 rounded-full bg-white/12"/><i className="h-2 w-2 rounded-full bg-white/7"/></div><span className="font-mono text-[10px] text-white/30">ware / command center</span></div></div>
       <div className="p-4 sm:p-5 md:p-6"><div className="mb-5 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-black/40"><img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 object-contain"/></div><div className="text-[15px] font-semibold tracking-[-.02em] text-white">Ware</div></div>
       <div className="mb-3 flex items-center justify-between px-1"><span className="text-[10px] font-semibold uppercase tracking-[.14em] text-white/35">Command modules</span><a href="/commands" className="text-[11px] font-medium text-white/42 transition hover:text-white">View all →</a></div>
