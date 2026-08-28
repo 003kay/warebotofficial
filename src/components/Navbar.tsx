@@ -116,6 +116,7 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
   const accountHref = dashboardMode ? DASHBOARD_LOGOUT : DASHBOARD_LOGIN;
 
   return <>
+    <style>{`body [class~="z-[990]"],body [class~="z-[991]"]{display:none!important}`}</style>
     <header className="relative z-40 grid grid-cols-[auto_1fr_auto] items-center px-6 py-6 md:px-10 md:py-7">
       <Link to="/" aria-label="Ware home" className="group grid h-12 w-12 place-items-center rounded-2xl border border-white/[.09] bg-black/55 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[.035]"><img src="/ware-logo.svg?v=4" alt="Ware bot" className="h-9 w-9 object-contain transition duration-500 group-hover:scale-105"/></Link>
       <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 md:flex">
