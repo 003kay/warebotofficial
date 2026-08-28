@@ -82,46 +82,58 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
   const overlayRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const overlay = overlayRef.current;
     const logo = logoRef.current;
     const glow = glowRef.current;
-    if (!overlay || !logo || !glow) return;
+    const ring = ringRef.current;
+    if (!overlay || !logo || !glow || !ring) return;
 
-    const duration = 1800;
+    const duration = 1660;
 
     const overlayAnimation = overlay.animate(
       [
-        { opacity: 1, offset: 0 },
-        { opacity: 1, offset: 0.66 },
-        { opacity: 0.82, offset: 0.78 },
-        { opacity: 0, offset: 1 },
+        { opacity: 1, background: "radial-gradient(circle at center, #101111 0%, #050505 34%, #000 68%)", offset: 0 },
+        { opacity: 1, background: "radial-gradient(circle at center, #111212 0%, #050505 32%, #000 68%)", offset: 0.58 },
+        { opacity: 0.9, background: "radial-gradient(circle at center, #0a0b0b 0%, #020202 38%, #000 72%)", offset: 0.74 },
+        { opacity: 0, background: "#000", offset: 1 },
       ],
       { duration, easing: "linear", fill: "forwards" },
     );
 
     const logoAnimation = logo.animate(
       [
-        { transform: "scale(.2)", opacity: 0, filter: "blur(18px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 0 },
-        { transform: "scale(.72)", opacity: .5, filter: "blur(7px) drop-shadow(0 0 12px rgba(255,255,255,.08))", offset: 0.1 },
-        { transform: "scale(1.24)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 46px rgba(255,255,255,.28))", offset: 0.24 },
-        { transform: "scale(.98)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 24px rgba(255,255,255,.15))", offset: 0.42 },
-        { transform: "scale(1.03)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 24px rgba(255,255,255,.15))", offset: 0.56 },
-        { transform: "scale(.92)", opacity: .95, filter: "blur(1px) drop-shadow(0 0 16px rgba(255,255,255,.10))", offset: 0.68 },
-        { transform: "scale(.54)", opacity: .38, filter: "blur(9px) drop-shadow(0 0 4px rgba(255,255,255,.04))", offset: 0.84 },
-        { transform: "scale(.28)", opacity: 0, filter: "blur(16px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 1 },
+        { transform: "perspective(900px) translateZ(-180px) scale(.38)", opacity: 0, filter: "blur(16px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 0 },
+        { transform: "perspective(900px) translateZ(48px) scale(1.16)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 48px rgba(255,255,255,.30))", offset: 0.20 },
+        { transform: "perspective(900px) translateZ(0) scale(.98)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 26px rgba(255,255,255,.17))", offset: 0.37 },
+        { transform: "perspective(900px) translateZ(10px) scale(1.02)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 24px rgba(255,255,255,.14))", offset: 0.50 },
+        { transform: "perspective(900px) translateZ(-42px) scale(.92)", opacity: .96, filter: "blur(.5px) drop-shadow(0 0 18px rgba(255,255,255,.10))", offset: 0.64 },
+        { transform: "perspective(900px) translateZ(-175px) scale(.66)", opacity: .48, filter: "blur(7px) drop-shadow(0 0 8px rgba(255,255,255,.05))", offset: 0.80 },
+        { transform: "perspective(900px) translateZ(-300px) scale(.48)", opacity: 0, filter: "blur(15px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 1 },
       ],
       { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" },
     );
 
     const glowAnimation = glow.animate(
       [
-        { transform: "scale(.25)", opacity: 0, offset: 0 },
-        { transform: "scale(1.35)", opacity: .85, offset: .25 },
-        { transform: "scale(1.08)", opacity: .55, offset: .58 },
-        { transform: "scale(.72)", opacity: .18, offset: .82 },
-        { transform: "scale(.38)", opacity: 0, offset: 1 },
+        { transform: "scale(.32)", opacity: 0, offset: 0 },
+        { transform: "scale(1.28)", opacity: .78, offset: .22 },
+        { transform: "scale(1.02)", opacity: .46, offset: .54 },
+        { transform: "scale(.68)", opacity: .15, offset: .78 },
+        { transform: "scale(.36)", opacity: 0, offset: 1 },
+      ],
+      { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" },
+    );
+
+    const ringAnimation = ring.animate(
+      [
+        { transform: "scale(.45)", opacity: 0, offset: 0 },
+        { transform: "scale(.72)", opacity: .48, offset: .17 },
+        { transform: "scale(1.08)", opacity: .18, offset: .38 },
+        { transform: "scale(1.55)", opacity: 0, offset: .68 },
+        { transform: "scale(1.65)", opacity: 0, offset: 1 },
       ],
       { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" },
     );
@@ -133,7 +145,7 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
       onDone();
     };
 
-    Promise.allSettled([overlayAnimation.finished, logoAnimation.finished, glowAnimation.finished]).then(finish);
+    Promise.allSettled([overlayAnimation.finished, logoAnimation.finished, glowAnimation.finished, ringAnimation.finished]).then(finish);
     const fallback = window.setTimeout(finish, duration + 120);
 
     return () => {
@@ -141,6 +153,7 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
       overlayAnimation.cancel();
       logoAnimation.cancel();
       glowAnimation.cancel();
+      ringAnimation.cancel();
     };
   }, [runId, onDone]);
 
@@ -151,10 +164,14 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
       aria-hidden
     >
       <div
-        ref={glowRef}
-        className="absolute h-[290px] w-[290px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.12),rgba(255,255,255,.03)_40%,transparent_72%)] blur-[26px]"
+        ref={ringRef}
+        className="absolute h-[210px] w-[210px] rounded-full border border-white/[.10]"
       />
-      <img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[132px] w-[132px] object-contain" />
+      <div
+        ref={glowRef}
+        className="absolute h-[300px] w-[300px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.13),rgba(255,255,255,.032)_40%,transparent_72%)] blur-[28px]"
+      />
+      <img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[136px] w-[136px] object-contain" />
     </div>
   );
 }
