@@ -91,13 +91,14 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
     const ring = ringRef.current;
     if (!overlay || !logo || !glow || !ring) return;
 
-    const duration = 1660;
+    const duration = 2580;
 
     const overlayAnimation = overlay.animate(
       [
-        { opacity: 1, background: "radial-gradient(circle at center, #101111 0%, #050505 34%, #000 68%)", offset: 0 },
-        { opacity: 1, background: "radial-gradient(circle at center, #111212 0%, #050505 32%, #000 68%)", offset: 0.58 },
-        { opacity: 0.9, background: "radial-gradient(circle at center, #0a0b0b 0%, #020202 38%, #000 72%)", offset: 0.74 },
+        { opacity: 1, background: "radial-gradient(circle at center, #0f1010 0%, #050505 34%, #000 69%)", offset: 0 },
+        { opacity: 1, background: "radial-gradient(circle at center, #111212 0%, #050505 33%, #000 69%)", offset: 0.62 },
+        { opacity: 1, background: "radial-gradient(circle at center, #0b0c0c 0%, #030303 38%, #000 72%)", offset: 0.72 },
+        { opacity: .72, background: "radial-gradient(circle at center, #070808 0%, #010101 42%, #000 75%)", offset: 0.86 },
         { opacity: 0, background: "#000", offset: 1 },
       ],
       { duration, easing: "linear", fill: "forwards" },
@@ -105,37 +106,41 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
 
     const logoAnimation = logo.animate(
       [
-        { transform: "perspective(900px) translateZ(-180px) scale(.38)", opacity: 0, filter: "blur(16px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 0 },
-        { transform: "perspective(900px) translateZ(48px) scale(1.16)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 48px rgba(255,255,255,.30))", offset: 0.20 },
-        { transform: "perspective(900px) translateZ(0) scale(.98)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 26px rgba(255,255,255,.17))", offset: 0.37 },
-        { transform: "perspective(900px) translateZ(10px) scale(1.02)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 24px rgba(255,255,255,.14))", offset: 0.50 },
-        { transform: "perspective(900px) translateZ(-42px) scale(.92)", opacity: .96, filter: "blur(.5px) drop-shadow(0 0 18px rgba(255,255,255,.10))", offset: 0.64 },
-        { transform: "perspective(900px) translateZ(-175px) scale(.66)", opacity: .48, filter: "blur(7px) drop-shadow(0 0 8px rgba(255,255,255,.05))", offset: 0.80 },
-        { transform: "perspective(900px) translateZ(-300px) scale(.48)", opacity: 0, filter: "blur(15px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 1 },
+        { transform: "perspective(1000px) translateZ(-210px) scale(.34)", opacity: 0, filter: "blur(18px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 0 },
+        { transform: "perspective(1000px) translateZ(-65px) scale(.70)", opacity: .5, filter: "blur(7px) drop-shadow(0 0 14px rgba(255,255,255,.08))", offset: .11 },
+        { transform: "perspective(1000px) translateZ(34px) scale(1.10)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 44px rgba(255,255,255,.25))", offset: .25 },
+        { transform: "perspective(1000px) translateZ(0) scale(1)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 26px rgba(255,255,255,.16))", offset: .42 },
+        { transform: "perspective(1000px) translateZ(6px) scale(1.018)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 23px rgba(255,255,255,.14))", offset: .56 },
+        { transform: "perspective(1000px) translateZ(-28px) scale(.96)", opacity: 1, filter: "blur(.3px) drop-shadow(0 0 18px rgba(255,255,255,.11))", offset: .67 },
+        { transform: "perspective(1000px) translateZ(-115px) scale(.78)", opacity: .78, filter: "blur(4px) drop-shadow(0 0 10px rgba(255,255,255,.07))", offset: .79 },
+        { transform: "perspective(1000px) translateZ(-230px) scale(.55)", opacity: .34, filter: "blur(10px) drop-shadow(0 0 4px rgba(255,255,255,.03))", offset: .90 },
+        { transform: "perspective(1000px) translateZ(-330px) scale(.38)", opacity: 0, filter: "blur(18px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 1 },
       ],
-      { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" },
+      { duration, easing: "cubic-bezier(.22,.72,.18,1)", fill: "forwards" },
     );
 
     const glowAnimation = glow.animate(
       [
-        { transform: "scale(.32)", opacity: 0, offset: 0 },
-        { transform: "scale(1.28)", opacity: .78, offset: .22 },
-        { transform: "scale(1.02)", opacity: .46, offset: .54 },
-        { transform: "scale(.68)", opacity: .15, offset: .78 },
-        { transform: "scale(.36)", opacity: 0, offset: 1 },
+        { transform: "scale(.28)", opacity: 0, offset: 0 },
+        { transform: "scale(1.18)", opacity: .70, offset: .27 },
+        { transform: "scale(1.04)", opacity: .48, offset: .58 },
+        { transform: "scale(.82)", opacity: .25, offset: .76 },
+        { transform: "scale(.56)", opacity: .08, offset: .90 },
+        { transform: "scale(.40)", opacity: 0, offset: 1 },
       ],
-      { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" },
+      { duration, easing: "cubic-bezier(.22,.72,.18,1)", fill: "forwards" },
     );
 
     const ringAnimation = ring.animate(
       [
-        { transform: "scale(.45)", opacity: 0, offset: 0 },
-        { transform: "scale(.72)", opacity: .48, offset: .17 },
-        { transform: "scale(1.08)", opacity: .18, offset: .38 },
-        { transform: "scale(1.55)", opacity: 0, offset: .68 },
-        { transform: "scale(1.65)", opacity: 0, offset: 1 },
+        { transform: "scale(.52)", opacity: 0, offset: 0 },
+        { transform: "scale(.72)", opacity: .36, offset: .19 },
+        { transform: "scale(1.02)", opacity: .20, offset: .40 },
+        { transform: "scale(1.34)", opacity: .10, offset: .62 },
+        { transform: "scale(1.72)", opacity: 0, offset: .82 },
+        { transform: "scale(1.78)", opacity: 0, offset: 1 },
       ],
-      { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" },
+      { duration, easing: "cubic-bezier(.22,.72,.18,1)", fill: "forwards" },
     );
 
     let finished = false;
@@ -146,7 +151,7 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
     };
 
     Promise.allSettled([overlayAnimation.finished, logoAnimation.finished, glowAnimation.finished, ringAnimation.finished]).then(finish);
-    const fallback = window.setTimeout(finish, duration + 120);
+    const fallback = window.setTimeout(finish, duration + 140);
 
     return () => {
       window.clearTimeout(fallback);
@@ -163,15 +168,9 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
       className="pointer-events-none fixed inset-0 z-[1000] grid place-items-center bg-black"
       aria-hidden
     >
-      <div
-        ref={ringRef}
-        className="absolute h-[210px] w-[210px] rounded-full border border-white/[.10]"
-      />
-      <div
-        ref={glowRef}
-        className="absolute h-[300px] w-[300px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.13),rgba(255,255,255,.032)_40%,transparent_72%)] blur-[28px]"
-      />
-      <img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[136px] w-[136px] object-contain" />
+      <div ref={ringRef} className="absolute h-[220px] w-[220px] rounded-full border border-white/[.09]" />
+      <div ref={glowRef} className="absolute h-[310px] w-[310px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.12),rgba(255,255,255,.03)_40%,transparent_72%)] blur-[30px]" />
+      <img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[138px] w-[138px] object-contain" />
     </div>
   );
 }
