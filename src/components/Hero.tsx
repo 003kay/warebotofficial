@@ -25,20 +25,24 @@ export function Hero() {
   return <section className="ware-hero relative z-10 mx-auto max-w-[1400px] px-6 pb-16 pt-10 md:px-10 md:pb-20 md:pt-14">
     <style>{`
       @keyframes wareSilverShine { 0% { background-position: 180% 50%; } 100% { background-position: -80% 50%; } }
-      @keyframes wareCommandDrift {
-        0%,100% { transform: perspective(1400px) translate3d(-3px,8px,0) rotateX(.22deg) rotateZ(-.10deg); }
-        26% { transform: perspective(1400px) translate3d(2px,-5px,9px) rotateX(-.16deg) rotateZ(.08deg); }
-        52% { transform: perspective(1400px) translate3d(4px,-12px,13px) rotateX(-.28deg) rotateZ(.12deg); }
-        76% { transform: perspective(1400px) translate3d(-1px,-3px,6px) rotateX(.10deg) rotateZ(-.04deg); }
+      @keyframes wareCommandFloat {
+        0%,100% { transform: translate3d(0,7px,0) rotateZ(-.10deg); }
+        25% { transform: translate3d(5px,-5px,0) rotateZ(.05deg); }
+        50% { transform: translate3d(-2px,-16px,0) rotateZ(.12deg); }
+        75% { transform: translate3d(-5px,-5px,0) rotateZ(-.04deg); }
       }
-      @keyframes wareConsoleBreath {
-        0%,100% { box-shadow: 0 52px 145px -72px rgba(255,255,255,.18), 0 30px 90px -55px rgba(0,0,0,.95); }
-        50% { box-shadow: 0 64px 170px -70px rgba(255,255,255,.25), 0 38px 110px -54px rgba(0,0,0,.98); }
+      @keyframes wareConsoleShadow {
+        0%,100% { opacity:.48; transform:translate3d(0,22px,0) scale(.94); }
+        50% { opacity:.72; transform:translate3d(0,34px,0) scale(1.02); }
       }
       .ware-silver-shine { color: transparent; background-image: linear-gradient(105deg,#808388 0%,#c8cbd0 28%,#f3f4f5 46%,#b4b7bc 64%,#72757a 82%,#d5d7da 100%); background-size:240% 100%; background-position:180% 50%; -webkit-background-clip:text; background-clip:text; animation:wareSilverShine 4.6s cubic-bezier(.4,0,.2,1) infinite; }
-      .ware-command-center-float { animation: wareCommandDrift 10.5s cubic-bezier(.45,.05,.55,.95) infinite !important; will-change: transform; transform-origin: 50% 50%; }
-      .ware-command-center-float .hero-console { animation: wareConsoleBreath 8s ease-in-out infinite; }
-      @media(prefers-reduced-motion:reduce){.ware-silver-shine,.ware-command-center-float,.ware-command-center-float .hero-console{animation:none!important}}
+      .ware-command-center-float { animation:wareCommandFloat 9.6s cubic-bezier(.45,.05,.55,.95) infinite; will-change:transform; transform:translateZ(0); }
+      .ware-command-center-shadow { animation:wareConsoleShadow 9.6s cubic-bezier(.45,.05,.55,.95) infinite; }
+      .ware-command-center-tilt { --ware-tilt-x:0deg; --ware-tilt-y:0deg; --ware-mx:50%; --ware-my:50%; transform:perspective(1200px) rotateX(var(--ware-tilt-x)) rotateY(var(--ware-tilt-y)) translateZ(0); transform-style:preserve-3d; transition:transform .16s cubic-bezier(.2,.75,.2,1), box-shadow .24s ease, border-color .24s ease; will-change:transform; }
+      .ware-command-center-tilt:hover { border-color:rgba(255,255,255,.16); box-shadow:0 65px 170px -76px rgba(255,255,255,.30); }
+      .ware-command-cursor-light { background:radial-gradient(330px circle at var(--ware-mx) var(--ware-my),rgba(255,255,255,.085),rgba(255,255,255,.026) 34%,transparent 68%); opacity:0; transition:opacity .22s ease; }
+      .ware-command-center-tilt:hover .ware-command-cursor-light { opacity:1; }
+      @media(prefers-reduced-motion:reduce){.ware-silver-shine,.ware-command-center-float,.ware-command-center-shadow{animation:none!important}.ware-command-center-tilt{transform:none!important}}
     `}</style>
     <div className="hero-orb hero-orb-a"/><div className="hero-orb hero-orb-b"/><div className="hero-beam"/>
     <div className="relative z-10 max-w-[900px] text-left animate-[soft-rise_.7s_ease_both]">
@@ -47,13 +51,38 @@ export function Hero() {
       <div className="mt-9 flex flex-wrap gap-3"><a href={INVITE_URL} target="_blank" rel="noreferrer" className="premium-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold"><DiscordLogo/>Add to Discord<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a><a href="/commands" className="glass-button group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium">Explore commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></a></div>
     </div>
 
-    <div className="ware-command-center-float relative mx-auto mt-16 w-full max-w-[1120px] md:mt-20"><div className="pointer-events-none absolute -inset-20 -z-10 rounded-full bg-white/[.028] blur-[110px]"/><div className="hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 backdrop-blur-2xl"><div className="hero-console-sheen"/><div className="overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
-      <div className="border-b border-white/[.07] px-5 py-4"><div className="flex items-center gap-3"><div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20"/><i className="h-2 w-2 rounded-full bg-white/12"/><i className="h-2 w-2 rounded-full bg-white/7"/></div><span className="font-mono text-[10px] text-white/30">ware / command center</span></div></div>
-      <div className="p-4 sm:p-5 md:p-6"><div className="mb-5 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-black/40"><img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 object-contain"/></div><div className="text-[15px] font-semibold tracking-[-.02em] text-white">Ware</div></div>
-      <div className="mb-3 flex items-center justify-between px-1"><span className="text-[10px] font-semibold uppercase tracking-[.14em] text-white/35">Command modules</span><a href="/commands" className="text-[11px] font-medium text-white/42 transition hover:text-white">View all →</a></div>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{categories.map(c=>{const Icon="icon" in c?c.icon:null;return <a key={c.title} href={c.href} className={`group relative flex min-h-[122px] flex-col overflow-hidden rounded-2xl border p-4 transition duration-300 hover:-translate-y-1 ${"accent" in c&&c.accent?"border-[#d9232e]/25 bg-[#d9232e]/[.035] hover:border-[#ff4651]/40":"border-white/[.07] bg-white/[.018] hover:border-white/[.16] hover:bg-white/[.045]"}`}><div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]"/><div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${"accent" in c&&c.accent?"border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff4b55]":"border-white/10 bg-white/[.035] text-white/70"}`}>{"lastfm" in c&&c.lastfm?<LastFmLogo/>:Icon?<Icon className="h-4 w-4"/>:null}</div><div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-[15px] font-semibold tracking-[-.02em] text-white/90">{c.title}<ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70"/></div><div className="mt-1.5 text-[11px] leading-4 text-white/38">{c.description}</div></div></a>})}</div>
-      <a href="/commands" className="group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5 transition duration-300 hover:border-white/[.15] hover:bg-white/[.035]"><Terminal className="h-4 w-4 text-white/45"/><span className="font-mono text-[11px] text-white/40">$ ware commands --all</span><span className="animate-cursor h-4 w-px bg-white/50"/><ArrowRight className="ml-auto h-3.5 w-3.5 text-white/25 transition group-hover:translate-x-1"/></a></div>
-      <div className="grid grid-cols-3 divide-x divide-white/[.07] border-t border-white/[.07]">{[["99.99%","uptime"],[String(COMMAND_COUNT),"commands"],["24/7","protection"]].map(([v,l])=><div key={l} className="px-3 py-4 text-center"><div className="text-[15px] font-semibold text-white">{v}</div><div className="mt-1 text-[9px] uppercase tracking-[.12em] text-white/30">{l}</div></div>)}</div>
-    </div></div></div>
+    <div className="ware-command-center-float relative mx-auto mt-16 w-full max-w-[1120px] md:mt-20">
+      <div className="ware-command-center-shadow pointer-events-none absolute inset-x-[7%] bottom-[-42px] -z-10 h-[105px] rounded-[50%] bg-white/[.055] blur-[54px]"/>
+      <div
+        className="ware-command-center-tilt hero-console relative overflow-hidden rounded-[32px] border border-white/[.12] bg-black/75 p-2 shadow-[0_55px_150px_-70px_rgba(255,255,255,.22)] backdrop-blur-2xl"
+        onPointerMove={(event) => {
+          if (event.pointerType === "touch") return;
+          const rect = event.currentTarget.getBoundingClientRect();
+          const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+          const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+          event.currentTarget.style.setProperty("--ware-tilt-x", `${((.5 - y) * 4.2).toFixed(2)}deg`);
+          event.currentTarget.style.setProperty("--ware-tilt-y", `${((x - .5) * 5.2).toFixed(2)}deg`);
+          event.currentTarget.style.setProperty("--ware-mx", `${(x * 100).toFixed(1)}%`);
+          event.currentTarget.style.setProperty("--ware-my", `${(y * 100).toFixed(1)}%`);
+        }}
+        onPointerLeave={(event) => {
+          event.currentTarget.style.setProperty("--ware-tilt-x", "0deg");
+          event.currentTarget.style.setProperty("--ware-tilt-y", "0deg");
+          event.currentTarget.style.setProperty("--ware-mx", "50%");
+          event.currentTarget.style.setProperty("--ware-my", "50%");
+        }}
+      >
+        <div className="ware-command-cursor-light pointer-events-none absolute inset-0 z-[3]"/>
+        <div className="hero-console-sheen"/>
+        <div className="relative z-[4] overflow-hidden rounded-[25px] border border-white/[.07] bg-[#080909]/95">
+          <div className="border-b border-white/[.07] px-5 py-4"><div className="flex items-center gap-3"><div className="flex gap-1.5"><i className="h-2 w-2 rounded-full bg-white/20"/><i className="h-2 w-2 rounded-full bg-white/12"/><i className="h-2 w-2 rounded-full bg-white/7"/></div><span className="font-mono text-[10px] text-white/30">ware / command center</span></div></div>
+          <div className="p-4 sm:p-5 md:p-6"><div className="mb-5 flex items-center gap-3 rounded-2xl border border-white/[.08] bg-gradient-to-r from-white/[.05] to-white/[.018] p-4"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-black/40"><img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 object-contain"/></div><div className="text-[15px] font-semibold tracking-[-.02em] text-white">Ware</div></div>
+          <div className="mb-3 flex items-center justify-between px-1"><span className="text-[10px] font-semibold uppercase tracking-[.14em] text-white/35">Command modules</span><a href="/commands" className="text-[11px] font-medium text-white/42 transition hover:text-white">View all →</a></div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{categories.map(c=>{const Icon="icon" in c?c.icon:null;return <a key={c.title} href={c.href} className={`group relative flex min-h-[122px] flex-col overflow-hidden rounded-2xl border p-4 transition duration-300 hover:-translate-y-1 ${"accent" in c&&c.accent?"border-[#d9232e]/25 bg-[#d9232e]/[.035] hover:border-[#ff4651]/40":"border-white/[.07] bg-white/[.018] hover:border-white/[.16] hover:bg-white/[.045]"}`}><div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,.07),transparent_55%)]"/><div className={`relative grid h-9 w-9 place-items-center rounded-xl border ${"accent" in c&&c.accent?"border-[#d9232e]/30 bg-[#d9232e]/12 text-[#ff4b55]":"border-white/10 bg-white/[.035] text-white/70"}`}>{"lastfm" in c&&c.lastfm?<LastFmLogo/>:Icon?<Icon className="h-4 w-4"/>:null}</div><div className="relative mt-auto pt-4"><div className="flex items-center gap-1 text-[15px] font-semibold tracking-[-.02em] text-white/90">{c.title}<ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-70"/></div><div className="mt-1.5 text-[11px] leading-4 text-white/38">{c.description}</div></div></a>})}</div>
+          <a href="/commands" className="group mt-3 flex items-center gap-3 rounded-2xl border border-white/[.07] bg-black/35 px-4 py-3.5 transition duration-300 hover:border-white/[.15] hover:bg-white/[.035]"><Terminal className="h-4 w-4 text-white/45"/><span className="font-mono text-[11px] text-white/40">$ ware commands --all</span><span className="animate-cursor h-4 w-px bg-white/50"/><ArrowRight className="ml-auto h-3.5 w-3.5 text-white/25 transition group-hover:translate-x-1"/></a></div>
+          <div className="grid grid-cols-3 divide-x divide-white/[.07] border-t border-white/[.07]">{[["99.99%","uptime"],[String(COMMAND_COUNT),"commands"],["24/7","protection"]].map(([v,l])=><div key={l} className="px-3 py-4 text-center"><div className="text-[15px] font-semibold text-white">{v}</div><div className="mt-1 text-[9px] uppercase tracking-[.12em] text-white/30">{l}</div></div>)}</div>
+        </div>
+      </div>
+    </div>
   </section>;
 }
