@@ -31,8 +31,36 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => { reportLovableError(error, { boundary: "tanstack_root_error_component" }); }, [error]);
-  return <div className="flex min-h-screen items-center justify-center bg-background px-4"><div className="max-w-md text-center"><h1 className="text-xl font-semibold tracking-tight text-foreground">This page didn't load</h1><p className="mt-2 text-sm text-muted-foreground">Something went wrong on our end. You can try refreshing or head back home.</p><div className="mt-6 flex flex-wrap justify-center gap-2"><button onClick={() => { router.invalidate(); reset(); }} className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Try again</button><a href="/" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">Go home</a></div></div></div>;
+  const [retrying, setRetrying] = useState(true);
+
+  useEffect(() => {
+    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    const key = `ware-route-retry:${window.location.pathname}`;
+    const attempts = Number(sessionStorage.getItem(key) || "0");
+    if (attempts >= 2) {
+      setRetrying(false);
+      return;
+    }
+    sessionStorage.setItem(key, String(attempts + 1));
+    const timer = window.setTimeout(async () => {
+      try {
+        await router.invalidate();
+        reset();
+      } catch {
+        setRetrying(false);
+      }
+    }, 650 + attempts * 650);
+    return () => window.clearTimeout(timer);
+  }, [error, reset, router]);
+
+  const manualRetry = async () => {
+    sessionStorage.removeItem(`ware-route-retry:${window.location.pathname}`);
+    setRetrying(true);
+    await router.invalidate();
+    reset();
+  };
+
+  return <div className="flex min-h-screen items-center justify-center bg-background px-4"><div className="max-w-md text-center"><h1 className="text-xl font-semibold tracking-tight text-foreground">{retrying ? "Reconnecting to Ware…" : "This page didn't load"}</h1><p className="mt-2 text-sm text-muted-foreground">{retrying ? "A dashboard request failed. Ware is retrying automatically." : "The automatic retries didn't recover this page."}</p><div className="mt-6 flex flex-wrap justify-center gap-2"><button onClick={manualRetry} className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Try again</button><a href="/dashboard" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">Dashboard</a></div></div></div>;
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -78,70 +106,6 @@ function RootShell({ children }: { children: ReactNode }) {
   return <html lang="en"><head><HeadContent /></head><body>{children}<Scripts /></body></html>;
 }
 
-function CursorFollower() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const haloRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-    const dot = dotRef.current;
-    const halo = haloRef.current;
-    if (!dot || !halo) return;
-
-    let targetX = window.innerWidth / 2;
-    let targetY = window.innerHeight / 2;
-    let haloX = targetX;
-    let haloY = targetY;
-    let raf = 0;
-
-    const draw = () => {
-      haloX += (targetX - haloX) * .16;
-      haloY += (targetY - haloY) * .16;
-      dot.style.transform = `translate3d(${targetX}px,${targetY}px,0) translate(-50%,-50%)`;
-      halo.style.transform = `translate3d(${haloX}px,${haloY}px,0) translate(-50%,-50%)`;
-      raf = requestAnimationFrame(draw);
-    };
-
-    const onMove = (event: PointerEvent) => {
-      targetX = event.clientX;
-      targetY = event.clientY;
-      dot.style.opacity = "1";
-      halo.style.opacity = "1";
-    };
-
-    const onLeave = () => {
-      dot.style.opacity = "0";
-      halo.style.opacity = "0";
-    };
-
-    const onOver = (event: PointerEvent) => {
-      const target = event.target as Element | null;
-      const interactive = target?.closest?.("a,button,summary,input,[role='button']");
-      halo.style.width = interactive ? "48px" : "30px";
-      halo.style.height = interactive ? "48px" : "30px";
-      halo.style.borderColor = interactive ? "rgba(255,255,255,.34)" : "rgba(255,255,255,.18)";
-      halo.style.background = interactive ? "rgba(255,255,255,.035)" : "rgba(255,255,255,.012)";
-    };
-
-    document.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("pointerleave", onLeave);
-    document.addEventListener("pointerover", onOver, { passive: true });
-    raf = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      document.removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerleave", onLeave);
-      document.removeEventListener("pointerover", onOver);
-    };
-  }, []);
-
-  return <>
-    <div ref={haloRef} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[990] h-[30px] w-[30px] rounded-full border border-white/[.18] bg-white/[.012] opacity-0 transition-[width,height,border-color,background-color,opacity] duration-300" />
-    <div ref={dotRef} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[991] h-[4px] w-[4px] rounded-full bg-white/75 opacity-0 shadow-[0_0_12px_rgba(255,255,255,.34)] transition-opacity duration-200" />
-  </>;
-}
-
 function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () => void }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
@@ -156,82 +120,45 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
     if (!overlay || !logo || !glow || !ring) return;
 
     const duration = 2860;
+    const overlayAnimation = overlay.animate([
+      { opacity: 1, background: "radial-gradient(circle at center, #0d0e0e 0%, #050505 36%, #000 70%)", offset: 0 },
+      { opacity: 1, background: "radial-gradient(circle at center, #101111 0%, #050505 34%, #000 70%)", offset: .58 },
+      { opacity: .98, background: "radial-gradient(circle at center, #0b0c0c 0%, #030303 40%, #000 74%)", offset: .75 },
+      { opacity: .62, background: "radial-gradient(circle at center, #060707 0%, #010101 44%, #000 78%)", offset: .90 },
+      { opacity: 0, background: "#000", offset: 1 },
+    ], { duration, easing: "linear", fill: "forwards" });
 
-    const overlayAnimation = overlay.animate(
-      [
-        { opacity: 1, background: "radial-gradient(circle at center, #0d0e0e 0%, #050505 36%, #000 70%)", offset: 0 },
-        { opacity: 1, background: "radial-gradient(circle at center, #101111 0%, #050505 34%, #000 70%)", offset: .58 },
-        { opacity: .98, background: "radial-gradient(circle at center, #0b0c0c 0%, #030303 40%, #000 74%)", offset: .75 },
-        { opacity: .62, background: "radial-gradient(circle at center, #060707 0%, #010101 44%, #000 78%)", offset: .90 },
-        { opacity: 0, background: "#000", offset: 1 },
-      ],
-      { duration, easing: "linear", fill: "forwards" },
-    );
+    const logoAnimation = logo.animate([
+      { transform: "perspective(1100px) translateZ(-240px) scale(.30)", opacity: 0, filter: "blur(20px)", offset: 0 },
+      { transform: "perspective(1100px) translateZ(-80px) scale(.66)", opacity: .48, filter: "blur(8px)", offset: .12 },
+      { transform: "perspective(1100px) translateZ(26px) scale(1.08)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 42px rgba(255,255,255,.23))", offset: .28 },
+      { transform: "perspective(1100px) translateZ(0) scale(1)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 26px rgba(255,255,255,.15))", offset: .58 },
+      { transform: "perspective(1100px) translateZ(-145px) scale(.73)", opacity: .68, filter: "blur(5px)", offset: .82 },
+      { transform: "perspective(1100px) translateZ(-360px) scale(.34)", opacity: 0, filter: "blur(20px)", offset: 1 },
+    ], { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" });
 
-    const logoAnimation = logo.animate(
-      [
-        { transform: "perspective(1100px) translateZ(-240px) scale(.30)", opacity: 0, filter: "blur(20px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 0 },
-        { transform: "perspective(1100px) translateZ(-80px) scale(.66)", opacity: .48, filter: "blur(8px) drop-shadow(0 0 14px rgba(255,255,255,.07))", offset: .12 },
-        { transform: "perspective(1100px) translateZ(26px) scale(1.08)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 42px rgba(255,255,255,.23))", offset: .28 },
-        { transform: "perspective(1100px) translateZ(0) scale(1)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 26px rgba(255,255,255,.15))", offset: .44 },
-        { transform: "perspective(1100px) translateZ(5px) scale(1.012)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 22px rgba(255,255,255,.13))", offset: .58 },
-        { transform: "perspective(1100px) translateZ(-38px) scale(.94)", opacity: .98, filter: "blur(.5px) drop-shadow(0 0 17px rgba(255,255,255,.09))", offset: .70 },
-        { transform: "perspective(1100px) translateZ(-145px) scale(.73)", opacity: .68, filter: "blur(5px) drop-shadow(0 0 8px rgba(255,255,255,.05))", offset: .82 },
-        { transform: "perspective(1100px) translateZ(-275px) scale(.47)", opacity: .24, filter: "blur(12px) drop-shadow(0 0 3px rgba(255,255,255,.02))", offset: .92 },
-        { transform: "perspective(1100px) translateZ(-360px) scale(.34)", opacity: 0, filter: "blur(20px) drop-shadow(0 0 0 rgba(255,255,255,0))", offset: 1 },
-      ],
-      { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" },
-    );
+    const glowAnimation = glow.animate([
+      { transform: "scale(.28)", opacity: 0 },
+      { transform: "scale(1.12)", opacity: .64, offset: .30 },
+      { transform: "scale(1.02)", opacity: .43, offset: .60 },
+      { transform: "scale(.44)", opacity: 0 },
+    ], { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" });
 
-    const glowAnimation = glow.animate(
-      [
-        { transform: "scale(.28)", opacity: 0, offset: 0 },
-        { transform: "scale(1.12)", opacity: .64, offset: .30 },
-        { transform: "scale(1.02)", opacity: .43, offset: .60 },
-        { transform: "scale(.74)", opacity: .16, offset: .84 },
-        { transform: "scale(.44)", opacity: 0, offset: 1 },
-      ],
-      { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" },
-    );
-
-    const ringAnimation = ring.animate(
-      [
-        { transform: "scale(.56)", opacity: 0, offset: 0 },
-        { transform: "scale(.78)", opacity: .28, offset: .22 },
-        { transform: "scale(1.05)", opacity: .16, offset: .45 },
-        { transform: "scale(1.42)", opacity: .07, offset: .68 },
-        { transform: "scale(1.72)", opacity: 0, offset: .88 },
-        { transform: "scale(1.78)", opacity: 0, offset: 1 },
-      ],
-      { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" },
-    );
+    const ringAnimation = ring.animate([
+      { transform: "scale(.56)", opacity: 0 },
+      { transform: "scale(.78)", opacity: .28, offset: .22 },
+      { transform: "scale(1.42)", opacity: .07, offset: .68 },
+      { transform: "scale(1.78)", opacity: 0 },
+    ], { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" });
 
     let finished = false;
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      onDone();
-    };
-
+    const finish = () => { if (!finished) { finished = true; onDone(); } };
     Promise.allSettled([overlayAnimation.finished, logoAnimation.finished, glowAnimation.finished, ringAnimation.finished]).then(finish);
     const fallback = window.setTimeout(finish, duration + 150);
-
-    return () => {
-      window.clearTimeout(fallback);
-      overlayAnimation.cancel();
-      logoAnimation.cancel();
-      glowAnimation.cancel();
-      ringAnimation.cancel();
-    };
+    return () => { window.clearTimeout(fallback); overlayAnimation.cancel(); logoAnimation.cancel(); glowAnimation.cancel(); ringAnimation.cancel(); };
   }, [runId, onDone]);
 
-  return (
-    <div ref={overlayRef} className="pointer-events-none fixed inset-0 z-[1000] grid place-items-center bg-black" aria-hidden>
-      <div ref={ringRef} className="absolute h-[226px] w-[226px] rounded-full border border-white/[.08]" />
-      <div ref={glowRef} className="absolute h-[320px] w-[320px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.105),rgba(255,255,255,.026)_40%,transparent_72%)] blur-[31px]" />
-      <img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[140px] w-[140px] object-contain" />
-    </div>
-  );
+  return <div ref={overlayRef} className="pointer-events-none fixed inset-0 z-[1000] grid place-items-center bg-black" aria-hidden><div ref={ringRef} className="absolute h-[226px] w-[226px] rounded-full border border-white/[.08]"/><div ref={glowRef} className="absolute h-[320px] w-[320px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.105),rgba(255,255,255,.026)_40%,transparent_72%)] blur-[31px]"/><img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[140px] w-[140px] object-contain"/></div>;
 }
 
 function RootComponent() {
@@ -240,25 +167,15 @@ function RootComponent() {
   const previousPathRef = useRef<string | null>(null);
   const [transitionRun, setTransitionRun] = useState(0);
   const [transitionVisible, setTransitionVisible] = useState(false);
-
   const finishTransition = useCallback(() => setTransitionVisible(false), []);
-  const playCommandsTransition = useCallback(() => {
-    setTransitionRun(current => current + 1);
-    setTransitionVisible(true);
-  }, []);
+  const playCommandsTransition = useCallback(() => { setTransitionRun(current => current + 1); setTransitionVisible(true); }, []);
 
   useEffect(() => {
     const previousPath = previousPathRef.current;
     previousPathRef.current = pathname;
+    sessionStorage.removeItem(`ware-route-retry:${pathname}`);
     if (pathname === "/commands" && previousPath !== "/commands") playCommandsTransition();
   }, [pathname, playCommandsTransition]);
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <CursorFollower />
-      {transitionVisible ? <CommandsClickTransition key={transitionRun} runId={transitionRun} onDone={finishTransition} /> : null}
-      <CategoryRailEnhancer />
-      <Outlet />
-    </QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{transitionVisible ? <CommandsClickTransition key={transitionRun} runId={transitionRun} onDone={finishTransition} /> : null}<CategoryRailEnhancer/><Outlet/></QueryClientProvider>;
 }
