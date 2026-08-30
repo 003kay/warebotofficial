@@ -33,11 +33,37 @@ export function buildAuthorizeUrl(request: Request, state: string): string {
   return `https://discord.com/oauth2/authorize?${params}`;
 }
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function discordFetch(url: string, init: RequestInit = {}, attempts = 3): Promise<Response> {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      const res = await fetch(url, init);
+      if (res.ok || (res.status !== 429 && res.status < 500)) return res;
+
+      if (attempt < attempts - 1) {
+        const retryAfter = Number(res.headers.get("retry-after") || 0);
+        await wait(retryAfter > 0 ? Math.min(retryAfter * 1000, 1800) : 180 * (attempt + 1));
+        continue;
+      }
+      return res;
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts - 1) {
+        await wait(180 * (attempt + 1));
+        continue;
+      }
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("Discord request failed");
+}
+
 export async function exchangeCode(code: string, request: Request) {
   const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
   if (!clientSecret) throw new Error("DISCORD_CLIENT_SECRET is not configured");
 
-  const res = await fetch(`${DISCORD_API}/oauth2/token`, {
+  const res = await discordFetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -70,7 +96,7 @@ export async function exchangeCode(code: string, request: Request) {
 export async function refreshToken(refresh: string) {
   const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
   if (!clientSecret) throw new Error("DISCORD_CLIENT_SECRET is not configured");
-  const res = await fetch(`${DISCORD_API}/oauth2/token`, {
+  const res = await discordFetch(`${DISCORD_API}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -89,7 +115,7 @@ export async function refreshToken(refresh: string) {
 }
 
 export async function fetchDiscordUser(accessToken: string) {
-  const res = await fetch(`${DISCORD_API}/users/@me`, {
+  const res = await discordFetch(`${DISCORD_API}/users/@me`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (!res.ok) throw new Error("Failed to fetch Discord user");
@@ -103,17 +129,24 @@ const GUILDS_TTL_MS = 30_000;
 async function fetchGuildsRaw(accessToken: string): Promise<DiscordGuild[]> {
   const cached = guildsCache.get(accessToken);
   if (cached && Date.now() - cached.at < GUILDS_TTL_MS) return cached.guilds;
-  const res = await fetch(`${DISCORD_API}/users/@me/guilds`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (res.status === 429 && cached) return cached.guilds;
-  if (!res.ok) {
+
+  try {
+    const res = await discordFetch(`${DISCORD_API}/users/@me/guilds`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    if (res.status === 429 && cached) return cached.guilds;
+    if (!res.ok) {
+      if (cached) return cached.guilds;
+      throw new Error(`Failed to fetch guilds: ${res.status}`);
+    }
+    const guilds = (await res.json()) as DiscordGuild[];
+    guildsCache.set(accessToken, { at: Date.now(), guilds });
+    return guilds;
+  } catch (error) {
     if (cached) return cached.guilds;
-    throw new Error(`Failed to fetch guilds: ${res.status}`);
+    throw error;
   }
-  const guilds = (await res.json()) as DiscordGuild[];
-  guildsCache.set(accessToken, { at: Date.now(), guilds });
-  return guilds;
 }
 
 export async function getValidAccessToken(discordUserId: string): Promise<{ accessToken: string; username: string; avatar: string | null } | null> {
