@@ -89,6 +89,24 @@ export async function publishPanelMessage(channelId: string, panel: Parameters<t
   const payload = buildPanelPayload(panel, options); if (existingMessageId) { const edit = await fetch(`${DISCORD_API}/channels/${channelId}/messages/${existingMessageId}`, { method:"PATCH", headers:botHeaders(), body:JSON.stringify(payload) }); if (edit.ok) return { messageId: existingMessageId }; }
   const res = await fetch(`${DISCORD_API}/channels/${channelId}/messages`, { method:"POST", headers:botHeaders(), body:JSON.stringify(payload) }); if (!res.ok) throw new Error(`Discord post failed: ${res.status} ${await res.text()}`); const json=(await res.json()) as {id:string}; return {messageId:json.id};
 }
+
+export async function publishVerificationPanelMessage(channelId: string): Promise<{ messageId: string }> {
+  const payload = {
+    embeds: [{
+      title: "Verification",
+      description: "Press **Verify** below. Ware will generate a private verification challenge for you.",
+      color: 0x111827,
+      footer: { text: "Ware Verification" },
+    }],
+    components: [{ type: 1, components: [{ type: 2, style: 3, label: "Verify", custom_id: "gripx_verify_button", emoji: { name: "✓" } }] }],
+    allowed_mentions: { parse: [] },
+  };
+  const res = await fetch(`${DISCORD_API}/channels/${channelId}/messages`, { method: "POST", headers: botHeaders(), body: JSON.stringify(payload) });
+  if (!res.ok) throw new Error(`Discord verification panel failed: ${res.status} ${await res.text()}`);
+  const json = (await res.json()) as { id: string };
+  return { messageId: json.id };
+}
+
 export async function publishTranscriptClosedLog(input: { channelId:string; transcriptId:string; ticketId:string; openerName?:string|null; openerId:string; closerName?:string|null; closerId?:string|null; claimerName?:string|null; claimerId?:string|null; reason?:string|null; openedAt?:string|null; closedAt?:string|null; baseUrl:string }) {
   const transcriptUrl=`${input.baseUrl.replace(/\/$/,"")}/transcripts/${input.transcriptId}`; const opened=input.openedAt?`<t:${Math.floor(new Date(input.openedAt).getTime()/1000)}:f>`:"Unknown"; const closed=input.closedAt?`<t:${Math.floor(new Date(input.closedAt).getTime()/1000)}:f>`:`<t:${Math.floor(Date.now()/1000)}:f>`;
   const fields:any[]=[{name:"🎟️ Ticket",value:`#${input.ticketId}`,inline:true},{name:"✅ Opened by",value:input.openerName?`${input.openerName}\n<@${input.openerId}>`:`<@${input.openerId}>`,inline:true},{name:"🔒 Closed by",value:input.closerId?(input.closerName?`${input.closerName}\n<@${input.closerId}>`:`<@${input.closerId}>`):"Unknown",inline:true},{name:"🕒 Opened",value:opened,inline:true},{name:"📌 Claimed by",value:input.claimerId?(input.claimerName?`${input.claimerName}\n<@${input.claimerId}>`:`<@${input.claimerId}>`):"Not claimed",inline:true},{name:"⏱️ Closed",value:closed,inline:true}]; if(input.reason) fields.push({name:"❔ Reason",value:input.reason.slice(0,1024),inline:false});
