@@ -109,56 +109,100 @@ function RootShell({ children }: { children: ReactNode }) {
 function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () => void }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
+  const haloRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
+  const beamRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const overlay = overlayRef.current;
     const logo = logoRef.current;
-    const glow = glowRef.current;
+    const halo = haloRef.current;
     const ring = ringRef.current;
-    if (!overlay || !logo || !glow || !ring) return;
+    const beam = beamRef.current;
+    const label = labelRef.current;
+    if (!overlay || !logo || !halo || !ring || !beam || !label) return;
 
-    const duration = 2860;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const duration = reduce ? 500 : 3300;
+
     const overlayAnimation = overlay.animate([
-      { opacity: 1, background: "radial-gradient(circle at center, #0d0e0e 0%, #050505 36%, #000 70%)", offset: 0 },
-      { opacity: 1, background: "radial-gradient(circle at center, #101111 0%, #050505 34%, #000 70%)", offset: .58 },
-      { opacity: .98, background: "radial-gradient(circle at center, #0b0c0c 0%, #030303 40%, #000 74%)", offset: .75 },
-      { opacity: .62, background: "radial-gradient(circle at center, #060707 0%, #010101 44%, #000 78%)", offset: .90 },
-      { opacity: 0, background: "#000", offset: 1 },
-    ], { duration, easing: "linear", fill: "forwards" });
+      { opacity: 1, transform: "scale(1)", background: "#020303", offset: 0 },
+      { opacity: 1, transform: "scale(1)", background: "#030404", offset: .66 },
+      { opacity: .96, transform: "scale(1.006)", background: "#020303", offset: .78 },
+      { opacity: 0, transform: "scale(1.025)", background: "#000", offset: 1 },
+    ], { duration, easing: "cubic-bezier(.22,.72,.18,1)", fill: "forwards" });
 
     const logoAnimation = logo.animate([
-      { transform: "perspective(1100px) translateZ(-240px) scale(.30)", opacity: 0, filter: "blur(20px)", offset: 0 },
-      { transform: "perspective(1100px) translateZ(-80px) scale(.66)", opacity: .48, filter: "blur(8px)", offset: .12 },
-      { transform: "perspective(1100px) translateZ(26px) scale(1.08)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 42px rgba(255,255,255,.23))", offset: .28 },
-      { transform: "perspective(1100px) translateZ(0) scale(1)", opacity: 1, filter: "blur(0px) drop-shadow(0 0 26px rgba(255,255,255,.15))", offset: .58 },
-      { transform: "perspective(1100px) translateZ(-145px) scale(.73)", opacity: .68, filter: "blur(5px)", offset: .82 },
-      { transform: "perspective(1100px) translateZ(-360px) scale(.34)", opacity: 0, filter: "blur(20px)", offset: 1 },
-    ], { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" });
+      { transform: "perspective(1000px) translateZ(-260px) scale(.54) rotateX(8deg)", opacity: 0, filter: "blur(18px) brightness(.72)", offset: 0 },
+      { transform: "perspective(1000px) translateZ(-70px) scale(.82) rotateX(3deg)", opacity: .52, filter: "blur(7px) brightness(.9)", offset: .12 },
+      { transform: "perspective(1000px) translateZ(20px) scale(1.045) rotateX(0deg)", opacity: 1, filter: "blur(0px) brightness(1.08) drop-shadow(0 0 34px rgba(255,255,255,.16))", offset: .29 },
+      { transform: "perspective(1000px) translateZ(0) scale(1) rotateX(0deg)", opacity: 1, filter: "blur(0px) brightness(1) drop-shadow(0 0 22px rgba(255,255,255,.11))", offset: .62 },
+      { transform: "perspective(1000px) translateZ(-75px) scale(.9) rotateX(-2deg)", opacity: .82, filter: "blur(2px) brightness(.92)", offset: .78 },
+      { transform: "perspective(1000px) translateZ(-340px) scale(.5) rotateX(-7deg)", opacity: 0, filter: "blur(16px) brightness(.68)", offset: 1 },
+    ], { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
 
-    const glowAnimation = glow.animate([
-      { transform: "scale(.28)", opacity: 0 },
-      { transform: "scale(1.12)", opacity: .64, offset: .30 },
-      { transform: "scale(1.02)", opacity: .43, offset: .60 },
-      { transform: "scale(.44)", opacity: 0 },
-    ], { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" });
+    const haloAnimation = halo.animate([
+      { transform: "scale(.5)", opacity: 0, filter: "blur(34px)", offset: 0 },
+      { transform: "scale(1.08)", opacity: .52, filter: "blur(32px)", offset: .28 },
+      { transform: "scale(.96)", opacity: .28, filter: "blur(38px)", offset: .62 },
+      { transform: "scale(.62)", opacity: 0, filter: "blur(46px)", offset: 1 },
+    ], { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
 
     const ringAnimation = ring.animate([
-      { transform: "scale(.56)", opacity: 0 },
-      { transform: "scale(.78)", opacity: .28, offset: .22 },
-      { transform: "scale(1.42)", opacity: .07, offset: .68 },
-      { transform: "scale(1.78)", opacity: 0 },
-    ], { duration, easing: "cubic-bezier(.22,.75,.18,1)", fill: "forwards" });
+      { transform: "scale(.72)", opacity: 0, borderColor: "rgba(255,255,255,0)", offset: 0 },
+      { transform: "scale(.96)", opacity: .22, borderColor: "rgba(255,255,255,.12)", offset: .26 },
+      { transform: "scale(1.26)", opacity: .06, borderColor: "rgba(255,255,255,.05)", offset: .62 },
+      { transform: "scale(1.55)", opacity: 0, borderColor: "rgba(255,255,255,0)", offset: .9 },
+      { transform: "scale(1.55)", opacity: 0, offset: 1 },
+    ], { duration, easing: "cubic-bezier(.2,.8,.2,1)", fill: "forwards" });
+
+    const beamAnimation = beam.animate([
+      { transform: "scaleX(0)", opacity: 0, filter: "blur(8px)", offset: 0 },
+      { transform: "scaleX(.18)", opacity: 0, filter: "blur(6px)", offset: .16 },
+      { transform: "scaleX(1)", opacity: .75, filter: "blur(0px)", offset: .32 },
+      { transform: "scaleX(.78)", opacity: .18, filter: "blur(2px)", offset: .56 },
+      { transform: "scaleX(.18)", opacity: 0, filter: "blur(6px)", offset: .78 },
+      { transform: "scaleX(0)", opacity: 0, offset: 1 },
+    ], { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
+
+    const labelAnimation = label.animate([
+      { transform: "translateY(10px)", opacity: 0, letterSpacing: ".42em", offset: 0 },
+      { transform: "translateY(8px)", opacity: 0, letterSpacing: ".38em", offset: .19 },
+      { transform: "translateY(0)", opacity: .45, letterSpacing: ".30em", offset: .36 },
+      { transform: "translateY(0)", opacity: .34, letterSpacing: ".28em", offset: .63 },
+      { transform: "translateY(-8px)", opacity: 0, letterSpacing: ".34em", offset: .84 },
+      { transform: "translateY(-8px)", opacity: 0, offset: 1 },
+    ], { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
 
     let finished = false;
     const finish = () => { if (!finished) { finished = true; onDone(); } };
-    Promise.allSettled([overlayAnimation.finished, logoAnimation.finished, glowAnimation.finished, ringAnimation.finished]).then(finish);
-    const fallback = window.setTimeout(finish, duration + 150);
-    return () => { window.clearTimeout(fallback); overlayAnimation.cancel(); logoAnimation.cancel(); glowAnimation.cancel(); ringAnimation.cancel(); };
+    Promise.allSettled([
+      overlayAnimation.finished,
+      logoAnimation.finished,
+      haloAnimation.finished,
+      ringAnimation.finished,
+      beamAnimation.finished,
+      labelAnimation.finished,
+    ]).then(finish);
+    const fallback = window.setTimeout(finish, duration + 180);
+    return () => {
+      window.clearTimeout(fallback);
+      overlayAnimation.cancel(); logoAnimation.cancel(); haloAnimation.cancel();
+      ringAnimation.cancel(); beamAnimation.cancel(); labelAnimation.cancel();
+    };
   }, [runId, onDone]);
 
-  return <div ref={overlayRef} className="pointer-events-none fixed inset-0 z-[1000] grid place-items-center bg-black" aria-hidden><div ref={ringRef} className="absolute h-[226px] w-[226px] rounded-full border border-white/[.08]"/><div ref={glowRef} className="absolute h-[320px] w-[320px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.105),rgba(255,255,255,.026)_40%,transparent_72%)] blur-[31px]"/><img ref={logoRef} src={WARE_LOGO} alt="" className="relative z-10 h-[140px] w-[140px] object-contain"/></div>;
+  return <div ref={overlayRef} className="pointer-events-none fixed inset-0 z-[1000] grid place-items-center overflow-hidden bg-[#020303]" aria-hidden>
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,.025),transparent_32%),linear-gradient(to_bottom,transparent,rgba(255,255,255,.012),transparent)]" />
+    <div ref={haloRef} className="absolute h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,.10),rgba(255,255,255,.025)_35%,transparent_70%)]" />
+    <div ref={ringRef} className="absolute h-[232px] w-[232px] rounded-full border border-white/[.08]" />
+    <div ref={beamRef} className="absolute h-px w-[min(72vw,760px)] origin-center bg-[linear-gradient(90deg,transparent,rgba(255,255,255,.08),rgba(255,255,255,.85),rgba(255,255,255,.08),transparent)] shadow-[0_0_18px_rgba(255,255,255,.16)]" />
+    <div className="relative z-10 flex flex-col items-center">
+      <img ref={logoRef} src={WARE_LOGO} alt="" className="h-[132px] w-[132px] object-contain sm:h-[150px] sm:w-[150px]" />
+      <div ref={labelRef} className="mt-7 text-[9px] font-semibold uppercase text-white/40">COMMAND SYSTEM</div>
+    </div>
+  </div>;
 }
 
 function RootComponent() {
@@ -168,7 +212,10 @@ function RootComponent() {
   const [transitionRun, setTransitionRun] = useState(0);
   const [transitionVisible, setTransitionVisible] = useState(false);
   const finishTransition = useCallback(() => setTransitionVisible(false), []);
-  const playCommandsTransition = useCallback(() => { setTransitionRun(current => current + 1); setTransitionVisible(true); }, []);
+  const playCommandsTransition = useCallback(() => {
+    setTransitionRun(current => current + 1);
+    setTransitionVisible(true);
+  }, []);
 
   useEffect(() => {
     const previousPath = previousPathRef.current;
@@ -177,5 +224,9 @@ function RootComponent() {
     if (pathname === "/commands" && previousPath !== "/commands") playCommandsTransition();
   }, [pathname, playCommandsTransition]);
 
-  return <QueryClientProvider client={queryClient}>{transitionVisible ? <CommandsClickTransition key={transitionRun} runId={transitionRun} onDone={finishTransition} /> : null}<CategoryRailEnhancer/><Outlet/></QueryClientProvider>;
+  return <QueryClientProvider client={queryClient}>
+    {transitionVisible ? <CommandsClickTransition key={transitionRun} runId={transitionRun} onDone={finishTransition} /> : null}
+    <CategoryRailEnhancer/>
+    <Outlet/>
+  </QueryClientProvider>;
 }
