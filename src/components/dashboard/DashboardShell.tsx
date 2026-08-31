@@ -1,5 +1,5 @@
 import {
-  Activity, ChevronDown, ChevronLeft, FileText, Headphones, Home,
+  Activity, BadgeCheck, ChevronDown, ChevronLeft, FileText, Headphones, Home,
   LifeBuoy, LockKeyhole, MessageSquareText, PanelsTopLeft, Radio, ScrollText,
   Settings2, ShieldCheck, Sparkles, UsersRound, WandSparkles, Webhook,
 } from "lucide-react";
@@ -8,13 +8,14 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getManagedGuildsFn } from "@/lib/dashboard.functions";
 import { SUPPORT_URL } from "@/lib/links";
+import "@/dashboard-extra.css";
 
 type GuildInfo = { id: string; name: string; iconUrl: string | null };
 type DashboardShellProps = { guild: GuildInfo; guildId: string; active: string; children: ReactNode };
 type NavItemProps = { active?: boolean; icon?: typeof Home; customIcon?: ReactNode; children: ReactNode; href: string };
 
 const ACTIVE_LABELS: Record<string, string> = {
-  home: "Overview", settings: "Settings", security: "Security", joinGate: "Join Gate", permissions: "Permissions",
+  home: "Overview", settings: "Settings", security: "Antinuke", joinGate: "Join Gate", verification: "Verification", permissions: "Permissions",
   embeds: "Embed Builder", panels: "Ticket Panels", designer: "Ticket Designer", messages: "Messages",
   voicemaster: "VoiceMaster", customCommands: "Custom Commands", automations: "Automations", logging: "Logging", webhooks: "Webhooks", lastfm: "Last.fm",
 };
@@ -43,7 +44,7 @@ function NavSection({ title, children }: { title: string; children: ReactNode })
 }
 
 function destinationFor(active: string, guildId: string) {
-  const suffix: Record<string, string> = { home: "", settings: "settings", security: "security", joinGate: "join-gate", permissions: "permissions", embeds: "embeds", panels: "panels", designer: "tickets", messages: "messages", voicemaster: "voicemaster", customCommands: "custom-commands", automations: "automations", logging: "logging", webhooks: "webhooks", lastfm: "lastfm" };
+  const suffix: Record<string, string> = { home: "", settings: "settings", security: "security", joinGate: "join-gate", verification: "verification", permissions: "permissions", embeds: "embeds", panels: "panels", designer: "tickets", messages: "messages", voicemaster: "voicemaster", customCommands: "custom-commands", automations: "automations", logging: "logging", webhooks: "webhooks", lastfm: "lastfm" };
   return `/dashboard/${guildId}/${suffix[active] ?? ""}`;
 }
 
@@ -89,7 +90,7 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
       <div className="px-3.5 pb-3 pt-3"><button type="button" onClick={() => navigate({ to: "/dashboard" as never })} className="mb-2.5 inline-flex items-center gap-1 px-1 text-[9px] font-semibold text-white/28 hover:text-white/68"><ChevronLeft className="h-3 w-3" />All servers</button><ServerSwitcher guild={guild} guildId={guildId} active={active} /></div>
       <nav className="flex-1 overflow-y-auto px-3 pb-5 pt-3 [scrollbar-color:#242a34_transparent] [scrollbar-width:thin]">
         <NavSection title="Server"><NavItem icon={Home} active={active === "home"} href={`/dashboard/${guildId}/`}>Overview</NavItem><NavItem icon={Settings2} active={active === "settings"} href={`/dashboard/${guildId}/settings`}>Settings</NavItem></NavSection>
-        <NavSection title="Security"><NavItem icon={ShieldCheck} active={active === "security"} href={`/dashboard/${guildId}/security`}>Antinuke</NavItem><NavItem icon={LockKeyhole} active={active === "joinGate"} href={`/dashboard/${guildId}/join-gate`}>Join Gate</NavItem><NavItem icon={UsersRound} active={active === "permissions"} href={`/dashboard/${guildId}/permissions`}>Permissions</NavItem></NavSection>
+        <NavSection title="Security"><NavItem icon={ShieldCheck} active={active === "security"} href={`/dashboard/${guildId}/security`}>Antinuke</NavItem><NavItem icon={LockKeyhole} active={active === "joinGate"} href={`/dashboard/${guildId}/join-gate`}>Join Gate</NavItem><NavItem icon={BadgeCheck} active={active === "verification"} href={`/dashboard/${guildId}/verification`}>Verification</NavItem><NavItem icon={UsersRound} active={active === "permissions"} href={`/dashboard/${guildId}/permissions`}>Permissions</NavItem></NavSection>
         <NavSection title="Configuration"><NavItem icon={Sparkles} active={active === "embeds"} href={`/dashboard/${guildId}/embeds`}>Embed Builder</NavItem><NavItem icon={MessageSquareText} active={active === "messages"} href={`/dashboard/${guildId}/messages`}>Messages</NavItem><NavItem icon={Radio} active={active === "voicemaster"} href={`/dashboard/${guildId}/voicemaster`}>VoiceMaster</NavItem><NavItem icon={FileText} active={active === "customCommands"} href={`/dashboard/${guildId}/custom-commands`}>Custom Commands</NavItem><NavItem icon={PanelsTopLeft} active={active === "panels"} href={`/dashboard/${guildId}/panels`}>Ticket Panels</NavItem><NavItem icon={WandSparkles} active={active === "designer"} href={`/dashboard/${guildId}/tickets`}>Ticket Designer</NavItem><NavItem icon={ScrollText} active={active === "logging"} href={`/dashboard/${guildId}/logging`}>Logging</NavItem></NavSection>
         <NavSection title="Integrations"><NavItem icon={Webhook} active={active === "webhooks"} href={`/dashboard/${guildId}/webhooks`}>Webhooks</NavItem><NavItem active={active === "lastfm"} href={`/dashboard/${guildId}/lastfm`} customIcon={<LastFmMark active={active === "lastfm"} />}>Last.fm</NavItem></NavSection>
       </nav>
