@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Copy, Download, Image as ImageIcon, Plus, RefreshCw, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Copy, Download, Image as ImageIcon, Plus, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getDashboardSettings } from "@/lib/dashboard-settings.functions";
@@ -154,11 +154,11 @@ function Page() {
 
         <aside className="min-w-0 space-y-6 lg:sticky lg:top-[88px] lg:self-start">
           <section className={`${card} w-full min-w-0 overflow-hidden`}>
-            <div className="flex items-center justify-between border-b border-white/[.06] px-6 py-4"><div><div className="text-sm font-bold text-white/90">Discord preview</div><div className="mt-1 text-[10px] font-medium text-white/28">Wide live preview</div></div><Sparkles className="h-4 w-4 text-[#8b9aeb]/65"/></div>
+            <div className="border-b border-white/[.06] px-6 py-4"><div className="text-sm font-bold text-white/90">Discord preview</div><div className="mt-1 text-[10px] font-medium text-white/28">Wide live preview</div></div>
             <div className="w-full bg-[#0d1015] p-5 sm:p-7">
               {empty ? <div className="grid min-h-[410px] w-full place-items-center rounded-[18px] border border-white/[.055] bg-[#1e2025] text-sm font-medium text-[#949ba4]">Your embed will appear here</div> :
               <div className="min-h-[410px] w-full rounded-[18px] bg-[#313338] p-5 text-[#dbdee1]">
-                <div className="mb-4 flex items-center gap-2.5"><img src={WARE_AVATAR} className="h-10 w-10 rounded-full bg-black object-contain p-1"/><div className="text-sm font-bold text-white">ware <span className="rounded bg-[#5865F2] px-1.5 py-0.5 text-[9px]">APP</span></div></div>
+                <div className="mb-4 flex items-center gap-2.5"><img src={WARE_AVATAR} className="h-10 w-10 rounded-full bg-black object-contain p-1"/><div className="text-sm font-bold text-white">ware <span className="rounded bg-[#5865F2] px-1.5 py-0.5 text-[9px]">✓ APP</span></div></div>
                 {content&&<div className="mb-3 whitespace-pre-wrap text-sm">{content}</div>}
                 <div className="relative w-full overflow-hidden rounded bg-[#2b2d31] p-4 pl-5" style={{borderLeft:`4px solid ${safeColor}`}}>
                   {thumbnail&&<img src={thumbnail==="{user.avatar}"?WARE_AVATAR:thumbnail} className="absolute right-4 top-4 h-20 w-20 rounded object-cover"/>}
