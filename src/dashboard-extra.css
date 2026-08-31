@@ -1,0 +1,35 @@
+/* Dashboard-only polish: member profile layout + Discord preview app badge. */
+
+/* Fix the member profile card overlapping its header/banner. */
+[class~="z-[800]"] > div > [class~="px-6"][class~="pb-6"] > [class~="-mt-8"] {
+  margin-top: 0 !important;
+  padding-top: 22px;
+  align-items: center !important;
+}
+
+[class~="z-[800]"] > div > [class~="px-6"][class~="pb-6"] > [class~="-mt-8"] > img,
+[class~="z-[800]"] > div > [class~="px-6"][class~="pb-6"] > [class~="-mt-8"] > div:first-child {
+  flex: 0 0 auto;
+}
+
+[class~="z-[800]"] [class~="text-[23px]"] {
+  line-height: 1.08 !important;
+  overflow: visible !important;
+}
+
+/* Discord-style verified application badge in the Embed Builder preview. */
+[class~="bg-[#5865F2]"][class~="text-[9px]"] {
+  font-size: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 2px;
+  border-radius: 4px !important;
+  font-weight: 800 !important;
+}
+
+[class~="bg-[#5865F2]"][class~="text-[9px]"]::after {
+  content: "✓ APP";
+  font-size: 9px;
+  line-height: 1;
+  color: #fff;
+}
