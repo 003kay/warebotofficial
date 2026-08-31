@@ -17,15 +17,16 @@ export const getDashboardSettings = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { guild } = await requireGuildManager(data.guildId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { fetchGuildChannels } = await import("@/lib/discord-bot.server");
+    const { fetchGuildChannels, fetchGuildRoles } = await import("@/lib/discord-bot.server");
 
-    const [{ data: row, error }, channels] = await Promise.all([
+    const [{ data: row, error }, channels, roles] = await Promise.all([
       (supabaseAdmin as any)
         .from("guild_dashboard_settings")
         .select("settings,updated_at")
         .eq("guild_id", data.guildId)
         .maybeSingle(),
       fetchGuildChannels(data.guildId).catch(() => null),
+      fetchGuildRoles(data.guildId).catch(() => null),
     ]);
 
     if (error) console.warn("Dashboard settings lookup failed", error.message);
@@ -34,6 +35,11 @@ export const getDashboardSettings = createServerFn({ method: "GET" })
       .filter((channel) => channel.type === 0 || channel.type === 5)
       .sort((a, b) => a.position - b.position)
       .map((channel) => ({ id: String(channel.id), name: String(channel.name), parentId: channel.parent_id ? String(channel.parent_id) : null }));
+
+    const assignableRoles = (roles ?? [])
+      .filter((role) => role.name !== "@everyone" && !role.managed)
+      .sort((a, b) => b.position - a.position)
+      .map((role) => ({ id: String(role.id), name: String(role.name), color: Number(role.color || 0), position: Number(role.position || 0) }));
 
     return {
       guild: {
@@ -45,6 +51,7 @@ export const getDashboardSettings = createServerFn({ method: "GET" })
       updatedAt: row?.updated_at ? String(row.updated_at) : null,
       botInGuild: channels !== null,
       textChannels,
+      roles: assignableRoles,
     };
   });
 
@@ -76,4 +83,14 @@ export const saveDashboardSettings = createServerFn({ method: "POST" })
     );
     if (error) throw new Error(error.message);
     return { ok: true, settings };
+  });
+
+export const publishVerificationPanel = createServerFn({ method: "POST" })
+  .inputValidator((d: { guildId: string; channelId: string }) => d)
+  .handler(async ({ data }) => {
+    await requireGuildManager(data.guildId);
+    const { fetchGuildChannels, publishVerificationPanelMessage } = await import("@/lib/discord-bot.server");
+    const channels = await fetchGuildChannels(data.guildId);
+    if (!channels?.some((channel) => String(channel.id) === data.channelId && (channel.type === 0 || channel.type === 5))) throw new Error("Choose a text channel Ware can access.");
+    return publishVerificationPanelMessage(data.channelId);
   });
