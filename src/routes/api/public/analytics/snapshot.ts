@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 function safeEqual(a: string, b: string) {
   const left = Buffer.from(a, "utf8");
@@ -7,15 +7,21 @@ function safeEqual(a: string, b: string) {
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
+function derivedBotSecret(value: string | undefined) {
+  const token = (value || "").trim().replace(/^Bot\s+/i, "");
+  if (!token) return "";
+  return createHash("sha256")
+    .update(`ware-analytics-v1:${token}`)
+    .digest("hex");
+}
+
 function analyticsSecrets() {
   const values = [
-    process.env.WARE_ANALYTICS_SECRET,
-    process.env.DISCORD_BOT_TOKEN,
-    process.env.BOT_TOKEN,
-    process.env.DISCORD_TOKEN,
-  ]
-    .map((value) => (value || "").trim().replace(/^Bot\s+/i, ""))
-    .filter(Boolean);
+    (process.env.WARE_ANALYTICS_SECRET || "").trim(),
+    derivedBotSecret(process.env.DISCORD_BOT_TOKEN),
+    derivedBotSecret(process.env.BOT_TOKEN),
+    derivedBotSecret(process.env.DISCORD_TOKEN),
+  ].filter(Boolean);
 
   return [...new Set(values)];
 }
