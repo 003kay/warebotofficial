@@ -7,25 +7,30 @@ function safeEqual(a: string, b: string) {
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
-function secret() {
-  return (
-    process.env.WARE_ANALYTICS_SECRET ||
-    process.env.DISCORD_BOT_TOKEN ||
-    process.env.BOT_TOKEN ||
-    process.env.DISCORD_TOKEN ||
-    ""
-  ).trim().replace(/^Bot\s+/i, "");
+function secrets() {
+  const values = [
+    process.env.WARE_ANALYTICS_SECRET,
+    process.env.DISCORD_BOT_TOKEN,
+    process.env.BOT_TOKEN,
+    process.env.DISCORD_TOKEN,
+  ]
+    .map((value) => (value || "").trim().replace(/^Bot\s+/i, ""))
+    .filter(Boolean);
+
+  return [...new Set(values)];
 }
 
 function verify(request: Request, body: string) {
-  const key = secret();
-  if (!key) return false;
+  const keys = secrets();
+  if (!keys.length) return false;
   const timestamp = request.headers.get("x-ware-timestamp") || "";
   const signature = request.headers.get("x-ware-signature") || "";
   if (!/^\d+$/.test(timestamp) || !signature) return false;
   if (Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp)) > 300) return false;
-  const expected = createHmac("sha256", key).update(`${timestamp}.${body}`).digest("hex");
-  return safeEqual(signature, expected);
+  return keys.some((key) => {
+    const expected = createHmac("sha256", key).update(`${timestamp}.${body}`).digest("hex");
+    return safeEqual(signature, expected);
+  });
 }
 
 function snowflake(value: unknown) {
