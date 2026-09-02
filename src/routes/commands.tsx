@@ -1,12 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
+  Bell,
+  Bot,
   Check,
   ChevronLeft,
   ChevronRight,
+  CircleEllipsis,
   Copy,
+  Gamepad2,
+  Gavel,
+  Hash,
+  Heart,
+  Info,
   Layers3,
+  Mic2,
+  Music2,
   Search,
+  Server,
+  Settings2,
+  ShieldCheck,
+  Sparkles,
   Terminal,
+  TicketCheck,
+  WalletCards,
+  Wrench,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -34,6 +51,47 @@ export const Route = createFileRoute("/commands")({
   }),
   component: CommandsPage,
 });
+
+function CategoryIcon({ group }: { group?: WareCommandCategory }) {
+  const name = (group?.name ?? "all").toLowerCase();
+  const className = "h-[18px] w-[18px]";
+
+  if (!group) return <Layers3 className={className} />;
+  if (name.includes("moder")) return <Gavel className={className} />;
+  if (name.includes("channel") || name.includes("role")) return <Hash className={className} />;
+  if (name.includes("voice")) return <Mic2 className={className} />;
+  if (name.includes("config") || name.includes("log")) return <Settings2 className={className} />;
+  if (name.includes("nuke") || name.includes("security") || name.includes("anti")) return <ShieldCheck className={className} />;
+  if (name.includes("econom")) return <WalletCards className={className} />;
+  if (name.includes("fun")) return <Sparkles className={className} />;
+  if (name.includes("game")) return <Gamepad2 className={className} />;
+  if (name.includes("util")) return <Wrench className={className} />;
+  if (name.includes("music") || name.includes("last")) return <Music2 className={className} />;
+  if (name.includes("ticket")) return <TicketCheck className={className} />;
+  if (name.includes("notify") || name.includes("social")) return <Bell className={className} />;
+  if (name.includes("info")) return <Info className={className} />;
+  if (name.includes("roleplay")) return <Heart className={className} />;
+  if (name.includes("server") || name.includes("home")) return <Server className={className} />;
+  if (name.includes("bot") || name.includes("ai")) return <Bot className={className} />;
+  return <Terminal className={className} />;
+}
+
+function commandArguments(command: (typeof canonicalCommands)[number]) {
+  const usage = command.usage.trim();
+  const name = command.name.trim();
+  if (!usage || usage.toLowerCase() === name.toLowerCase()) return "none";
+
+  let value = usage;
+  if (usage.toLowerCase().startsWith(name.toLowerCase())) {
+    value = usage.slice(name.length).trim();
+  }
+
+  if (!value) return "none";
+  return value
+    .replace(/^[-–—,:\s]+/, "")
+    .replace(/^\((.*)\)$/, "$1")
+    .trim() || "none";
+}
 
 function CommandsPage() {
   const search = Route.useSearch();
@@ -105,9 +163,11 @@ function CommandsPage() {
       if (max <= 0) return;
       const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
       if (!delta) return;
+
       const movingRight = delta > 0;
       const canMove = movingRight ? rail.scrollLeft < max - 1 : rail.scrollLeft > 1;
       if (!canMove) return;
+
       event.preventDefault();
       rail.scrollLeft = Math.max(0, Math.min(max, rail.scrollLeft + delta));
       updateScrollState();
@@ -199,95 +259,63 @@ function CommandsPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#070808] text-white">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute left-1/2 top-[-320px] h-[620px] w-[900px] -translate-x-1/2 rounded-full bg-white/[.025] blur-[140px]" />
-        <div className="absolute right-[-260px] top-[340px] h-[520px] w-[520px] rounded-full bg-white/[.018] blur-[130px]" />
-      </div>
-
+    <div className="relative min-h-screen overflow-x-hidden bg-[#080909] text-white">
       <Navbar />
 
-      <main className="relative mx-auto max-w-[1500px] px-5 pb-28 pt-10 sm:px-8 lg:px-12 xl:px-14">
-        <header className="grid gap-10 border-b border-white/[.065] pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(420px,540px)] lg:items-end">
-          <div className="max-w-[760px]">
-            <div className="mb-6 flex items-center gap-2.5 font-mono text-[10px] uppercase tracking-[.24em] text-white/28">
-              <Terminal className="h-3.5 w-3.5" />
-              Ware command library
+      <main className="mx-auto max-w-[1500px] px-5 pb-28 pt-9 sm:px-8 lg:px-12 xl:px-14">
+        <header className="flex items-center justify-between gap-6 pb-10 pt-3">
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/[.08] bg-[#111313] text-white/62 sm:h-14 sm:w-14">
+              <Terminal className="h-5 w-5" />
             </div>
-            <h1 className="text-[52px] font-semibold leading-[.95] tracking-[-.06em] text-white sm:text-[72px] lg:text-[78px]">
-              Commands
-            </h1>
-            <p className="mt-6 max-w-2xl text-[14px] leading-7 text-white/42 sm:text-[15px]">
-              Browse all {WARE_COMMAND_COUNT.toLocaleString()} command paths. Filter by category or search by command, alias, syntax, and feature.
-            </p>
+            <div className="min-w-0">
+              <h1 className="text-[38px] font-semibold tracking-[-.055em] text-white sm:text-[48px]">Commands</h1>
+              <p className="mt-1 hidden text-[12px] text-white/28 sm:block">
+                {WARE_COMMAND_COUNT.toLocaleString()} commands available
+              </p>
+            </div>
           </div>
 
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="group flex h-[66px] w-full items-center gap-4 rounded-[20px] border border-white/[.09] bg-[#0d0f0f]/95 px-5 text-left shadow-[0_18px_70px_-42px_rgba(255,255,255,.24)] transition duration-300 hover:-translate-y-0.5 hover:border-white/[.18] hover:bg-[#101212] focus:outline-none focus-visible:border-white/30"
-            aria-label="Open command search"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/[.09] bg-[#111313] text-white/52 transition duration-200 hover:border-white/[.18] hover:bg-white/[.05] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/15 sm:h-14 sm:w-14"
+            aria-label="Search commands"
+            title="Search commands"
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[.07] bg-white/[.025] text-white/38 transition group-hover:text-white/75">
-              <Search className="h-4 w-4" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[13px] font-medium text-white/72">
-                {query ? query : `Search ${WARE_COMMAND_COUNT.toLocaleString()} commands`}
-              </span>
-              <span className="mt-0.5 block text-[10px] text-white/26">Commands, aliases, syntax, or categories</span>
-            </span>
-            <span className="hidden items-center gap-1 rounded-lg border border-white/[.075] bg-black/30 px-2 py-1 font-mono text-[9px] text-white/30 sm:flex">
-              <span>⌘</span><span>K</span>
-            </span>
+            <Search className="h-[21px] w-[21px]" />
           </button>
         </header>
 
-        <section className="mt-9">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[.16em] text-white/28">Browse by category</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => scrollRail(-1)}
-                disabled={!canScrollLeft}
-                aria-label="Scroll categories left"
-                className="grid h-9 w-9 place-items-center rounded-xl border border-white/[.07] bg-white/[.02] text-white/42 transition hover:border-white/[.14] hover:bg-white/[.05] hover:text-white disabled:cursor-default disabled:opacity-20"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollRail(1)}
-                disabled={!canScrollRight}
-                aria-label="Scroll categories right"
-                className="grid h-9 w-9 place-items-center rounded-xl border border-white/[.07] bg-white/[.02] text-white/42 transition hover:border-white/[.14] hover:bg-white/[.05] hover:text-white disabled:cursor-default disabled:opacity-20"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+        <section className="relative mb-9">
+          <div className="flex h-[76px] overflow-hidden rounded-[18px] border border-white/[.075] bg-[#0f1111]">
+            <button
+              type="button"
+              onClick={() => scrollRail(-1)}
+              disabled={!canScrollLeft}
+              aria-label="Scroll categories left"
+              className="grid w-11 shrink-0 place-items-center border-r border-white/[.055] bg-[#0d0f0f] text-white/38 transition hover:bg-white/[.035] hover:text-white disabled:cursor-default disabled:opacity-20 sm:w-12"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
 
-          <div className="relative overflow-hidden rounded-[20px] border border-white/[.07] bg-[#0b0d0d]/92 p-2 shadow-[0_18px_70px_-54px_rgba(255,255,255,.22)]">
             <div
               ref={railRef}
-              className="overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
-              <div className="flex w-max items-center gap-2">
+              <div className="flex h-full w-max items-stretch">
                 <button
                   type="button"
                   onClick={() => setCategory("all")}
-                  className={`flex h-[52px] items-center gap-3 rounded-[14px] border px-4 transition duration-200 ${
-                    category === "all"
-                      ? "border-white/[.13] bg-white/[.075] text-white"
-                      : "border-transparent text-white/48 hover:border-white/[.06] hover:bg-white/[.035] hover:text-white/80"
+                  className={`flex min-w-[170px] items-center gap-3 border-r border-white/[.045] px-5 text-left transition ${
+                    category === "all" ? "bg-white/[.055] text-white" : "text-white/48 hover:bg-white/[.025] hover:text-white/80"
                   }`}
                 >
-                  <Layers3 className="h-4 w-4" />
-                  <span className="text-[12px] font-semibold">All commands</span>
-                  <span className="rounded-md bg-black/25 px-2 py-1 font-mono text-[9px] text-white/35">{WARE_COMMAND_COUNT.toLocaleString()}</span>
+                  <CategoryIcon />
+                  <span className="min-w-0">
+                    <span className="block whitespace-nowrap text-[13px] font-semibold">All commands</span>
+                    <span className="mt-1 block font-mono text-[10px] text-white/28">{WARE_COMMAND_COUNT.toLocaleString()}</span>
+                  </span>
                 </button>
 
                 {canonicalCommandCategories.map((group) => (
@@ -295,31 +323,41 @@ function CommandsPage() {
                     key={group.slug}
                     type="button"
                     onClick={() => setCategory(group.slug)}
-                    className={`flex h-[52px] items-center gap-3 rounded-[14px] border px-4 transition duration-200 ${
-                      category === group.slug
-                        ? "border-white/[.13] bg-white/[.075] text-white"
-                        : "border-transparent text-white/48 hover:border-white/[.06] hover:bg-white/[.035] hover:text-white/80"
+                    className={`flex min-w-[164px] items-center gap-3 border-r border-white/[.045] px-5 text-left transition ${
+                      category === group.slug ? "bg-white/[.055] text-white" : "text-white/48 hover:bg-white/[.025] hover:text-white/80"
                     }`}
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />
-                    <span className="whitespace-nowrap text-[12px] font-semibold">{group.name}</span>
-                    <span className="rounded-md bg-black/25 px-2 py-1 font-mono text-[9px] text-white/35">{group.commands.length}</span>
+                    <CategoryIcon group={group} />
+                    <span className="min-w-0">
+                      <span className="block max-w-[118px] truncate text-[13px] font-semibold">{group.name}</span>
+                      <span className="mt-1 block font-mono text-[10px] text-white/28">{group.commands.length}</span>
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={() => scrollRail(1)}
+              disabled={!canScrollRight}
+              aria-label="Scroll categories right"
+              className="grid w-11 shrink-0 place-items-center border-l border-white/[.055] bg-[#0d0f0f] text-white/38 transition hover:bg-white/[.035] hover:text-white disabled:cursor-default disabled:opacity-20 sm:w-12"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
         </section>
 
-        <section id="command-results" className="scroll-mt-28 pt-10">
-          <div className="flex flex-col gap-3 border-b border-white/[.06] pb-5 sm:flex-row sm:items-end sm:justify-between">
+        <section id="command-results" className="scroll-mt-28">
+          <div className="mb-5 flex items-end justify-between gap-4 border-b border-white/[.06] pb-5">
             <div>
-              <h2 className="text-[18px] font-semibold tracking-[-.03em] text-white/90">
+              <h2 className="text-[16px] font-semibold tracking-[-.02em] text-white/88">
                 {activeCategory?.name ?? "All commands"}
               </h2>
-              <p className="mt-1.5 text-[11px] text-white/30">
-                <span className="font-medium text-white/55">{shown.length.toLocaleString()}</span> results
-                {query ? <span> for “{query}”</span> : null}
+              <p className="mt-1 text-[11px] text-white/28">
+                {shown.length.toLocaleString()} {shown.length === 1 ? "command" : "commands"}
+                {query ? <span> matching “{query}”</span> : null}
               </p>
             </div>
             {query || category !== "all" ? (
@@ -329,57 +367,71 @@ function CommandsPage() {
                   setQuery("");
                   setCategory("all");
                 }}
-                className="self-start rounded-xl border border-white/[.07] bg-white/[.02] px-3 py-2 text-[10px] font-medium text-white/38 transition hover:border-white/[.14] hover:bg-white/[.05] hover:text-white/75 sm:self-auto"
+                className="rounded-xl border border-white/[.07] px-3 py-2 text-[10px] text-white/38 transition hover:bg-white/[.04] hover:text-white/72"
               >
                 Clear filters
               </button>
             ) : null}
           </div>
 
-          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {shown.map((command) => {
               const key = command.name.toLowerCase();
-              const group = categoryByCommand.get(key);
               const copyValue = `,${command.usage}`;
+              const args = commandArguments(command);
+              const permission = command.permission?.trim() || "none";
 
               return (
                 <article
                   key={key}
-                  className="group relative flex min-h-[246px] flex-col overflow-hidden rounded-[22px] border border-white/[.07] bg-[#0c0e0e] shadow-[0_22px_75px_-62px_rgba(255,255,255,.32)] transition duration-300 hover:-translate-y-1 hover:border-white/[.14] hover:bg-[#0f1111] hover:shadow-[0_28px_90px_-58px_rgba(255,255,255,.18)]"
+                  className="group flex min-h-[340px] flex-col overflow-hidden rounded-[26px] border border-white/[.09] bg-[#101212] transition duration-200 hover:border-white/[.15] hover:bg-[#111414]"
                 >
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[.12] to-transparent opacity-0 transition group-hover:opacity-100" />
-
-                  <div className="flex items-start justify-between gap-4 px-5 pb-4 pt-5">
+                  <div className="flex min-h-[150px] items-start justify-between gap-5 px-7 pb-6 pt-7">
                     <div className="min-w-0">
-                      <div className="truncate font-mono text-[16px] font-semibold tracking-[-.025em] text-white/96">,{command.name}</div>
-                      <div className="mt-2 inline-flex rounded-lg border border-white/[.055] bg-white/[.025] px-2 py-1 text-[8px] font-semibold uppercase tracking-[.15em] text-white/30">
-                        {group?.name ?? "Ware"}
-                      </div>
+                      <h3 className="truncate text-[19px] font-semibold tracking-[-.025em] text-white sm:text-[20px]">
+                        ,{command.name}
+                      </h3>
+                      <p className="mt-4 max-w-[92%] text-[13px] leading-[1.6] text-white/56 sm:text-[14px]">
+                        {command.description}
+                      </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => copy(copyValue, key)}
-                      className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[.065] bg-black/20 text-white/28 transition hover:border-white/[.16] hover:bg-white/[.05] hover:text-white/80"
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white/38 transition hover:bg-white/[.055] hover:text-white/78"
                       title={copied === key ? "Copied" : "Copy usage"}
                       aria-label={copied === key ? "Copied" : `Copy ${command.name} usage`}
                     >
-                      {copied === key ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                      {copied === key ? <Check className="h-[18px] w-[18px]" /> : <Copy className="h-[18px] w-[18px]" />}
                     </button>
                   </div>
 
-                  <p className="px-5 text-[12px] leading-[1.7] text-white/44">{command.description}</p>
-
-                  <div className="mt-auto border-t border-white/[.055] bg-black/20 px-5 py-4 font-mono text-[10px] leading-[1.85]">
-                    <div className="flex min-w-0 items-baseline gap-3">
-                      <span className="w-[43px] shrink-0 text-[8px] uppercase tracking-[.12em] text-white/18">syntax</span>
-                      <span className="truncate text-white/48">,{command.usage}</span>
-                    </div>
-                    {command.example ? (
-                      <div className="mt-1 flex min-w-0 items-baseline gap-3">
-                        <span className="w-[43px] shrink-0 text-[8px] uppercase tracking-[.12em] text-white/18">example</span>
-                        <span className="truncate text-white/36">,{command.example}</span>
+                  <div className="mt-auto border-t border-white/[.065] px-7 py-6">
+                    <div>
+                      <div className="text-[13px] font-medium text-slate-300/75">arguments</div>
+                      <div className="mt-4">
+                        {args === "none" ? (
+                          <span className="text-[12px] font-medium text-white/62">none</span>
+                        ) : (
+                          <span className="inline-flex max-w-full rounded-[10px] bg-white/[.055] px-3 py-2 font-mono text-[12px] italic text-white/72">
+                            <span className="truncate">{args}</span>
+                          </span>
+                        )}
                       </div>
-                    ) : null}
+                    </div>
+
+                    <div className="mt-6">
+                      <div className="text-[13px] font-medium text-slate-300/75">permissions</div>
+                      <div className="mt-4">
+                        {permission.toLowerCase() === "none" ? (
+                          <span className="text-[12px] font-medium text-white/62">none</span>
+                        ) : (
+                          <span className="inline-flex max-w-full rounded-[10px] bg-white/[.055] px-3 py-2 text-[12px] font-semibold text-white/82">
+                            <span className="truncate">{permission}</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </article>
               );
@@ -387,8 +439,8 @@ function CommandsPage() {
           </div>
 
           {!shown.length ? (
-            <div className="mt-5 rounded-[22px] border border-white/[.07] bg-[#0c0e0e] px-6 py-20 text-center">
-              <Search className="mx-auto h-5 w-5 text-white/20" />
+            <div className="mt-5 rounded-[24px] border border-white/[.08] bg-[#101212] px-6 py-20 text-center">
+              <CircleEllipsis className="mx-auto h-6 w-6 text-white/20" />
               <div className="mt-4 text-[13px] font-medium text-white/60">No commands found</div>
               <div className="mt-2 text-[11px] text-white/28">Try another command, alias, syntax, or category.</div>
             </div>
@@ -400,7 +452,7 @@ function CommandsPage() {
 
       {searchOpen ? (
         <div
-          className="ware-search-backdrop fixed inset-0 z-[220] overflow-y-auto bg-black/82 px-4 py-[12vh] backdrop-blur-[9px]"
+          className="ware-search-backdrop fixed inset-0 z-[220] overflow-y-auto bg-black/84 px-4 py-[12vh] backdrop-blur-[10px]"
           role="dialog"
           aria-modal="true"
           aria-label="Search Ware commands"
@@ -408,23 +460,25 @@ function CommandsPage() {
             if (event.currentTarget === event.target) setSearchOpen(false);
           }}
         >
-          <div className="ware-search-panel mx-auto w-full max-w-[720px]">
-            <div className="overflow-hidden rounded-[24px] border border-white/[.11] bg-[#101212]/[.99] shadow-[0_44px_150px_rgba(0,0,0,.75)]">
-              <div className="flex h-[78px] items-center gap-4 px-5 sm:px-6">
-                <Search className="h-5 w-5 shrink-0 text-white/62" />
+          <div className="ware-search-panel mx-auto w-full max-w-[760px]">
+            <div className="overflow-hidden rounded-[26px] border border-white/[.12] bg-[#111313] shadow-[0_45px_150px_rgba(0,0,0,.78)]">
+              <div className="flex min-h-[84px] items-center gap-4 px-5 sm:px-6">
+                <Search className="h-5 w-5 shrink-0 text-white/60" />
                 <input
                   ref={searchInputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search commands or categories..."
-                  className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[16px] font-medium text-white outline-none ring-0 placeholder:text-white/34 focus:border-0 focus:outline-none focus:ring-0"
+                  className="ware-search-input min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[16px] font-medium text-white outline-none shadow-none ring-0 placeholder:text-white/32 focus:border-0 focus:outline-none focus:ring-0"
                   aria-label="Search commands or categories"
+                  autoComplete="off"
+                  spellCheck={false}
                 />
                 {query ? (
                   <button
                     type="button"
                     onClick={() => setQuery("")}
-                    className="rounded-lg px-2 py-1 text-[10px] text-white/32 transition hover:bg-white/[.05] hover:text-white/70"
+                    className="rounded-lg px-2 py-1 text-[10px] text-white/30 transition hover:bg-white/[.05] hover:text-white/70"
                   >
                     Clear
                   </button>
@@ -432,7 +486,7 @@ function CommandsPage() {
                 <button
                   type="button"
                   onClick={() => setSearchOpen(false)}
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[.07] bg-white/[.025] text-white/35 transition hover:border-white/[.14] hover:bg-white/[.06] hover:text-white"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.07] bg-white/[.025] text-white/38 transition hover:border-white/[.14] hover:bg-white/[.06] hover:text-white"
                   aria-label="Close search"
                 >
                   <X className="h-4 w-4" />
@@ -440,7 +494,7 @@ function CommandsPage() {
               </div>
 
               {query.trim() ? (
-                <div className="border-t border-white/[.06] p-2.5">
+                <div className="border-t border-white/[.065] p-2.5">
                   <div className="px-3 pb-2 pt-1 text-[9px] font-semibold uppercase tracking-[.15em] text-white/22">
                     {modalResults.length ? "Top matches" : "No matches"}
                   </div>
@@ -453,7 +507,7 @@ function CommandsPage() {
                             key={command.name}
                             type="button"
                             onClick={() => chooseSearchResult(command.name)}
-                            className="group/result flex w-full items-center gap-4 rounded-[14px] px-3 py-3 text-left transition hover:bg-white/[.045]"
+                            className="group/result flex w-full items-center gap-4 rounded-[15px] px-3 py-3 text-left transition hover:bg-white/[.045]"
                           >
                             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[.06] bg-black/20 font-mono text-[11px] text-white/50">
                               ,_
@@ -485,6 +539,17 @@ function CommandsPage() {
       ) : null}
 
       <style>{`
+        .ware-search-input,
+        .ware-search-input:focus,
+        .ware-search-input:focus-visible,
+        .ware-search-input:active {
+          outline: none !important;
+          border: 0 !important;
+          box-shadow: none !important;
+          ring: 0 !important;
+          -webkit-appearance: none !important;
+          appearance: none !important;
+        }
         @keyframes wareSearchBackdropIn {
           from { opacity: 0; }
           to { opacity: 1; }
