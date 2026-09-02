@@ -1,7 +1,9 @@
+import { WARE_COMMAND_COUNT } from "@/lib/canonicalCommands";
+
 const stats = [
   { value: "14,534+", label: "users" },
   { value: "243", label: "communities" },
-  { value: "836", label: "commands" },
+  { value: WARE_COMMAND_COUNT.toLocaleString(), label: "commands" },
   { value: "99.99%", label: "uptime" },
 ];
 
