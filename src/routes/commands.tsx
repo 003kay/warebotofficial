@@ -54,7 +54,7 @@ export const Route = createFileRoute("/commands")({
 
 function CategoryIcon({ group }: { group?: WareCommandCategory }) {
   const name = (group?.name ?? "all").toLowerCase();
-  const className = "h-[17px] w-[17px]";
+  const className = "h-[19px] w-[19px]";
 
   if (!group) return <Layers3 className={className} />;
   if (name.includes("moder")) return <Gavel className={className} />;
@@ -305,9 +305,7 @@ function CommandsPage() {
         </header>
 
         <section className="relative mb-10">
-          <div className="relative flex h-[82px] items-center overflow-hidden rounded-[24px] border border-white/[.085] bg-[linear-gradient(180deg,#111313_0%,#0d0f0f_100%)] shadow-[0_20px_70px_-52px_rgba(255,255,255,.28)]">
-            <div className="pointer-events-none absolute inset-x-14 top-0 h-px bg-gradient-to-r from-transparent via-white/[.16] to-transparent" />
-
+          <div className="relative flex h-[74px] items-center overflow-hidden rounded-[20px] border border-white/[.08] bg-[#111212] shadow-[0_18px_60px_-50px_rgba(255,255,255,.26)]">
             <button
               type="button"
               onClick={() => scrollRail(-1)}
@@ -318,30 +316,27 @@ function CommandsPage() {
               <ChevronLeft className="h-4 w-4" />
             </button>
 
-            <div className="pointer-events-none absolute left-0 z-10 h-full w-20 bg-gradient-to-r from-[#0f1111] via-[#0f1111]/90 to-transparent" />
+            <div className="pointer-events-none absolute left-0 z-10 h-full w-[68px] bg-gradient-to-r from-[#111212] via-[#111212]/95 to-transparent" />
 
             <div
               ref={railRef}
               className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-[62px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
-              <div className="flex h-[64px] w-max items-center gap-2 py-1">
+              <div className="flex h-[72px] w-max items-stretch">
                 <button
                   type="button"
                   onClick={() => setCategory("all")}
-                  className={`group/category flex h-[56px] min-w-[172px] items-center gap-3 rounded-[18px] border px-3.5 text-left transition duration-200 ${
+                  className={`group/category flex min-w-[180px] items-center gap-3 border-r border-white/[.045] px-5 text-left transition duration-200 ${
                     category === "all"
-                      ? "border-white/[.14] bg-white/[.075] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)]"
-                      : "border-transparent text-white/48 hover:border-white/[.07] hover:bg-white/[.035] hover:text-white/82"
+                      ? "bg-white/[.075] text-white"
+                      : "text-white/48 hover:bg-white/[.03] hover:text-white/82"
                   }`}
                 >
-                  <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[12px] border transition ${category === "all" ? "border-white/[.11] bg-white/[.06]" : "border-white/[.06] bg-black/15 group-hover/category:bg-white/[.035]"}`}>
+                  <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl transition ${category === "all" ? "bg-white/[.07] text-white" : "text-[#bcd3df]/80 group-hover/category:text-white"}`}>
                     <CategoryIcon />
                   </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block whitespace-nowrap text-[12px] font-semibold">All commands</span>
-                    <span className="mt-1 block text-[9px] font-medium text-white/26">Everything in Ware</span>
-                  </span>
-                  <span className="rounded-[9px] border border-white/[.055] bg-black/20 px-2 py-1 font-mono text-[9px] text-white/36">
+                  <span className="whitespace-nowrap text-[14px] font-semibold">All commands</span>
+                  <span className="ml-auto rounded-[9px] bg-white/[.07] px-2.5 py-1 font-mono text-[10px] text-white/55">
                     {WARE_COMMAND_COUNT.toLocaleString()}
                   </span>
                 </button>
@@ -351,20 +346,17 @@ function CommandsPage() {
                     key={group.slug}
                     type="button"
                     onClick={() => setCategory(group.slug)}
-                    className={`group/category flex h-[56px] min-w-[160px] items-center gap-3 rounded-[18px] border px-3.5 text-left transition duration-200 ${
+                    className={`group/category flex min-w-[170px] items-center gap-3 border-r border-white/[.045] px-5 text-left transition duration-200 ${
                       category === group.slug
-                        ? "border-white/[.14] bg-white/[.075] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)]"
-                        : "border-transparent text-white/48 hover:border-white/[.07] hover:bg-white/[.035] hover:text-white/82"
+                        ? "bg-white/[.075] text-white"
+                        : "text-white/48 hover:bg-white/[.03] hover:text-white/82"
                     }`}
                   >
-                    <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-[12px] border transition ${category === group.slug ? "border-white/[.11] bg-white/[.06]" : "border-white/[.06] bg-black/15 group-hover/category:bg-white/[.035]"}`}>
+                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl transition ${category === group.slug ? "bg-white/[.07] text-white" : "text-[#bcd3df]/80 group-hover/category:text-white"}`}>
                       <CategoryIcon group={group} />
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block max-w-[104px] truncate text-[12px] font-semibold">{group.name}</span>
-                      <span className="mt-1 block text-[9px] text-white/24">Browse category</span>
-                    </span>
-                    <span className="rounded-[9px] border border-white/[.055] bg-black/20 px-2 py-1 font-mono text-[9px] text-white/36">
+                    <span className="max-w-[120px] truncate whitespace-nowrap text-[14px] font-medium">{group.name}</span>
+                    <span className="ml-auto rounded-[9px] bg-white/[.06] px-2.5 py-1 font-mono text-[10px] text-white/45">
                       {group.commands.length}
                     </span>
                   </button>
@@ -372,7 +364,7 @@ function CommandsPage() {
               </div>
             </div>
 
-            <div className="pointer-events-none absolute right-0 z-10 h-full w-20 bg-gradient-to-l from-[#0f1111] via-[#0f1111]/90 to-transparent" />
+            <div className="pointer-events-none absolute right-0 z-10 h-full w-[68px] bg-gradient-to-l from-[#111212] via-[#111212]/95 to-transparent" />
 
             <button
               type="button"
