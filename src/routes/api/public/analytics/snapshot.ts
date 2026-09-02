@@ -7,19 +7,22 @@ function safeEqual(a: string, b: string) {
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
-function analyticsSecret() {
-  return (
-    process.env.WARE_ANALYTICS_SECRET ||
-    process.env.DISCORD_BOT_TOKEN ||
-    process.env.BOT_TOKEN ||
-    process.env.DISCORD_TOKEN ||
-    ""
-  ).trim().replace(/^Bot\s+/i, "");
+function analyticsSecrets() {
+  const values = [
+    process.env.WARE_ANALYTICS_SECRET,
+    process.env.DISCORD_BOT_TOKEN,
+    process.env.BOT_TOKEN,
+    process.env.DISCORD_TOKEN,
+  ]
+    .map((value) => (value || "").trim().replace(/^Bot\s+/i, ""))
+    .filter(Boolean);
+
+  return [...new Set(values)];
 }
 
 function verifyRequest(request: Request, body: string) {
-  const secret = analyticsSecret();
-  if (!secret) return false;
+  const secrets = analyticsSecrets();
+  if (!secrets.length) return false;
 
   const timestampText = request.headers.get("x-ware-timestamp") || "";
   const signature = request.headers.get("x-ware-signature") || "";
@@ -29,11 +32,12 @@ function verifyRequest(request: Request, body: string) {
   const now = Math.floor(Date.now() / 1000);
   if (!Number.isFinite(timestamp) || Math.abs(now - timestamp) > 5 * 60) return false;
 
-  const expected = createHmac("sha256", secret)
-    .update(`${timestampText}.${body}`)
-    .digest("hex");
-
-  return safeEqual(signature, expected);
+  return secrets.some((secret) => {
+    const expected = createHmac("sha256", secret)
+      .update(`${timestampText}.${body}`)
+      .digest("hex");
+    return safeEqual(signature, expected);
+  });
 }
 
 export const Route = createFileRoute("/api/public/analytics/snapshot")({
