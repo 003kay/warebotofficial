@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { WARE_COMMAND_COUNT } from "@/lib/canonicalCommands";
 
 const DISCORD_URL = "https://discord.gg/warebot";
 const DASHBOARD_LOGIN = "/auth/discord/login";
 const DASHBOARD_LOGOUT = "/auth/discord/logout";
-const COMMAND_COUNT = 836;
 
 type NavbarProps = { dashboardMode?: boolean };
 const menuRow = "ware-menu-item group flex min-h-[76px] items-center rounded-[18px] border border-white/[.075] bg-[#0c0d0d] px-5 py-4 text-left transition duration-300 hover:-translate-y-0.5 hover:border-white/[.16] hover:bg-[#121414] hover:shadow-[0_16px_45px_-32px_rgba(255,255,255,.25)]";
@@ -138,7 +138,7 @@ export function Navbar({ dashboardMode = false }: NavbarProps) {
           <button aria-label="Close menu" onClick={closeMenu} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[.08] bg-white/[.03] text-white/50 transition duration-200 hover:rotate-90 hover:border-white/[.15] hover:bg-white/[.07] hover:text-white"><X className="h-5 w-5"/></button>
         </div>
         <nav className="grid gap-3 p-5">
-          <Link to="/commands" onClick={markCommandsTransition} className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Commands</span><span className="mt-1.5 block text-[12px] text-white/38">Browse all {COMMAND_COUNT} Ware command paths</span></span><ArrowRight className="h-4 w-4 text-white/30 transition-transform group-hover:translate-x-1"/></Link>
+          <Link to="/commands" onClick={markCommandsTransition} className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Commands</span><span className="mt-1.5 block text-[12px] text-white/38">Browse all {WARE_COMMAND_COUNT} Ware command paths</span></span><ArrowRight className="h-4 w-4 text-white/30 transition-transform group-hover:translate-x-1"/></Link>
           <Link to="/documentation" className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Documentation</span><span className="mt-1.5 block text-[12px] text-white/38">Setup guides, features, and references</span></span><ArrowRight className="h-4 w-4 text-white/30 transition-transform group-hover:translate-x-1"/></Link>
           <Link to="/faq" className={menuRow}><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">FAQ</span><span className="mt-1.5 block text-[12px] text-white/38">Answers to common Ware questions</span></span><ArrowRight className="h-4 w-4 text-white/30 transition-transform group-hover:translate-x-1"/></Link>
           <a href={DISCORD_URL} target="_blank" rel="noreferrer" className={`${menuRow} gap-4`}><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[.08] bg-black/40"><ExternalLink className="h-4 w-4 text-white/65"/></span><span className="min-w-0 flex-1"><span className="block text-[16px] font-semibold text-white/94">Discord</span><span className="mt-1.5 block text-[12px] text-white/38">Support, updates, and the Ware community</span></span><ExternalLink className="h-4 w-4 text-white/30"/></a>
