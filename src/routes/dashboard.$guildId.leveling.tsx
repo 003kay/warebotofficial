@@ -169,6 +169,9 @@ function LevelingPage() {
         >
           <div className="grid gap-3 xl:grid-cols-2">
             <Card title="Formula" icon={<BarChart3 />}>
+              <p className="mb-4 text-[10px] font-semibold leading-5 text-white/30">
+                Linear level costs increase by 100 XP each time: 100, 200, 300, 400…
+              </p>
               <Grid>
                 <SelectField
                   label="Curve"

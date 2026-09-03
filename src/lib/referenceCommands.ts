@@ -118,6 +118,19 @@ export const referenceCommandCategories = [
       cmd("log ignore list", "View all ignored members and channels", [], "Manage Guild"),
       cmd("log color", "Customize embed color for an event", ["channel", "event", "color"], "Manage Guild"),
       cmd("log color list", "List embed color customization for events", ["channel"], "Manage Guild"),
+      cmd("log add", "Set up logging in a channel", ["channel", "event"], "Manage Guild"),
+    ],
+  },
+  {
+    slug: "fake-permissions",
+    name: "Fake Permissions",
+    description: "Grant bot-only command permissions to trusted server roles.",
+    commands: [
+      cmd("fakepermissions", "Manage bot-only permissions for server roles", [], "Server Owner"),
+      cmd("fakepermissions grant", "Grant a fake permission to a role", ["role", "permission"], "Server Owner"),
+      cmd("fakepermissions remove", "Remove a fake permission from a role", ["role", "permission"], "Server Owner"),
+      cmd("fakepermissions list", "View fake permissions for one role or the server", ["role"], "Server Owner"),
+      cmd("fakepermissions reset", "Remove every configured fake permission", [], "Server Owner"),
     ],
   },
   {

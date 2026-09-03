@@ -13,13 +13,10 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import appCss from "../styles.css?url";
 import polishCss from "../site-polish.css?url";
 import interactionsCss from "../interactions.css?url";
-import categoryRailCss from "../category-rail.css?url";
-import commandPremiumCss from "../command-premium.css?url";
 import securitySaveCss from "../security-save.css?url";
 import wareV2Css from "../ware-v2.css?url";
 import refreshCss from "../ware-refresh.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { CategoryRailEnhancer } from "../components/CategoryRailEnhancer";
 
 const WARE_LOGO = "/ware-logo.svg?v=4";
 const WARE_FAVICON = "/favicon.svg?v=4";
@@ -89,8 +86,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "stylesheet", href: polishCss },
       { rel: "stylesheet", href: interactionsCss },
-      { rel: "stylesheet", href: categoryRailCss },
-      { rel: "stylesheet", href: commandPremiumCss },
       { rel: "stylesheet", href: securitySaveCss },
       { rel: "stylesheet", href: wareV2Css },
       { rel: "stylesheet", href: refreshCss },
@@ -124,54 +119,54 @@ function CommandsClickTransition({ runId, onDone }: { runId: number; onDone: () 
     if (!overlay || !logo || !halo || !ring || !beam || !label) return;
 
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const duration = reduce ? 500 : 3300;
+    const duration = reduce ? 180 : 920;
 
     const overlayAnimation = overlay.animate([
       { opacity: 1, transform: "scale(1)", background: "#020303", offset: 0 },
-      { opacity: 1, transform: "scale(1)", background: "#030404", offset: .66 },
-      { opacity: .96, transform: "scale(1.006)", background: "#020303", offset: .78 },
+      { opacity: 1, transform: "scale(1)", background: "#030404", offset: .48 },
+      { opacity: .96, transform: "scale(1.006)", background: "#020303", offset: .7 },
       { opacity: 0, transform: "scale(1.025)", background: "#000", offset: 1 },
     ], { duration, easing: "cubic-bezier(.22,.72,.18,1)", fill: "forwards" });
 
     const logoAnimation = logo.animate([
       { transform: "perspective(1000px) translateZ(-260px) scale(.54) rotateX(8deg)", opacity: 0, filter: "blur(18px) brightness(.72)", offset: 0 },
       { transform: "perspective(1000px) translateZ(-70px) scale(.82) rotateX(3deg)", opacity: .52, filter: "blur(7px) brightness(.9)", offset: .12 },
-      { transform: "perspective(1000px) translateZ(20px) scale(1.045) rotateX(0deg)", opacity: 1, filter: "blur(0px) brightness(1.08) drop-shadow(0 0 34px rgba(255,255,255,.16))", offset: .29 },
-      { transform: "perspective(1000px) translateZ(0) scale(1) rotateX(0deg)", opacity: 1, filter: "blur(0px) brightness(1) drop-shadow(0 0 22px rgba(255,255,255,.11))", offset: .62 },
-      { transform: "perspective(1000px) translateZ(-75px) scale(.9) rotateX(-2deg)", opacity: .82, filter: "blur(2px) brightness(.92)", offset: .78 },
+      { transform: "perspective(1000px) translateZ(20px) scale(1.045) rotateX(0deg)", opacity: 1, filter: "blur(0px) brightness(1.08) drop-shadow(0 0 34px rgba(255,255,255,.16))", offset: .24 },
+      { transform: "perspective(1000px) translateZ(0) scale(1) rotateX(0deg)", opacity: 1, filter: "blur(0px) brightness(1) drop-shadow(0 0 22px rgba(255,255,255,.11))", offset: .5 },
+      { transform: "perspective(1000px) translateZ(-75px) scale(.9) rotateX(-2deg)", opacity: .82, filter: "blur(2px) brightness(.92)", offset: .72 },
       { transform: "perspective(1000px) translateZ(-340px) scale(.5) rotateX(-7deg)", opacity: 0, filter: "blur(16px) brightness(.68)", offset: 1 },
     ], { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
 
     const haloAnimation = halo.animate([
       { transform: "scale(.5)", opacity: 0, filter: "blur(34px)", offset: 0 },
-      { transform: "scale(1.08)", opacity: .52, filter: "blur(32px)", offset: .28 },
-      { transform: "scale(.96)", opacity: .28, filter: "blur(38px)", offset: .62 },
+      { transform: "scale(1.08)", opacity: .52, filter: "blur(32px)", offset: .24 },
+      { transform: "scale(.96)", opacity: .28, filter: "blur(38px)", offset: .52 },
       { transform: "scale(.62)", opacity: 0, filter: "blur(46px)", offset: 1 },
     ], { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
 
     const ringAnimation = ring.animate([
       { transform: "scale(.72)", opacity: 0, borderColor: "rgba(255,255,255,0)", offset: 0 },
-      { transform: "scale(.96)", opacity: .22, borderColor: "rgba(255,255,255,.12)", offset: .26 },
-      { transform: "scale(1.26)", opacity: .06, borderColor: "rgba(255,255,255,.05)", offset: .62 },
-      { transform: "scale(1.55)", opacity: 0, borderColor: "rgba(255,255,255,0)", offset: .9 },
+      { transform: "scale(.96)", opacity: .22, borderColor: "rgba(255,255,255,.12)", offset: .22 },
+      { transform: "scale(1.26)", opacity: .06, borderColor: "rgba(255,255,255,.05)", offset: .5 },
+      { transform: "scale(1.55)", opacity: 0, borderColor: "rgba(255,255,255,0)", offset: .8 },
       { transform: "scale(1.55)", opacity: 0, offset: 1 },
     ], { duration, easing: "cubic-bezier(.2,.8,.2,1)", fill: "forwards" });
 
     const beamAnimation = beam.animate([
       { transform: "scaleX(0)", opacity: 0, filter: "blur(8px)", offset: 0 },
-      { transform: "scaleX(.18)", opacity: 0, filter: "blur(6px)", offset: .16 },
-      { transform: "scaleX(1)", opacity: .75, filter: "blur(0px)", offset: .32 },
-      { transform: "scaleX(.78)", opacity: .18, filter: "blur(2px)", offset: .56 },
-      { transform: "scaleX(.18)", opacity: 0, filter: "blur(6px)", offset: .78 },
+      { transform: "scaleX(.18)", opacity: 0, filter: "blur(6px)", offset: .12 },
+      { transform: "scaleX(1)", opacity: .75, filter: "blur(0px)", offset: .26 },
+      { transform: "scaleX(.78)", opacity: .18, filter: "blur(2px)", offset: .5 },
+      { transform: "scaleX(.18)", opacity: 0, filter: "blur(6px)", offset: .72 },
       { transform: "scaleX(0)", opacity: 0, offset: 1 },
     ], { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
 
     const labelAnimation = label.animate([
       { transform: "translateY(10px)", opacity: 0, letterSpacing: ".42em", offset: 0 },
-      { transform: "translateY(8px)", opacity: 0, letterSpacing: ".38em", offset: .19 },
-      { transform: "translateY(0)", opacity: .45, letterSpacing: ".30em", offset: .36 },
-      { transform: "translateY(0)", opacity: .34, letterSpacing: ".28em", offset: .63 },
-      { transform: "translateY(-8px)", opacity: 0, letterSpacing: ".34em", offset: .84 },
+      { transform: "translateY(8px)", opacity: 0, letterSpacing: ".38em", offset: .14 },
+      { transform: "translateY(0)", opacity: .45, letterSpacing: ".30em", offset: .28 },
+      { transform: "translateY(0)", opacity: .34, letterSpacing: ".28em", offset: .52 },
+      { transform: "translateY(-8px)", opacity: 0, letterSpacing: ".34em", offset: .76 },
       { transform: "translateY(-8px)", opacity: 0, offset: 1 },
     ], { duration, easing: "cubic-bezier(.16,1,.3,1)", fill: "forwards" });
 
@@ -226,7 +221,6 @@ function RootComponent() {
 
   return <QueryClientProvider client={queryClient}>
     {transitionVisible ? <CommandsClickTransition key={transitionRun} runId={transitionRun} onDone={finishTransition} /> : null}
-    <CategoryRailEnhancer/>
     <Outlet/>
   </QueryClientProvider>;
 }

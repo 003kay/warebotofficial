@@ -12,7 +12,6 @@ import {
   Hash,
   Heart,
   Info,
-  Layers3,
   Mic2,
   Music2,
   Search,
@@ -24,7 +23,6 @@ import {
   TicketCheck,
   WalletCards,
   Wrench,
-  X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
@@ -52,11 +50,10 @@ export const Route = createFileRoute("/commands")({
   component: CommandsPage,
 });
 
-function CategoryIcon({ group }: { group?: WareCommandCategory }) {
-  const name = (group?.name ?? "all").toLowerCase();
+function CategoryIcon({ group }: { group: WareCommandCategory }) {
+  const name = group.name.toLowerCase();
   const className = "h-[19px] w-[19px]";
 
-  if (!group) return <Layers3 className={className} />;
   if (name.includes("moder")) return <Gavel className={className} />;
   if (name.includes("channel") || name.includes("role")) return <Hash className={className} />;
   if (name.includes("voice")) return <Mic2 className={className} />;
@@ -119,7 +116,7 @@ function CommandsPage() {
   const [category, setCategory] = useState(() =>
     canonicalCommandCategories.some((group) => group.slug === search.category)
       ? search.category!
-      : "all",
+      : canonicalCommandCategories[0]?.slug ?? "home",
   );
   const [copied, setCopied] = useState<string | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -150,15 +147,10 @@ function CommandsPage() {
   const shown = useMemo(() => {
     return canonicalCommands.filter((command) => {
       const group = categoryByCommand.get(command.name.toLowerCase());
-      const categoryMatches = category === "all" || group?.slug === category;
+      const categoryMatches = query.trim() ? true : group?.slug === category;
       return categoryMatches && commandMatches(command, query);
     });
   }, [category, categoryByCommand, query]);
-
-  const modalResults = useMemo(() => {
-    if (!query.trim()) return [];
-    return canonicalCommands.filter((command) => commandMatches(command, query)).slice(0, 8);
-  }, [categoryByCommand, query]);
 
   const activeCategory = useMemo(
     () => canonicalCommandCategories.find((group) => group.slug === category),
@@ -266,20 +258,11 @@ function CommandsPage() {
     }
   };
 
-  const chooseSearchResult = (name: string) => {
-    setQuery(name);
-    setCategory("all");
-    setSearchOpen(false);
-    window.setTimeout(() => {
-      document.getElementById("command-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 60);
-  };
-
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#080909] text-white">
       <Navbar />
 
-      <main className="mx-auto max-w-[1320px] px-5 pb-28 pt-9 sm:px-8 lg:px-10">
+      <main className="mx-auto max-w-[1280px] px-5 pb-28 pt-9 sm:px-8 lg:px-10">
         <header className="flex items-center justify-between gap-6 pb-10 pt-3">
           <div className="flex min-w-0 items-center gap-4">
             <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/[.08] bg-[#111313] text-white/62 sm:h-14 sm:w-14">
@@ -293,66 +276,54 @@ function CommandsPage() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/[.09] bg-[#111313] text-white/52 transition duration-200 hover:border-white/[.18] hover:bg-white/[.05] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/15 sm:h-14 sm:w-14"
-            aria-label="Search commands"
-            title="Search commands"
-          >
-            <Search className="h-[21px] w-[21px]" />
-          </button>
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-[11px] font-medium lowercase tracking-wide text-white/38">search</span>
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/[.09] bg-[#111313] text-[#bdd8ef]/75 transition duration-200 hover:border-white/[.18] hover:bg-white/[.05] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/15 sm:h-14 sm:w-14"
+              aria-label="Search commands"
+              title="Search commands"
+            >
+              <Search className="h-[22px] w-[22px]" />
+            </button>
+          </div>
         </header>
 
         <section className="relative mb-10">
-          <div className="relative flex h-[74px] items-center overflow-hidden rounded-[20px] border border-white/[.08] bg-[#111212] shadow-[0_18px_60px_-50px_rgba(255,255,255,.26)]">
+          <div className="relative flex h-[72px] items-center overflow-hidden rounded-[22px] border border-white/[.08] bg-[#101212] shadow-[0_18px_60px_-50px_rgba(255,255,255,.26)]">
             <button
               type="button"
               onClick={() => scrollRail(-1)}
               disabled={!canScrollLeft}
               aria-label="Scroll categories left"
-              className="absolute left-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.085] bg-[#111313]/95 text-white/42 shadow-[0_8px_25px_rgba(0,0,0,.35)] backdrop-blur transition hover:border-white/[.18] hover:bg-[#171919] hover:text-white disabled:cursor-default disabled:opacity-20"
+              className="absolute left-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.085] bg-[#0d0f0f]/95 text-white/42 shadow-[0_8px_25px_rgba(0,0,0,.35)] backdrop-blur transition hover:border-white/[.18] hover:bg-[#171919] hover:text-white disabled:cursor-default disabled:opacity-20"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
 
-            <div className="pointer-events-none absolute left-0 z-10 h-full w-[68px] bg-gradient-to-r from-[#111212] via-[#111212]/95 to-transparent" />
+            <div className="pointer-events-none absolute left-0 z-10 h-full w-[68px] bg-gradient-to-r from-[#101212] via-[#101212]/95 to-transparent" />
 
             <div
               ref={railRef}
               className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-[62px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
-              <div className="flex h-[72px] w-max items-stretch">
-                <button
-                  type="button"
-                  onClick={() => setCategory("all")}
-                  className={`group/category flex min-w-[180px] items-center gap-3 border-r border-white/[.045] px-5 text-left transition duration-200 ${
-                    category === "all"
-                      ? "bg-white/[.075] text-white"
-                      : "text-white/48 hover:bg-white/[.03] hover:text-white/82"
-                  }`}
-                >
-                  <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl transition ${category === "all" ? "bg-white/[.07] text-white" : "text-[#bcd3df]/80 group-hover/category:text-white"}`}>
-                    <CategoryIcon />
-                  </span>
-                  <span className="whitespace-nowrap text-[14px] font-semibold">All commands</span>
-                  <span className="ml-auto rounded-[9px] bg-white/[.07] px-2.5 py-1 font-mono text-[10px] text-white/55">
-                    {WARE_COMMAND_COUNT.toLocaleString()}
-                  </span>
-                </button>
-
+              <div className="flex h-[70px] w-max items-stretch">
                 {canonicalCommandCategories.map((group) => (
                   <button
                     key={group.slug}
                     type="button"
-                    onClick={() => setCategory(group.slug)}
-                    className={`group/category flex min-w-[170px] items-center gap-3 border-r border-white/[.045] px-5 text-left transition duration-200 ${
+                    onClick={() => {
+                      setCategory(group.slug);
+                      setQuery("");
+                    }}
+                    className={`group/category flex min-w-[158px] items-center gap-3 border-r border-white/[.045] px-5 text-left transition duration-200 ${
                       category === group.slug
-                        ? "bg-white/[.075] text-white"
+                        ? "bg-[#252727] text-white"
                         : "text-white/48 hover:bg-white/[.03] hover:text-white/82"
                     }`}
                   >
-                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl transition ${category === group.slug ? "bg-white/[.07] text-white" : "text-[#bcd3df]/80 group-hover/category:text-white"}`}>
+                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full transition ${category === group.slug ? "bg-white/[.08] text-white" : "text-[#bcd3df]/80 group-hover/category:text-white"}`}>
                       <CategoryIcon group={group} />
                     </span>
                     <span className="max-w-[120px] truncate whitespace-nowrap text-[14px] font-medium">{group.name}</span>
@@ -364,14 +335,14 @@ function CommandsPage() {
               </div>
             </div>
 
-            <div className="pointer-events-none absolute right-0 z-10 h-full w-[68px] bg-gradient-to-l from-[#111212] via-[#111212]/95 to-transparent" />
+            <div className="pointer-events-none absolute right-0 z-10 h-full w-[68px] bg-gradient-to-l from-[#101212] via-[#101212]/95 to-transparent" />
 
             <button
               type="button"
               onClick={() => scrollRail(1)}
               disabled={!canScrollRight}
               aria-label="Scroll categories right"
-              className="absolute right-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.085] bg-[#111313]/95 text-white/42 shadow-[0_8px_25px_rgba(0,0,0,.35)] backdrop-blur transition hover:border-white/[.18] hover:bg-[#171919] hover:text-white disabled:cursor-default disabled:opacity-20"
+              className="absolute right-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.085] bg-[#0d0f0f]/95 text-white/42 shadow-[0_8px_25px_rgba(0,0,0,.35)] backdrop-blur transition hover:border-white/[.18] hover:bg-[#171919] hover:text-white disabled:cursor-default disabled:opacity-20"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -382,19 +353,18 @@ function CommandsPage() {
           <div className="mb-6 flex items-end justify-between gap-4 border-b border-white/[.06] pb-5">
             <div>
               <h2 className="text-[17px] font-semibold tracking-[-.025em] text-white/90">
-                {activeCategory?.name ?? "All commands"}
+                {query ? "Search results" : activeCategory?.name ?? "Commands"}
               </h2>
               <p className="mt-1.5 text-[11px] text-white/28">
                 {shown.length.toLocaleString()} {shown.length === 1 ? "command" : "commands"}
                 {query ? <span> matching “{query}”</span> : null}
               </p>
             </div>
-            {query || category !== "all" ? (
+            {query ? (
               <button
                 type="button"
                 onClick={() => {
                   setQuery("");
-                  setCategory("all");
                 }}
                 className="rounded-xl border border-white/[.07] px-3 py-2 text-[10px] text-white/38 transition hover:bg-white/[.04] hover:text-white/72"
               >
@@ -413,7 +383,7 @@ function CommandsPage() {
               return (
                 <article
                   key={key}
-                  className="group flex min-h-[372px] flex-col overflow-hidden rounded-[28px] border border-white/[.095] bg-[#101212] transition duration-200 hover:border-white/[.16] hover:bg-[#111414]"
+                  className="group flex min-h-[348px] flex-col overflow-hidden rounded-[28px] border border-white/[.095] bg-[#101212] transition duration-200 hover:-translate-y-0.5 hover:border-white/[.16] hover:bg-[#111414]"
                 >
                   <div className="flex min-h-[150px] items-start justify-between gap-5 px-7 pb-6 pt-7">
                     <div className="min-w-0">
@@ -435,7 +405,7 @@ function CommandsPage() {
                     </button>
                   </div>
 
-                  <div className="mt-auto min-h-[218px] border-t border-white/[.065] px-7 pb-7 pt-6">
+                  <div className="mt-auto min-h-[198px] border-t border-white/[.065] px-7 pb-7 pt-6">
                     <div>
                       <div className="text-[13px] font-medium text-[#bdd8ef]/80">arguments</div>
                       <div className="mt-4 flex min-h-[34px] flex-wrap items-start gap-2">
@@ -486,7 +456,7 @@ function CommandsPage() {
 
       {searchOpen ? (
         <div
-          className="ware-search-backdrop fixed inset-0 z-[220] overflow-y-auto bg-black/84 px-4 py-[12vh] backdrop-blur-[10px]"
+          className="ware-search-backdrop fixed inset-0 z-[220] bg-black/90 px-5 pt-[16vh] backdrop-blur-[5px]"
           role="dialog"
           aria-modal="true"
           aria-label="Search Ware commands"
@@ -494,79 +464,34 @@ function CommandsPage() {
             if (event.currentTarget === event.target) setSearchOpen(false);
           }}
         >
-          <div className="ware-search-panel mx-auto w-full max-w-[760px]">
-            <div className="overflow-hidden rounded-[26px] border border-white/[.12] bg-[#111313] shadow-[0_45px_150px_rgba(0,0,0,.78)]">
-              <div className="flex min-h-[84px] items-center gap-4 px-5 sm:px-6">
-                <Search className="h-5 w-5 shrink-0 text-white/60" />
-                <input
-                  ref={searchInputRef}
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search commands or categories..."
-                  className="ware-search-input min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[16px] font-medium text-white outline-none shadow-none ring-0 placeholder:text-white/32 focus:border-0 focus:outline-none focus:ring-0"
-                  aria-label="Search commands or categories"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                {query ? (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="rounded-lg px-2 py-1 text-[10px] text-white/30 transition hover:bg-white/[.05] hover:text-white/70"
-                  >
-                    Clear
-                  </button>
-                ) : null}
+          <div className="ware-search-panel mx-auto w-full max-w-[680px]">
+            <div className="flex min-h-[86px] items-center gap-5 rounded-[22px] border border-white/[.08] bg-[#171818] px-6 shadow-[0_45px_150px_rgba(0,0,0,.82)] sm:px-7">
+              <Search className="h-6 w-6 shrink-0 text-[#d5e7f2]/90" />
+              <input
+                ref={searchInputRef}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    setSearchOpen(false);
+                    window.setTimeout(() => document.getElementById("command-results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+                  }
+                }}
+                placeholder="Search commands or categories..."
+                className="ware-search-input min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[17px] font-medium text-white outline-none shadow-none ring-0 placeholder:text-white/34 focus:border-0 focus:outline-none focus:ring-0 sm:text-[18px]"
+                aria-label="Search commands or categories"
+                autoComplete="off"
+                spellCheck={false}
+              />
+              {query ? (
                 <button
                   type="button"
-                  onClick={() => setSearchOpen(false)}
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.07] bg-white/[.025] text-white/38 transition hover:border-white/[.14] hover:bg-white/[.06] hover:text-white"
-                  aria-label="Close search"
+                  onClick={() => setQuery("")}
+                  className="rounded-lg px-2 py-1 text-[10px] text-white/30 transition hover:bg-white/[.05] hover:text-white/70"
                 >
-                  <X className="h-4 w-4" />
+                  Clear
                 </button>
-              </div>
-
-              {query.trim() ? (
-                <div className="border-t border-white/[.065] p-2.5">
-                  <div className="px-3 pb-2 pt-1 text-[9px] font-semibold uppercase tracking-[.15em] text-white/22">
-                    {modalResults.length ? "Top matches" : "No matches"}
-                  </div>
-                  {modalResults.length ? (
-                    <div className="grid gap-1">
-                      {modalResults.map((command) => {
-                        const group = categoryByCommand.get(command.name.toLowerCase());
-                        return (
-                          <button
-                            key={command.name}
-                            type="button"
-                            onClick={() => chooseSearchResult(command.name)}
-                            className="group/result flex w-full items-center gap-4 rounded-[15px] px-3 py-3 text-left transition hover:bg-white/[.045]"
-                          >
-                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[.06] bg-black/20 font-mono text-[11px] text-white/50">
-                              &gt;_
-                            </span>
-                            <span className="min-w-0 flex-1">
-                              <span className="flex items-center gap-2">
-                                <span className="truncate text-[12px] font-semibold text-white/86">{command.name}</span>
-                                <span className="shrink-0 text-[8px] uppercase tracking-[.12em] text-white/20">{group?.name ?? "Ware"}</span>
-                              </span>
-                              <span className="mt-1 block truncate text-[10px] text-white/28">{command.description}</span>
-                            </span>
-                            <ChevronRight className="h-4 w-4 shrink-0 text-white/16 transition group-hover/result:translate-x-0.5 group-hover/result:text-white/45" />
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="px-3 pb-6 pt-3 text-[12px] text-white/30">No Ware commands match “{query}”.</div>
-                  )}
-                </div>
               ) : null}
-            </div>
-            <div className="mt-3 flex items-center justify-between px-2 text-[9px] text-white/20">
-              <span>Search all {WARE_COMMAND_COUNT.toLocaleString()} commands</span>
-              <span className="font-mono">ESC to close</span>
             </div>
           </div>
         </div>

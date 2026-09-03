@@ -286,6 +286,11 @@ essay
 execute
 explain
 fasttype
+fakepermissions
+fakepermissions grant
+fakepermissions list
+fakepermissions remove
+fakepermissions reset
 filter
 filter add
 filter links
@@ -454,17 +459,33 @@ leaderboards messages
 leaderboards voice
 lego
 lesbian
-leveling
-leveling rewards
+levels
+levels add
+levels ignore
+levels ignore list
+levels leaderboard
+levels lock
+levels message
+levels messagemode
+levels remove
+levels roles
+levels setrate
+levels stackroles
+levels sync
+levels unlock
 lock
 lockall
 lockdown
 log
 log add
+log color
+log color list
 log channel
 log disable
 log enable
 log events
+log ignore
+log ignore list
 log remove
 lottery
 ltc
@@ -1071,7 +1092,11 @@ export const canonicalCommandCategories: WareCommandCategory[] = baseCategories
     ...category,
     commands: category.commands
       .filter((command, index, all) => all.findIndex((item) => item.name.toLowerCase() === command.name.toLowerCase()) === index)
-      .sort((a, b) => a.name.localeCompare(b.name)),
+      .sort((a, b) => {
+        if (category.slug !== "logs") return a.name.localeCompare(b.name);
+        const order = ["log", "log remove", "log ignore", "log ignore list", "log color", "log color list", "log add"];
+        return order.indexOf(a.name.toLowerCase()) - order.indexOf(b.name.toLowerCase());
+      }),
   }))
   .filter((category) => category.commands.length > 0);
 
