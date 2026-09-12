@@ -1,8 +1,77 @@
+import { PublicLayout, PublicTitle } from "@/components/site/PublicLayout";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BookOpen, Code2, Settings, ShieldCheck, Share2 } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { Starfield } from "@/components/Starfield";
-const guides=[{icon:ShieldCheck,title:"Security",body:"Antinuke, anti-raid, moderation and protection setup.",slug:"security-setup"},{icon:Settings,title:"Configuration",body:"Tickets, roles, messages and server behavior.",slug:"server-configuration"},{icon:Share2,title:"Roles & integrations",body:"Role utilities and connected server workflows.",slug:"integrations"},{icon:Code2,title:"Messages & embeds",body:"Embeds, message tools and presentation features.",slug:"embed-scripting"}];
-export const Route=createFileRoute("/documentation")({head:()=>({meta:[{title:"Docs"},{name:"description",content:"Ware setup guides, security documentation, configuration and feature documentation."}]}),component:DocumentationPage});
-function DocumentationPage(){return <div className="relative min-h-screen overflow-hidden bg-[#050505]"><Starfield/><Navbar/><main className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-8 md:px-8"><section className="rounded-[34px] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012))] p-6 md:p-10"><div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-white/35"><BookOpen className="h-3 w-3"/>ware documentation</div><h1 className="mt-6 text-5xl font-bold tracking-[-0.055em] md:text-7xl">Documentation</h1><p className="mt-5 max-w-2xl text-base leading-7 text-white/45">Everything you need to configure Ware, secure a server, build support systems, and understand the bot's major features.</p><div className="mt-8"><Link to="/commands" className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white px-5 py-3 text-sm font-semibold text-black transition-transform hover:-translate-y-0.5">Open Commands<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/></Link></div></section><section className="mt-8 grid gap-4 md:grid-cols-2">{guides.map(g=><Link key={g.slug} to="/docs/$slug" params={{slug:g.slug}} className="group rounded-[26px] border border-white/[0.08] bg-white/[0.022] p-6 transition-all duration-200 hover:-translate-y-1 hover:border-white/[0.17] hover:bg-white/[0.045]"><div className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/[0.04]"><g.icon className="h-5 w-5 text-white/65"/></div><h2 className="mt-6 text-xl font-semibold">{g.title}</h2><p className="mt-2 text-sm leading-6 text-white/45">{g.body}</p><div className="mt-6 inline-flex items-center gap-2 text-xs text-white/35 group-hover:text-white/65">Read guide<ArrowRight className="h-3.5 w-3.5"/></div></Link>)}</section></main><Footer/></div>}
+const guides = [
+  {
+    icon: ShieldCheck,
+    title: "Security",
+    body: "Antinuke, anti-raid, moderation and protection setup.",
+    slug: "security-setup",
+  },
+  {
+    icon: Settings,
+    title: "Configuration",
+    body: "Tickets, roles, messages and server behavior.",
+    slug: "server-configuration",
+  },
+  {
+    icon: Share2,
+    title: "Roles & integrations",
+    body: "Role utilities and connected server workflows.",
+    slug: "integrations",
+  },
+  {
+    icon: Code2,
+    title: "Messages & embeds",
+    body: "Embeds, message tools and presentation features.",
+    slug: "embed-scripting",
+  },
+];
+export const Route = createFileRoute("/documentation")({
+  head: () => ({
+    meta: [
+      { title: "Docs" },
+      {
+        name: "description",
+        content:
+          "Ware setup guides, security documentation, configuration and feature documentation.",
+      },
+    ],
+  }),
+  component: DocumentationPage,
+});
+function DocumentationPage() {
+  return (
+    <PublicLayout>
+      <div className="pub-width">
+        <PublicTitle label="Ware / Documentation" title="Get Ware set up.">
+          Start with the basics, then find the tools you need for your server.
+        </PublicTitle>
+        <div className="pub-doc-start">
+          <a href="/docs/introduction">
+            <span className="pub-label">Start here</span>
+            <h2>Your first few commands</h2>
+            <p>Adding Ware, the default prefix, and where to go next.</p>
+            <span>Read the introduction ↗</span>
+          </a>
+          <div>
+            <h3>Know what you're looking for?</h3>
+            <p>Find syntax, examples, aliases, and permissions in the command reference.</p>
+            <a className="pub-text-link" href="/commands">
+              Browse commands ↗
+            </a>
+          </div>
+        </div>
+        <div className="pub-guide-list">
+          {guides.map((g) => (
+            <a key={g.slug} href={`/docs/${g.slug}`}>
+              <h2>{g.title}</h2>
+              <p>{g.body}</p>
+              <span aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </PublicLayout>
+  );
+}

@@ -17,7 +17,11 @@ type Result =
     };
 
 function commandAnchor(name: string) {
-  return `command-${name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`;
+  return `command-${name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")}`;
 }
 
 export function DocsSearch() {
@@ -83,6 +87,7 @@ export function DocsSearch() {
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        if (window.location.pathname === "/docs/commands") return;
         event.preventDefault();
         inputRef.current?.focus();
         setOpen(true);
@@ -116,7 +121,7 @@ export function DocsSearch() {
 
   return (
     <div ref={containerRef} className="relative mx-auto min-w-0 max-w-2xl flex-1">
-      <div className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,.025)] transition-all focus-within:border-white/20 focus-within:bg-white/[0.05] focus-within:shadow-[0_12px_40px_-22px_rgba(255,255,255,.18)]">
+      <div className="group flex items-center gap-2  border border-white/10  px-4 py-2.5 text-sm text-muted-foreground   focus-within:border-white/20 focus-within:bg-white/[0.05] ">
         <Search className="h-4 w-4 shrink-0 transition-colors group-focus-within:text-white" />
         <input
           ref={inputRef}
@@ -143,14 +148,14 @@ export function DocsSearch() {
           aria-label="Search documentation and commands"
           autoComplete="off"
         />
-        <kbd className="hidden shrink-0 rounded-md border border-white/10 bg-black/30 px-2 py-1 font-mono text-[9px] text-muted-foreground md:inline">
+        <kbd className="hidden shrink-0  border border-white/10 bg-black/30 px-2 py-1 font-mono text-[14px] text-muted-foreground md:inline">
           CTRL K
         </kbd>
       </div>
 
       {open && query.trim() && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-3 max-h-[430px] overflow-y-auto rounded-2xl border border-white/10 bg-[#0a0a0b]/95 p-2 shadow-[0_30px_100px_-40px_rgba(0,0,0,.95)] backdrop-blur-2xl">
-          <div className="mb-1 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
+        <div className="absolute left-0 right-0 top-full z-50 mt-3 max-h-[430px] overflow-y-auto  border border-white/10 bg-[#0a0a0b]/95 p-2  ">
+          <div className="mb-1 px-3 py-2 font-mono text-[14px] uppercase tracking-[0.16em] text-muted-foreground">
             Search results
           </div>
           {results.length === 0 ? (
@@ -167,13 +172,13 @@ export function DocsSearch() {
                       type="button"
                       onMouseEnter={() => setActive(index)}
                       onClick={() => void go(result)}
-                      className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition-all ${
+                      className={`group flex w-full items-center gap-3  border px-3 py-3 text-left  ${
                         index === active
                           ? "border-white/10 bg-white/[0.07]"
                           : "border-transparent hover:border-white/[0.06] hover:bg-white/[0.035]"
                       }`}
                     >
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.035]">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center  border border-white/10 bg-white/[0.035]">
                         <Icon className="h-4 w-4" />
                       </span>
                       <span className="min-w-0 flex-1">
@@ -181,10 +186,12 @@ export function DocsSearch() {
                           {result.kind === "command" ? `,${result.label}` : result.label}
                         </span>
                         <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                          {result.kind === "doc" ? result.section : `${result.category} · ${result.description}`}
+                          {result.kind === "doc"
+                            ? result.section
+                            : `${result.category} · ${result.description}`}
                         </span>
                       </span>
-                      <ArrowUpRight className="h-3.5 w-3.5 text-white/25 transition-all group-hover:text-white/70" />
+                      <ArrowUpRight className="h-3.5 w-3.5 text-white/65  group-hover:text-white/70" />
                     </button>
                   </li>
                 );
