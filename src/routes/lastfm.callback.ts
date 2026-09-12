@@ -11,7 +11,7 @@ const escapeHtml = (value: unknown) =>
 
 const html = (title: string, message: string, status = 200) =>
   new Response(
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>body{margin:0;background:#0d0e10;color:#ededeb;font:16px/1.7 Inter,system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}.card{width:min(620px,calc(100% - 48px));padding:55px 0;border-top:1px solid #303236}h1{font-size:clamp(32px,6vw,52px);font-weight:500;letter-spacing:-.045em;line-height:1.12;margin:0 0 24px}p{color:#b9bbc0}.detail{padding:12px 0;border-top:1px solid #303236;color:#e7b0b5;font-family:ui-monospace,monospace;font-size:14px;overflow-wrap:anywhere}a{color:#ededeb;text-underline-offset:5px}a:hover{color:#d9edac}a:focus-visible{outline:2px solid #d9edac;outline-offset:5px}</style></head><body><main class="card"><h1>${escapeHtml(title)}</h1><p>${message}</p><p><a href="https://warebot.xyz/commands">Return to Ware</a></p></main></body></html>`,
+    `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>body{margin:0;background:#0b0b0d;color:#f5f5f5;font-family:Inter,system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}.card{max-width:620px;margin:24px;padding:32px;border:1px solid #26262b;border-radius:16px;background:#121216}h1{font-size:24px;margin:0 0 12px}p{line-height:1.6;color:#c8c8cf}.detail{padding:12px 14px;border-radius:10px;background:#19191f;color:#ff9aa5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow-wrap:anywhere}a{color:#ff4d5f}</style></head><body><main class="card"><h1>${escapeHtml(title)}</h1><p>${message}</p><p><a href="https://warebot.xyz/commands">Return to Ware</a></p></main></body></html>`,
     { status, headers: { "content-type": "text/html; charset=utf-8" } },
   );
 
@@ -38,12 +38,11 @@ function verifyState(state: string, secret: string): string | null {
 }
 
 function lastfmSignature(params: Record<string, string>, secret: string) {
-  const source =
-    Object.keys(params)
-      .filter((key) => key !== "format" && key !== "callback")
-      .sort()
-      .map((key) => `${key}${params[key]}`)
-      .join("") + secret;
+  const source = Object.keys(params)
+    .filter((key) => key !== "format" && key !== "callback")
+    .sort()
+    .map((key) => `${key}${params[key]}`)
+    .join("") + secret;
   return createHash("md5").update(source, "utf8").digest("hex");
 }
 
@@ -54,31 +53,19 @@ export const Route = createFileRoute("/lastfm/callback")({
         const apiKey = process.env.LASTFM_API_KEY?.trim();
         const apiSecret = process.env.LASTFM_API_SECRET?.trim();
         if (!apiKey || !apiSecret) {
-          return html(
-            "Last.fm is not configured",
-            "Ware is missing its Last.fm API credentials on Vercel.",
-            503,
-          );
+          return html("Last.fm is not configured", "Ware is missing its Last.fm API credentials on Vercel.", 503);
         }
 
         const url = new URL(request.url);
         const token = url.searchParams.get("token")?.trim();
         const state = url.searchParams.get("state")?.trim();
         if (!token || !state) {
-          return html(
-            "Authorization failed",
-            "Last.fm did not return a valid authorization token.",
-            400,
-          );
+          return html("Authorization failed", "Last.fm did not return a valid authorization token.", 400);
         }
 
         const discordId = verifyState(state, apiSecret);
         if (!discordId) {
-          return html(
-            "Authorization expired",
-            "This Ware login link is invalid or has expired. Return to Discord and run the Last.fm login command again.",
-            400,
-          );
+          return html("Authorization expired", "This Ware login link is invalid or has expired. Return to Discord and run the Last.fm login command again.", 400);
         }
 
         try {
@@ -104,16 +91,18 @@ export const Route = createFileRoute("/lastfm/callback")({
           }
 
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const { error } = await (supabaseAdmin as any).from("lastfm_connections").upsert(
-            {
-              discord_user_id: discordId,
-              lastfm_username: payload.session.name,
-              session_key: payload.session.key,
-              connected_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: "discord_user_id" },
-          );
+          const { error } = await (supabaseAdmin as any)
+            .from("lastfm_connections")
+            .upsert(
+              {
+                discord_user_id: discordId,
+                lastfm_username: payload.session.name,
+                session_key: payload.session.key,
+                connected_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: "discord_user_id" },
+            );
           if (error) {
             throw new Error(`Supabase: ${error.message || error.code || "database write failed"}`);
           }

@@ -1,143 +1,20 @@
-import { PublicLayout } from "@/components/site/PublicLayout";
 import { createFileRoute, Link } from "@tanstack/react-router";
-const UPDATED = "August 19th 2026 3:19 PM";
-export const Route = createFileRoute("/terms")({
-  head: () => ({
-    meta: [
-      { title: "Terms of Service — ware" },
-      {
-        name: "description",
-        content:
-          "Terms governing use of the Ware Discord bot, dashboard, website, and related services.",
-      },
-      { property: "og:title", content: "Terms of Service — ware" },
-    ],
-  }),
-  component: TermsPage,
-});
-function TermsPage() {
-  return (
-    <PublicLayout className="pub-legal">
-      <article className="pub-legal-article">
-        <div className="pub-legal-date">
-          <span className="font-semibold text-white">Last updated:</span> {UPDATED}
-        </div>
-        <p className="text-base text-white/80">
-          <Link to="/" className="transition hover:text-white">
-            ← Home
-          </Link>
-        </p>
-        <h1 className="pub-legal-title">Terms of Service</h1>
-        <p className="pub-legal-intro">
-          These Terms govern access to and use of Ware, including the Discord bot, warebot.xyz, its
-          dashboard, commands, moderation and security systems, integrations, and related services.
-        </p>
-        <div className="pub-legal-body">
-          <section>
-            <h2 className="pub-clause-title">1. Acceptance</h2>
-            <p className="mt-2">
-              By inviting Ware, using its commands, accessing the dashboard, or otherwise using the
-              service, you agree to these Terms and applicable Discord rules. If you do not agree,
-              do not use Ware.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">2. Eligibility and accounts</h2>
-            <p className="mt-2">
-              You must meet Discord's minimum age requirements and be legally permitted to use the
-              service. You are responsible for activity performed through your Discord account and
-              for maintaining the security of accounts and permissions used with Ware.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">3. Server administration</h2>
-            <p className="mt-2">
-              Server owners and administrators are responsible for how Ware is configured and used
-              in their communities, including moderation actions, automod rules, tickets, roles,
-              permissions, logging, security settings, and other server-specific features.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">4. Acceptable use</h2>
-            <p className="mt-2">
-              You may not use Ware to violate law or Discord policies; harass, threaten, dox,
-              defraud, or target others; distribute malware or unlawful material; facilitate spam or
-              platform abuse; evade restrictions; interfere with Ware's infrastructure; scrape or
-              overload the service; exploit vulnerabilities; or attempt unauthorized access to
-              accounts, servers, data, or systems.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">5. Security and moderation features</h2>
-            <p className="mt-2">
-              Ware provides tools such as moderation, automod, antinuke, anti-raid, permissions,
-              logging, and server protection. These tools assist server administrators but cannot
-              guarantee prevention of every raid, compromise, deletion, malicious action, or other
-              loss. Administrators should maintain appropriate Discord permissions and security
-              practices.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">6. Content and data processing</h2>
-            <p className="mt-2">
-              You retain ownership of content you provide. You authorize Ware to access and process
-              information as reasonably necessary to provide requested commands, enforce configured
-              rules, operate security and moderation features, maintain the dashboard, and provide
-              the service. Our Privacy Policy explains our data practices in more detail.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">7. Paid or premium features</h2>
-            <p className="mt-2">
-              If Ware offers paid, supporter, or premium functionality, feature availability,
-              limits, pricing, and benefits may change. Any additional purchase terms presented at
-              checkout or when activating a feature also apply.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">8. Availability and changes</h2>
-            <p className="mt-2">
-              Ware is provided on an “as is” and “as available” basis. Features may be added,
-              changed, limited, suspended, or discontinued. We do not guarantee uninterrupted
-              availability, compatibility with every server configuration, or error-free operation.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">9. Enforcement and termination</h2>
-            <p className="mt-2">
-              We may restrict, blacklist, suspend, or terminate access when reasonably necessary to
-              protect Ware, Discord users, our infrastructure, or other communities; address abuse
-              or security risks; comply with law; or enforce these Terms. You may stop using Ware at
-              any time by removing it and signing out of the dashboard.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">10. Disclaimer and limitation</h2>
-            <p className="mt-2">
-              To the maximum extent permitted by applicable law, Ware is provided without warranties
-              of uninterrupted operation or fitness for a particular purpose. We are not responsible
-              for server configuration mistakes, actions taken by server staff, Discord outages or
-              API changes, third-party services, or losses resulting from unauthorized access
-              outside our reasonable control.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">11. Updates to these Terms</h2>
-            <p className="mt-2">
-              We may revise these Terms as Ware changes. The update timestamp at the top identifies
-              the current version. Continued use after an updated version becomes effective
-              constitutes acceptance of the revised Terms.
-            </p>
-          </section>
-          <section>
-            <h2 className="pub-clause-title">12. Contact</h2>
-            <p className="mt-2">
-              Questions about these Terms can be directed to the Ware team through the official
-              support server.
-            </p>
-          </section>
-        </div>
-      </article>
-    </PublicLayout>
-  );
-}
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { Starfield } from "@/components/Starfield";
+const UPDATED="August 19th 2026 3:19 PM";
+export const Route=createFileRoute("/terms")({head:()=>({meta:[{title:"Terms of Service — ware"},{name:"description",content:"Terms governing use of the Ware Discord bot, dashboard, website, and related services."},{property:"og:title",content:"Terms of Service — ware"}]}),component:TermsPage});
+function TermsPage(){return <div className="relative min-h-screen overflow-hidden"><Starfield/><Navbar/><main className="relative z-10 mx-auto max-w-3xl px-6 py-16 md:px-10"><div className="mb-8 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white/80"><span className="font-semibold text-white">Last updated:</span> {UPDATED}</div><p className="text-base text-white/80"><Link to="/" className="transition hover:text-white">← Home</Link></p><h1 className="mt-2 text-4xl font-bold tracking-tight text-white md:text-5xl">Terms of Service</h1><p className="mt-4 text-[17px] leading-8 text-white/85">These Terms govern access to and use of Ware, including the Discord bot, warebot.xyz, its dashboard, commands, moderation and security systems, integrations, and related services.</p><div className="mt-10 space-y-9 text-base leading-8 text-white/85">
+<section><h2 className="text-xl font-semibold text-white">1. Acceptance</h2><p className="mt-2">By inviting Ware, using its commands, accessing the dashboard, or otherwise using the service, you agree to these Terms and applicable Discord rules. If you do not agree, do not use Ware.</p></section>
+<section><h2 className="text-xl font-semibold text-white">2. Eligibility and accounts</h2><p className="mt-2">You must meet Discord's minimum age requirements and be legally permitted to use the service. You are responsible for activity performed through your Discord account and for maintaining the security of accounts and permissions used with Ware.</p></section>
+<section><h2 className="text-xl font-semibold text-white">3. Server administration</h2><p className="mt-2">Server owners and administrators are responsible for how Ware is configured and used in their communities, including moderation actions, automod rules, tickets, roles, permissions, logging, security settings, and other server-specific features.</p></section>
+<section><h2 className="text-xl font-semibold text-white">4. Acceptable use</h2><p className="mt-2">You may not use Ware to violate law or Discord policies; harass, threaten, dox, defraud, or target others; distribute malware or unlawful material; facilitate spam or platform abuse; evade restrictions; interfere with Ware's infrastructure; scrape or overload the service; exploit vulnerabilities; or attempt unauthorized access to accounts, servers, data, or systems.</p></section>
+<section><h2 className="text-xl font-semibold text-white">5. Security and moderation features</h2><p className="mt-2">Ware provides tools such as moderation, automod, antinuke, anti-raid, permissions, logging, and server protection. These tools assist server administrators but cannot guarantee prevention of every raid, compromise, deletion, malicious action, or other loss. Administrators should maintain appropriate Discord permissions and security practices.</p></section>
+<section><h2 className="text-xl font-semibold text-white">6. Content and data processing</h2><p className="mt-2">You retain ownership of content you provide. You authorize Ware to access and process information as reasonably necessary to provide requested commands, enforce configured rules, operate security and moderation features, maintain the dashboard, and provide the service. Our Privacy Policy explains our data practices in more detail.</p></section>
+<section><h2 className="text-xl font-semibold text-white">7. Paid or premium features</h2><p className="mt-2">If Ware offers paid, supporter, or premium functionality, feature availability, limits, pricing, and benefits may change. Any additional purchase terms presented at checkout or when activating a feature also apply.</p></section>
+<section><h2 className="text-xl font-semibold text-white">8. Availability and changes</h2><p className="mt-2">Ware is provided on an “as is” and “as available” basis. Features may be added, changed, limited, suspended, or discontinued. We do not guarantee uninterrupted availability, compatibility with every server configuration, or error-free operation.</p></section>
+<section><h2 className="text-xl font-semibold text-white">9. Enforcement and termination</h2><p className="mt-2">We may restrict, blacklist, suspend, or terminate access when reasonably necessary to protect Ware, Discord users, our infrastructure, or other communities; address abuse or security risks; comply with law; or enforce these Terms. You may stop using Ware at any time by removing it and signing out of the dashboard.</p></section>
+<section><h2 className="text-xl font-semibold text-white">10. Disclaimer and limitation</h2><p className="mt-2">To the maximum extent permitted by applicable law, Ware is provided without warranties of uninterrupted operation or fitness for a particular purpose. We are not responsible for server configuration mistakes, actions taken by server staff, Discord outages or API changes, third-party services, or losses resulting from unauthorized access outside our reasonable control.</p></section>
+<section><h2 className="text-xl font-semibold text-white">11. Updates to these Terms</h2><p className="mt-2">We may revise these Terms as Ware changes. The update timestamp at the top identifies the current version. Continued use after an updated version becomes effective constitutes acceptance of the revised Terms.</p></section>
+<section><h2 className="text-xl font-semibold text-white">12. Contact</h2><p className="mt-2">Questions about these Terms can be directed to the Ware team through the official support server.</p></section>
+</div></main><Footer/></div>;}
