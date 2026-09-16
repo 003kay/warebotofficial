@@ -6,7 +6,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getDashboardSettings, saveDashboardSettings } from "@/lib/dashboard-settings.functions";
 
 export const Route = createFileRoute("/dashboard/$guildId/join-gate")({
-  head: () => ({ meta: [{ title: "Join Gate — Ware Dashboard" }] }),
+  head: () => ({ meta: [{ title: "Join Gate — Stained Dashboard" }] }),
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData({
       queryKey: ["dashboardSettings", params.guildId],
@@ -130,7 +130,7 @@ function Page() {
             <div>
               <div className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-emerald-300/55"><ShieldCheck className="h-3.5 w-3.5" /> Entrance security</div>
               <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.045em] text-white/94">Join Gate</h1>
-              <p className="mt-2 max-w-2xl text-[11px] leading-5 text-white/32">Screen new members before they receive normal server access. Configure account-age rules, suspicious-account filters, enforcement, and where Ware reports events.</p>
+              <p className="mt-2 max-w-2xl text-[11px] leading-5 text-white/32">Screen new members before they receive normal server access. Configure account-age rules, suspicious-account filters, enforcement, and where Stained reports events.</p>
             </div>
             <button type="button" onClick={save} disabled={saving} className="inline-flex h-10 items-center gap-2 rounded-xl bg-white px-4 text-[11px] font-semibold text-black transition hover:bg-white/90 disabled:opacity-50">
               {saved ? <CheckCircle2 className="h-4 w-4" /> : <Save className="h-4 w-4" />}
@@ -155,7 +155,7 @@ function Page() {
             </div>
           </SettingRow>
 
-          <SettingRow title="Triggered-account action" detail="Choose what Ware does when a member fails the account-age or profile checks. Log is the safest testing mode.">
+          <SettingRow title="Triggered-account action" detail="Choose what Stained does when a member fails the account-age or profile checks. Log is the safest testing mode.">
             <select value={values.action} onChange={(e) => set("action", e.target.value as JoinAction)} className="w-full rounded-xl border border-white/[0.07] bg-[#0a0c0c] px-3.5 py-3 text-[12px] text-white/75 outline-none focus:border-white/[0.16]"><option value="log">Log only</option><option value="timeout">Timeout</option><option value="kick">Kick</option><option value="ban">Ban</option></select>
           </SettingRow>
 
@@ -163,17 +163,18 @@ function Page() {
           <SettingRow title="Unauthorized bot additions" detail="Treat newly added bots as suspicious unless they were added through an approved path."><Toggle value={values.blockBotAdds} onChange={(value) => set("blockBotAdds", value)} /></SettingRow>
           <SettingRow title="Unverified bot filter" detail="Flag Discord bots that are not verified. Keep this separate from the general bot-addition rule."><Toggle value={values.blockUnverifiedBots} onChange={(value) => set("blockUnverifiedBots", value)} /></SettingRow>
           <SettingRow title="Invite / advertising usernames" detail="Flag accounts whose visible identity appears to advertise Discord invites or server links."><Toggle value={values.blockInviteNames} onChange={(value) => set("blockInviteNames", value)} /></SettingRow>
-          <SettingRow title="Username filter" detail="Enable Ware's username-pattern checks for suspicious or server-defined terms."><Toggle value={values.usernameFilterEnabled} onChange={(value) => set("usernameFilterEnabled", value)} /></SettingRow>
+          <SettingRow title="Username filter" detail="Enable Stained's username-pattern checks for suspicious or server-defined terms."><Toggle value={values.usernameFilterEnabled} onChange={(value) => set("usernameFilterEnabled", value)} /></SettingRow>
 
           <SettingRow title="Join Gate alert channel" detail="Select the channel where Join Gate actions and suspicious-member reports should be posted.">
             <select value={values.alertChannelId} onChange={(e) => set("alertChannelId", e.target.value)} disabled={!data.botInGuild} className="w-full rounded-xl border border-white/[0.07] bg-[#0a0c0c] px-3.5 py-3 text-[12px] text-white/75 outline-none focus:border-white/[0.16] disabled:opacity-45">
               <option value="">No alert channel</option>
               {data.textChannels.map((channel) => <option key={channel.id} value={channel.id}># {channel.name}</option>)}
             </select>
-            {!data.botInGuild ? <div className="mt-2 text-[9px] text-amber-200/45">Ware could not load this server's channels. Confirm the website bot token and that Ware is still in the server.</div> : null}
+            {!data.botInGuild ? <div className="mt-2 text-[9px] text-amber-200/45">Stained could not load this server's channels. Confirm the website bot token and that Stained is still in the server.</div> : null}
           </SettingRow>
         </section>
       </div>
     </DashboardShell>
   );
 }
+

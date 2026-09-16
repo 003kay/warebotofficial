@@ -20,7 +20,7 @@ async function assertGuildChannel(guildId: string, channelId: string | null, all
   if (!channelId) return;
   const { fetchGuildChannels } = await import("@/lib/discord-bot.server");
   const channels = await fetchGuildChannels(guildId);
-  if (!channels) throw new Error("Ware is not currently in this server.");
+  if (!channels) throw new Error("Stained is not currently in this server.");
   const channel = channels.find((entry) => entry.id === channelId);
   if (!channel || !allowedTypes.includes(channel.type)) {
     throw new Error("That channel does not belong to the server you are managing.");
@@ -31,7 +31,7 @@ async function assertGuildRoleIds(guildId: string, roleIds: string[]) {
   if (!roleIds.length) return;
   const { fetchGuildRoles } = await import("@/lib/discord-bot.server");
   const roles = await fetchGuildRoles(guildId);
-  if (!roles) throw new Error("Ware is not currently in this server.");
+  if (!roles) throw new Error("Stained is not currently in this server.");
   const valid = new Set(roles.map((role) => role.id));
   if (roleIds.some((roleId) => !valid.has(roleId))) {
     throw new Error("One or more selected roles do not belong to this server.");
@@ -306,3 +306,4 @@ export const publishTicketPanel = createServerFn({ method: "POST" })
 
     return { ok: true, messageId };
   });
+

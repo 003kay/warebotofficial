@@ -11,7 +11,7 @@ const escapeHtml = (value: unknown) =>
 
 const html = (title: string, message: string, status = 200) =>
   new Response(
-    `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>body{margin:0;background:#0b0b0d;color:#f5f5f5;font-family:Inter,system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}.card{max-width:620px;margin:24px;padding:32px;border:1px solid #26262b;border-radius:16px;background:#121216}h1{font-size:24px;margin:0 0 12px}p{line-height:1.6;color:#c8c8cf}.detail{padding:12px 14px;border-radius:10px;background:#19191f;color:#ff9aa5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow-wrap:anywhere}a{color:#ff4d5f}</style></head><body><main class="card"><h1>${escapeHtml(title)}</h1><p>${message}</p><p><a href="https://warebot.xyz/commands">Return to Ware</a></p></main></body></html>`,
+    `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>body{margin:0;background:#0b0b0d;color:#f5f5f5;font-family:Inter,system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}.card{max-width:620px;margin:24px;padding:32px;border:1px solid #26262b;border-radius:16px;background:#121216}h1{font-size:24px;margin:0 0 12px}p{line-height:1.6;color:#c8c8cf}.detail{padding:12px 14px;border-radius:10px;background:#19191f;color:#ff9aa5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow-wrap:anywhere}a{color:#ff4d5f}</style></head><body><main class="card"><h1>${escapeHtml(title)}</h1><p>${message}</p><p><a href="https://warebot.xyz/commands">Return to Stained</a></p></main></body></html>`,
     { status, headers: { "content-type": "text/html; charset=utf-8" } },
   );
 
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/lastfm/callback")({
         const apiKey = process.env.LASTFM_API_KEY?.trim();
         const apiSecret = process.env.LASTFM_API_SECRET?.trim();
         if (!apiKey || !apiSecret) {
-          return html("Last.fm is not configured", "Ware is missing its Last.fm API credentials on Vercel.", 503);
+          return html("Last.fm is not configured", "Stained is missing its Last.fm API credentials on Vercel.", 503);
         }
 
         const url = new URL(request.url);
@@ -65,7 +65,7 @@ export const Route = createFileRoute("/lastfm/callback")({
 
         const discordId = verifyState(state, apiSecret);
         if (!discordId) {
-          return html("Authorization expired", "This Ware login link is invalid or has expired. Return to Discord and run the Last.fm login command again.", 400);
+          return html("Authorization expired", "This Stained login link is invalid or has expired. Return to Discord and run the Last.fm login command again.", 400);
         }
 
         try {
@@ -113,7 +113,7 @@ export const Route = createFileRoute("/lastfm/callback")({
           const detail = error instanceof Error ? error.message : "Unknown callback error";
           return html(
             "Authorization failed",
-            `Ware could not finish connecting your Last.fm account.<br><br><span class="detail">${escapeHtml(detail)}</span><br><br>Send that error text back in Discord so it can be fixed.`,
+            `Stained could not finish connecting your Last.fm account.<br><br><span class="detail">${escapeHtml(detail)}</span><br><br>Send that error text back in Discord so it can be fixed.`,
             500,
           );
         }
@@ -121,3 +121,4 @@ export const Route = createFileRoute("/lastfm/callback")({
     },
   },
 });
+

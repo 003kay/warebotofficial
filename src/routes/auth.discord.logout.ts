@@ -49,7 +49,7 @@ export const Route = createFileRoute("/auth/discord/logout")({
         }
 
         const headers = new Headers();
-        // Send the user straight into a fresh Discord login flow so the old Ware
+        // Send the user straight into a fresh Discord login flow so the old Stained
         // session cannot be silently reused when they press Dashboard again.
         headers.set("Location", "/auth/discord/login?switch=1");
         headers.append("Set-Cookie", clearSessionCookie());
@@ -61,3 +61,4 @@ export const Route = createFileRoute("/auth/discord/logout")({
     },
   },
 });
+

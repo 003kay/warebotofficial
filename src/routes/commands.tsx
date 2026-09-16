@@ -43,7 +43,7 @@ export const Route = createFileRoute("/commands")({
       { title: "Commands" },
       {
         name: "description",
-        content: `Browse all ${WARE_COMMAND_COUNT.toLocaleString()} Ware commands.`,
+        content: `Browse all ${WARE_COMMAND_COUNT.toLocaleString()} Stained commands.`,
       },
     ],
   }),
@@ -459,7 +459,7 @@ function CommandsPage() {
           className="ware-search-backdrop fixed inset-0 z-[220] bg-black/90 px-5 pt-[16vh] backdrop-blur-[5px]"
           role="dialog"
           aria-modal="true"
-          aria-label="Search Ware commands"
+          aria-label="Search Stained commands"
           onMouseDown={(event) => {
             if (event.currentTarget === event.target) setSearchOpen(false);
           }}
@@ -526,3 +526,4 @@ function CommandsPage() {
     </div>
   );
 }
+

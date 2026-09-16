@@ -19,7 +19,7 @@ export const Route = createFileRoute("/auth/discord/callback")({
         const cookieState = readStateFromCookie(cookieHeader);
 
         if (!code || !state || state !== cookieState) {
-          return new Response("Invalid OAuth state. Please return to Ware and try again.", { status: 400 });
+          return new Response("Invalid OAuth state. Please return to Stained and try again.", { status: 400 });
         }
 
         try {
@@ -73,3 +73,4 @@ export const Route = createFileRoute("/auth/discord/callback")({
     },
   },
 });
+

@@ -5,7 +5,7 @@ import { ExternalLink, Hash, LockKeyhole, MessageSquareText, Paperclip } from "l
 import { getTicketTranscript, type TranscriptMessage } from "@/lib/transcript.functions";
 
 export const Route = createFileRoute("/transcripts/$transcriptId")({
-  head: () => ({ meta: [{ title: "Ticket Transcript — Ware" }] }),
+  head: () => ({ meta: [{ title: "Ticket Transcript — Stained" }] }),
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData({
       queryKey: ["transcript", params.transcriptId],
@@ -125,7 +125,7 @@ function TranscriptPage() {
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/[0.05]"><Hash className="h-5 w-5 text-white/55" /></div>
             <div className="min-w-0"><div className="truncate text-[14px] font-semibold text-white">{t.channel_name || `ticket-${t.ticket_id}`}</div><div className="mt-0.5 text-[10px] text-white/35">Ticket #{t.ticket_id} · {t.message_count ?? messages.length} messages</div></div>
           </div>
-          <a href="/dashboard" className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-[11px] text-white/65 hover:bg-white/[0.07]">Ware Dashboard</a>
+          <a href="/dashboard" className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-[11px] text-white/65 hover:bg-white/[0.07]">Stained Dashboard</a>
         </div>
       </header>
 
@@ -148,3 +148,4 @@ function TranscriptPage() {
     </div>
   );
 }
+

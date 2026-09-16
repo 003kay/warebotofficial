@@ -131,7 +131,7 @@ function Page() {
   return <DashboardShell guild={data.guild} guildId={guildId} active="embeds">
     <div className="w-full pb-24">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div><div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7788d4]/70">Content tools</div><h1 className="mt-2 text-4xl font-bold tracking-[-0.05em] text-white">Embed Builder</h1><p className="mt-2 max-w-2xl text-sm font-medium text-white/38">Build, preview, export, and copy a Ware embed.</p></div>
+        <div><div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#7788d4]/70">Content tools</div><h1 className="mt-2 text-4xl font-bold tracking-[-0.05em] text-white">Embed Builder</h1><p className="mt-2 max-w-2xl text-sm font-medium text-white/38">Build, preview, export, and copy a Stained embed.</p></div>
         <div className="flex gap-2">
           <button type="button" onClick={exportScript} className="inline-flex items-center gap-2 rounded-xl border border-[#6878cf]/18 bg-[#5262ac]/10 px-4 py-2.5 text-xs font-semibold text-[#c4ccff]/72 hover:bg-[#5262ac]/18"><Download className="h-3.5 w-3.5"/>{exported ? "Exported" : "Export"}</button>
           <button type="button" onClick={clear} className="inline-flex items-center gap-2 rounded-xl border border-white/[.08] bg-white/[.035] px-4 py-2.5 text-xs font-semibold text-white/62 hover:bg-white/[.07]"><RotateCcw className="h-3.5 w-3.5"/>Reset</button>
@@ -158,7 +158,7 @@ function Page() {
             <div className="w-full bg-[#0d1015] p-5 sm:p-7">
               {empty ? <div className="grid min-h-[410px] w-full place-items-center rounded-[18px] border border-white/[.055] bg-[#1e2025] text-sm font-medium text-[#949ba4]">Your embed will appear here</div> :
               <div className="min-h-[410px] w-full rounded-[18px] bg-[#313338] p-5 text-[#dbdee1]">
-                <div className="mb-4 flex items-center gap-2.5"><img src={WARE_AVATAR} className="h-10 w-10 rounded-full bg-black object-contain p-1"/><div className="text-sm font-bold text-white">ware <span className="rounded bg-[#5865F2] px-1.5 py-0.5 text-[9px]">✓ APP</span></div></div>
+                <div className="mb-4 flex items-center gap-2.5"><img src={WARE_AVATAR} className="h-10 w-10 rounded-full bg-black object-contain p-1"/><div className="text-sm font-bold text-white">stained <span className="rounded bg-[#5865F2] px-1.5 py-0.5 text-[9px]">✓ APP</span></div></div>
                 {content&&<div className="mb-3 whitespace-pre-wrap text-sm">{content}</div>}
                 <div className="relative w-full overflow-hidden rounded bg-[#2b2d31] p-4 pl-5" style={{borderLeft:`4px solid ${safeColor}`}}>
                   {thumbnail&&<img src={thumbnail==="{user.avatar}"?WARE_AVATAR:thumbnail} className="absolute right-4 top-4 h-20 w-20 rounded object-cover"/>}
@@ -169,7 +169,7 @@ function Page() {
           </section>
 
           <section className={`${card} w-full min-w-0`}>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[.06] px-6 py-4"><div><div className="text-sm font-bold text-white/90">Generated script</div><div className="mt-1 text-[10px] text-white/28">Full-width Ware embed syntax</div></div><div className="flex gap-2"><button onClick={exportScript} className="inline-flex items-center gap-2 rounded-xl border border-white/[.08] bg-white/[.035] px-3.5 py-2 text-[10px] font-bold text-white/58 hover:bg-white/[.07]"><Download className="h-3.5 w-3.5"/>Export</button><button onClick={copy} className="inline-flex items-center gap-2 rounded-xl border border-[#6677c8]/16 bg-[#5262ac]/10 px-3.5 py-2 text-[10px] font-bold text-[#bec7ff]/70 hover:bg-[#5262ac]/18"><Copy className="h-3.5 w-3.5"/>{copied?"Copied":"Copy"}</button></div></div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[.06] px-6 py-4"><div><div className="text-sm font-bold text-white/90">Generated script</div><div className="mt-1 text-[10px] text-white/28">Full-width Stained embed syntax</div></div><div className="flex gap-2"><button onClick={exportScript} className="inline-flex items-center gap-2 rounded-xl border border-white/[.08] bg-white/[.035] px-3.5 py-2 text-[10px] font-bold text-white/58 hover:bg-white/[.07]"><Download className="h-3.5 w-3.5"/>Export</button><button onClick={copy} className="inline-flex items-center gap-2 rounded-xl border border-[#6677c8]/16 bg-[#5262ac]/10 px-3.5 py-2 text-[10px] font-bold text-[#bec7ff]/70 hover:bg-[#5262ac]/18"><Copy className="h-3.5 w-3.5"/>{copied?"Copied":"Copy"}</button></div></div>
             <div className="p-5"><textarea readOnly value={generated} rows={12} className="min-h-[300px] w-full resize-y rounded-[16px] border border-white/[.065] bg-[#06080b] p-5 font-mono text-[13px] leading-6 text-white/80 outline-none"/></div>
           </section>
         </aside>
@@ -177,3 +177,4 @@ function Page() {
     </div>
   </DashboardShell>;
 }
+

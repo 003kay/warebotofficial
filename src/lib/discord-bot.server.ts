@@ -9,7 +9,7 @@ function getBotToken() {
   ).trim();
   if (!token)
     throw new Error(
-      "Ware dashboard bot token is not configured. Set DISCORD_BOT_TOKEN in the website deployment environment.",
+      "Stained dashboard bot token is not configured. Set DISCORD_BOT_TOKEN in the website deployment environment.",
     );
   return token.replace(/^Bot\s+/i, "");
 }
@@ -154,7 +154,7 @@ export async function removeGuildAutoModFilter(
   const rules = await fetchGuildAutoModRules(guildId);
   if (!rules)
     throw new Error(
-      "Ware cannot edit Discord AutoMod. Make sure Ware has Manage Server permission.",
+      "Stained cannot edit Discord AutoMod. Make sure Stained has Manage Server permission.",
     );
   let changed = false;
   for (const rule of rules) {
@@ -291,9 +291,9 @@ export async function publishVerificationPanelMessage(
       {
         title: "Verification",
         description:
-          "Press **Verify** below. Ware will generate a private verification challenge for you.",
+          "Press **Verify** below. Stained will generate a private verification challenge for you.",
         color: 0x111827,
-        footer: { text: "Ware Verification" },
+        footer: { text: "Stained Verification" },
       },
     ],
     components: [
@@ -342,7 +342,7 @@ export async function publishLevelupTestMessage(
           {
             title: "Level 10",
             description:
-              "Rank-card images are attached by the live Ware bot when members level up.",
+              "Rank-card images are attached by the live Stained bot when members level up.",
             color: 0x6f7fe5,
           },
         ]
@@ -420,7 +420,7 @@ export async function publishTranscriptClosedLog(input: {
         color: 0x2b2d31,
         fields,
         timestamp: input.closedAt || new Date().toISOString(),
-        footer: { text: "Ware Tickets" },
+        footer: { text: "Stained Tickets" },
       },
     ],
     components: [
@@ -446,3 +446,4 @@ export async function publishTranscriptClosedLog(input: {
   if (!res.ok) throw new Error(`Discord transcript log failed: ${res.status} ${await res.text()}`);
   return (await res.json()) as { id: string };
 }
+

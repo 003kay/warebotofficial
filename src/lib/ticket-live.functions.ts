@@ -30,9 +30,9 @@ export const publishTicketPanelLive = createServerFn({ method: "POST" })
     await requireGuildManager(data.guildId);
     const { fetchGuildChannels, publishPanelMessage } = await import("@/lib/discord-bot.server");
     const channels = await fetchGuildChannels(data.guildId);
-    if (!channels) throw new Error("Ware could not access this server. Check the bot token and server permissions.");
+    if (!channels) throw new Error("Stained could not access this server. Check the bot token and server permissions.");
     const channel = channels.find((c) => c.id === data.channelId && (c.type === 0 || c.type === 5));
-    if (!channel) throw new Error("That text channel is not available to Ware.");
+    if (!channel) throw new Error("That text channel is not available to Stained.");
 
     const { messageId } = await publishPanelMessage(
       data.channelId,
@@ -58,3 +58,4 @@ export const publishTicketPanelLive = createServerFn({ method: "POST" })
 
     return { ok: true, messageId, channelName: channel.name };
   });
+

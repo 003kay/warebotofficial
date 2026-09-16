@@ -104,7 +104,7 @@ const spotifyCategory = {
     lfm("spotify resume", "Resume the current song", ",spotify resume", "None"),
     lfm("spotify pause", "Pause the current song", ",spotify pause", "None"),
     lfm("spotify shuffle", "Toggle playback shuffle", ",spotify shuffle (option)", "None"),
-    lfm("spotify login", "Grant Ware access to your Spotify account", ",spotify login", "None"),
+    lfm("spotify login", "Grant Stained access to your Spotify account", ",spotify login", "None"),
     lfm("spotify next", "Skip to the next song", ",spotify next", "None"),
     lfm("spotify like", "Like your current playing song on Spotify", ",spotify like", "None"),
     lfm("spotify vc", "Play your current track in a voice channel", ",spotify vc", "None"),
@@ -116,3 +116,4 @@ const spotifyCategory = {
 };
 
 (referenceCommandCategories as unknown as Array<unknown>).push(spotifyCategory);
+

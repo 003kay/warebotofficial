@@ -25,7 +25,7 @@ import {
 import { normalizeLevelingSettings, type LevelingSettings } from "@/lib/leveling-settings";
 
 export const Route = createFileRoute("/dashboard/$guildId/leveling")({
-  head: () => ({ meta: [{ title: "Leveling — Ware Dashboard" }] }),
+  head: () => ({ meta: [{ title: "Leveling — Stained Dashboard" }] }),
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData({
       queryKey: ["dashboardSettings", params.guildId],
@@ -86,7 +86,7 @@ function LevelingPage() {
           values: settings as unknown as Record<string, unknown>,
         },
       });
-      setNotice("Saved — Ware will sync these settings within about 30 seconds.");
+      setNotice("Saved — Stained will sync these settings within about 30 seconds.");
       await router.invalidate();
     } catch (error) {
       setNotice((error as Error).message || "Save failed");
@@ -387,7 +387,7 @@ function LevelingPage() {
                 </div>
               ) : (
                 <div className="text-[10px] font-semibold text-white/25">
-                  This server has no custom emojis available to Ware. You can still type or paste
+                  This server has no custom emojis available to Stained. You can still type or paste
                   any normal Unicode emoji.
                 </div>
               )}
@@ -1029,3 +1029,4 @@ function BoosterCard({
     </Card>
   );
 }
+

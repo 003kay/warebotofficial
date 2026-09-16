@@ -28,7 +28,7 @@ function DashboardIndex() {
       <section className="mb-10 grid gap-7 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#6577d6]/15 bg-[#5364b4]/8 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.17em] text-[#aeb9f8]/58"><Sparkles className="h-3.5 w-3.5"/>Server workspaces</div>
-          <h1 className="mt-5 max-w-3xl text-[42px] font-bold leading-[.96] tracking-[-.055em] text-white md:text-[60px]">Choose a server.<br/><span className="bg-gradient-to-r from-[#8c9ce8] via-[#8da8c8] to-[#73a2a0] bg-clip-text text-transparent">Manage it from Ware.</span></h1>
+          <h1 className="mt-5 max-w-3xl text-[42px] font-bold leading-[.96] tracking-[-.055em] text-white md:text-[60px]">Choose a server.<br/><span className="bg-gradient-to-r from-[#8c9ce8] via-[#8da8c8] to-[#73a2a0] bg-clip-text text-transparent">Manage it from Stained.</span></h1>
           <p className="mt-5 max-w-2xl text-[15px] font-medium leading-7 text-white/40">Protection, tickets, logs, embeds, integrations, and server tools all live inside one workspace.</p>
         </div>
         <div className="rounded-[22px] border border-[#6476c8]/12 bg-[linear-gradient(145deg,rgba(44,54,94,.26),rgba(9,12,17,.86))] px-6 py-5 shadow-[0_18px_60px_rgba(0,0,0,.25)]"><div className="text-[34px] font-bold tracking-[-.05em] text-white/94">{data.guilds.length}</div><div className="mt-1 text-[10px] font-bold uppercase tracking-[.15em] text-white/30">Available servers</div></div>
@@ -51,3 +51,4 @@ function DashboardIndex() {
     </main>
   </div>;
 }
+

@@ -97,7 +97,7 @@ async function persistEvent(event: any) {
 
   // Entitlement updates are intentionally metadata-driven. Checkout creation should
   // include discord_user_id, guild_id and plan in Session metadata so the webhook
-  // can activate the correct Ware account without trusting client-side state.
+  // can activate the correct Stained account without trusting client-side state.
   if (!discordUserId) return;
 
   if (event?.type === "checkout.session.completed") {
@@ -211,3 +211,4 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
     },
   },
 });
+

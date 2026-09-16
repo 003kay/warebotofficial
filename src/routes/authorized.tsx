@@ -7,8 +7,8 @@ import { Starfield } from "@/components/Starfield";
 export const Route = createFileRoute("/authorized")({
   head: () => ({
     meta: [
-      { title: "Authorized — ware" },
-      { name: "description", content: "Your account has been securely connected to Ware." },
+      { title: "Authorized — stained" },
+      { name: "description", content: "Your account has been securely connected to Stained." },
     ],
   }),
   component: AuthorizedPage,
@@ -44,7 +44,7 @@ function AuthorizedPage() {
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,.9)]" />
                     Authorization complete
                   </div>
-                  <p className="mt-2 text-sm text-white/45">Connected with Ware</p>
+                  <p className="mt-2 text-sm text-white/45">Connected with Stained</p>
                 </div>
               </div>
 
@@ -54,7 +54,7 @@ function AuthorizedPage() {
               </h1>
 
               <p className="mt-6 max-w-2xl text-base leading-7 text-white/48 md:text-lg md:leading-8">
-                Your authorization was completed successfully. Ware can now use the connection you just approved without tying this page to any one service.
+                Your authorization was completed successfully. Stained can now use the connection you just approved without tying this page to any one service.
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -63,7 +63,7 @@ function AuthorizedPage() {
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <Link to="/" className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.035] px-6 py-3.5 text-sm font-semibold text-white/68 transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.055] hover:text-white">
-                  Return to Ware
+                  Return to Stained
                 </Link>
               </div>
 
@@ -89,7 +89,7 @@ function AuthorizedPage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold">Connection active</p>
-                      <p className="mt-0.5 text-xs text-white/35">The service you approved is now available to Ware.</p>
+                      <p className="mt-0.5 text-xs text-white/35">The service you approved is now available to Stained.</p>
                     </div>
                   </div>
 
@@ -108,7 +108,7 @@ function AuthorizedPage() {
               <div className="mt-5 flex items-center justify-between rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.045] px-5 py-4">
                 <div>
                   <p className="text-xs font-semibold text-white/75">Authorization successful</p>
-                  <p className="mt-1 text-[11px] text-white/32">Return to Discord and continue using Ware.</p>
+                  <p className="mt-1 text-[11px] text-white/32">Return to Discord and continue using Stained.</p>
                 </div>
                 <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,.8)]" />
               </div>
@@ -121,3 +121,4 @@ function AuthorizedPage() {
     </div>
   );
 }
+

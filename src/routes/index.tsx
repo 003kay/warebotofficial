@@ -12,10 +12,10 @@ const WARE_FAVICON = "/favicon.svg?v=4";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ware" },
-      { name: "description", content: "Protection, moderation, tickets, music, utilities and more — powered by Ware." },
+      { title: "stained" },
+      { name: "description", content: "Protection, moderation, tickets, music, utilities and more — powered by Stained." },
       { property: "og:title", content: "Run your entire server from one bot." },
-      { property: "og:description", content: "Protection, moderation, tickets, music, utilities and more — powered by Ware." },
+      { property: "og:description", content: "Protection, moderation, tickets, music, utilities and more — powered by Stained." },
       { property: "og:image", content: WARE_LOGO },
     ],
     links: [
@@ -40,3 +40,4 @@ function Index() {
     </div>
   );
 }
+

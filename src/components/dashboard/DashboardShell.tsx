@@ -251,12 +251,12 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
             <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-[11px] border border-[#6677ca]/14 bg-black">
               <img
                 src="/ware-logo.svg?v=4"
-                alt="Ware"
+                alt="Stained"
                 className="h-full w-full object-contain p-1"
               />
             </div>
             <div>
-              <div className="text-[14px] font-bold tracking-[-.025em] text-white/94">Ware</div>
+              <div className="text-[14px] font-bold tracking-[-.025em] text-white/94">Stained</div>
               <div className="text-[8px] font-semibold uppercase tracking-[.12em] text-[#8898d7]/38">
                 Dashboard
               </div>
@@ -407,7 +407,7 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
             </span>
             <div className="min-w-0 flex-1">
               <div className="text-[10px] font-bold text-white/68">Support center</div>
-              <div className="mt-0.5 text-[8px] text-white/24">discord.gg/warebot</div>
+              <div className="mt-0.5 text-[8px] text-white/24">stained support</div>
             </div>
             <Activity className="h-3.5 w-3.5 text-[#5bc8aa]/70" />
           </a>
@@ -441,3 +441,4 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
     </div>
   );
 }
+

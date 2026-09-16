@@ -8,8 +8,8 @@ export function Footer() {
   return (
     <footer className="relative z-10 border-t border-white/[0.06] bg-[#0a0a0a] px-6 pb-10 pt-20 md:px-10 md:pt-24">
       <div className="mx-auto max-w-5xl text-center">
-        <img src={WARE_AVATAR} alt="ware" className="mx-auto h-16 w-16 rounded-2xl object-contain p-1.5 ring-1 ring-white/10" />
-        <p className="mt-6 text-sm leading-6 text-white/45">Copyright © {new Date().getFullYear()} warebot.xyz.<br />All rights reserved.</p>
+        <img src={WARE_AVATAR} alt="stained" className="mx-auto h-16 w-16 rounded-2xl object-contain p-1.5 ring-1 ring-white/10" />
+        <p className="mt-6 text-sm leading-6 text-white/45">Copyright © {new Date().getFullYear()} stained.<br />All rights reserved.</p>
 
         <div className="mt-14 grid gap-12 sm:grid-cols-2">
           <div>
@@ -43,3 +43,4 @@ export function Footer() {
     </footer>
   );
 }
+

@@ -4,7 +4,7 @@ import { FeatureSettingsPage } from "@/components/dashboard/FeatureSettingsPage"
 import { getDashboardSettings } from "@/lib/dashboard-settings.functions";
 
 export const Route = createFileRoute("/dashboard/$guildId/logging")({
-  head: () => ({ meta: [{ title: "Logging — Ware Dashboard" }] }),
+  head: () => ({ meta: [{ title: "Logging — Stained Dashboard" }] }),
   loader: async ({ context, params }) => { await context.queryClient.ensureQueryData({ queryKey: ["dashboardSettings", params.guildId], queryFn: () => getDashboardSettings({ data: { guildId: params.guildId } }) }); return null; },
   component: Page,
 });
@@ -22,7 +22,7 @@ function Page() {
     includeIds: Boolean(stored.includeIds ?? false),
   };
   const channelOptions = [
-    { label: "No channel selected", value: "", hint: "Ware will not send this log type" },
+    { label: "No channel selected", value: "", hint: "Stained will not send this log type" },
     ...data.textChannels.map((channel) => ({ label: `#${channel.name}`, value: channel.id, hint: `Discord channel · ${channel.id}` })),
   ];
 
@@ -32,7 +32,7 @@ function Page() {
     active="logging"
     eyebrow="Configuration"
     title="Logging"
-    description="Choose exactly where Ware sends audit events. Logging stays completely off until you enable it yourself."
+    description="Choose exactly where Stained sends audit events. Logging stays completely off until you enable it yourself."
     section="logging"
     initial={initial}
     fields={[
@@ -45,3 +45,4 @@ function Page() {
     ]}
   />;
 }
+

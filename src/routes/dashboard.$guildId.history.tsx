@@ -7,7 +7,7 @@ import { getDashboardSettings } from "@/lib/dashboard-settings.functions";
 import { listTicketTranscripts } from "@/lib/transcript.functions";
 
 export const Route = createFileRoute("/dashboard/$guildId/history")({
-  head: () => ({ meta: [{ title: "Ticket History — Ware Dashboard" }] }),
+  head: () => ({ meta: [{ title: "Ticket History — Stained Dashboard" }] }),
   loader: async ({ context, params }) => {
     await Promise.all([
       context.queryClient.ensureQueryData({ queryKey: ["dashboardSettings", params.guildId], queryFn: () => getDashboardSettings({ data: { guildId: params.guildId } }) }),
@@ -59,9 +59,10 @@ function TicketHistoryPage() {
               <div className="text-[10px] text-white/35">{when(t.closed_at)}</div>
               <div className="text-right"><a href={`/transcripts/${t.id}`} className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.035] px-2.5 py-2 text-[10px] text-white/65 transition hover:bg-white/[0.07] hover:text-white"><FileText className="h-3.5 w-3.5" /> View <ExternalLink className="h-3 w-3 text-white/25" /></a></div>
             </div>
-          )) : <div className="grid min-h-64 place-items-center px-6 text-center"><div><FileText className="mx-auto h-7 w-7 text-white/18" /><div className="mt-3 text-[12px] font-medium text-white/48">No closed tickets yet</div><div className="mt-1 text-[10px] text-white/22">Transcripts will appear here when Ware saves a closed ticket.</div></div></div>}
+          )) : <div className="grid min-h-64 place-items-center px-6 text-center"><div><FileText className="mx-auto h-7 w-7 text-white/18" /><div className="mt-3 text-[12px] font-medium text-white/48">No closed tickets yet</div><div className="mt-1 text-[10px] text-white/22">Transcripts will appear here when Stained saves a closed ticket.</div></div></div>}
         </div>
       </div>
     </DashboardShell>
   );
 }
+

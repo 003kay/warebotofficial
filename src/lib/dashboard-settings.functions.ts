@@ -178,7 +178,7 @@ export const testLevelupMessage = createServerFn({ method: "POST" })
           String(channel.id) === data.channelId && (channel.type === 0 || channel.type === 5),
       )
     )
-      throw new Error("Choose a text channel Ware can access.");
+      throw new Error("Choose a text channel Stained can access.");
     const emojiIds = new Set(
       (emojis ?? []).filter((emoji) => emoji.available !== false).map((emoji) => String(emoji.id)),
     );
@@ -208,6 +208,7 @@ export const publishVerificationPanel = createServerFn({ method: "POST" })
           String(channel.id) === data.channelId && (channel.type === 0 || channel.type === 5),
       )
     )
-      throw new Error("Choose a text channel Ware can access.");
+      throw new Error("Choose a text channel Stained can access.");
     return publishVerificationPanelMessage(data.channelId);
   });
+

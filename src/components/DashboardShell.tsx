@@ -45,8 +45,8 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
     <div className="min-h-screen bg-[#070707] text-foreground">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[280px] border-r border-white/10 bg-[#0a0a0a] lg:flex lg:flex-col">
         <div className="flex h-[70px] items-center gap-3 border-b border-white/10 px-5">
-          <div className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] p-1.5"><img src={WARE_LOGO} alt="Ware" className="h-full w-full object-contain" /></div>
-          <div className="leading-tight"><div className="font-semibold tracking-wide">ware</div><div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">dashboard</div></div>
+          <div className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] p-1.5"><img src={WARE_LOGO} alt="Stained" className="h-full w-full object-contain" /></div>
+          <div className="leading-tight"><div className="font-semibold tracking-wide">stained</div><div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">dashboard</div></div>
         </div>
 
         <div className="p-4">
@@ -69,7 +69,7 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
           </nav>
         </div>
 
-        <div className="border-t border-white/10 p-4"><div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/[0.05] px-3 py-2 text-xs text-emerald-300"><span className="h-2 w-2 rounded-full bg-emerald-400" />Ware systems operational</div></div>
+        <div className="border-t border-white/10 p-4"><div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/[0.05] px-3 py-2 text-xs text-emerald-300"><span className="h-2 w-2 rounded-full bg-emerald-400" />Stained systems operational</div></div>
       </aside>
 
       <div className="lg:pl-[280px]">
@@ -84,3 +84,4 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
     </div>
   );
 }
+

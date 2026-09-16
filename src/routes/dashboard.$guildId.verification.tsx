@@ -183,7 +183,7 @@ function VerificationPage() {
     try {
       await saveDashboardSettings({ data: { guildId, section: "verification", values } });
       setDirty(false);
-      setNotice("Saved. Ware will pick up the changes automatically.");
+      setNotice("Saved. Stained will pick up the changes automatically.");
       await Promise.allSettled([dashboardQuery.refetch(), securityQuery.refetch()]);
     } catch (error) {
       setNotice((error as Error).message);
@@ -219,7 +219,7 @@ function VerificationPage() {
             <div>
               <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.20em] text-[#8496df]/60"><BadgeCheck className="h-4 w-4" /> Member access</div>
               <h1 className="mt-2 text-[38px] font-black tracking-[-.055em] text-white/96 md:text-[44px]">Verification</h1>
-              <p className="mt-2 max-w-3xl text-[12px] font-semibold leading-5 text-white/34">Control how members prove they are human, which roles change after verification, and how Ware generates each private captcha.</p>
+              <p className="mt-2 max-w-3xl text-[12px] font-semibold leading-5 text-white/34">Control how members prove they are human, which roles change after verification, and how Stained generates each private captcha.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={reloadDiscord} className="inline-flex h-11 items-center gap-2 rounded-[14px] border border-white/[.08] bg-white/[.035] px-4 text-[10px] font-black text-white/58 transition hover:bg-white/[.07] hover:text-white/84"><RefreshCw className={`h-3.5 w-3.5 ${dashboardQuery.isFetching || securityQuery.isFetching ? "animate-spin" : ""}`} />Reload Discord</button>
@@ -237,7 +237,7 @@ function VerificationPage() {
 
         {!hasChannels ? (
           <section className="mt-4 flex flex-col gap-3 rounded-[18px] border border-amber-300/[.12] bg-amber-300/[.035] p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div><div className="text-[11px] font-black text-amber-100/76">Ware could not load the server channel list.</div><div className="mt-1 text-[9px] font-semibold text-amber-100/38">Use Reload Discord. If the list stays empty, Ware needs access to this server through the dashboard bot connection.</div></div>
+            <div><div className="text-[11px] font-black text-amber-100/76">Stained could not load the server channel list.</div><div className="mt-1 text-[9px] font-semibold text-amber-100/38">Use Reload Discord. If the list stays empty, Stained needs access to this server through the dashboard bot connection.</div></div>
             <button type="button" onClick={reloadDiscord} className="shrink-0 rounded-[12px] border border-amber-200/[.12] bg-amber-100/[.06] px-4 py-2.5 text-[9px] font-black text-amber-100/72">Try again</button>
           </section>
         ) : null}
@@ -249,10 +249,10 @@ function VerificationPage() {
           </div>
           <div className="grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
             <ToggleCard title="Enable verification" detail="Nothing runs until you turn this on and save it." value={values.enabled} onChange={value => set("enabled", value)} />
-            <FieldCard title="Verification mode" detail="Choose an in-server captcha, a DM captcha, or Instant Access." disabled={locked}><ModernSelect disabled={locked} value={values.mode} onChange={value => set("mode", value as VerificationMode)} options={[{ label: "Ware Captcha · Channel", value: "captcha_channel", hint: "Private challenge inside the server" }, { label: "Ware Captcha · DMs", value: "captcha_dm", hint: "Challenge is sent directly to the member" }, { label: "Instant Access", value: "instant", hint: "No captcha; roles change immediately" }]} /></FieldCard>
-            <FieldCard title="Verification channel" detail="Where Ware posts the public Verify button." disabled={locked}><ModernSelect disabled={locked || !hasChannels} value={values.channelId} onChange={value => set("channelId", value)} options={channelOptions} placeholder={hasChannels ? "Choose a channel" : "No channels available"} /></FieldCard>
+            <FieldCard title="Verification mode" detail="Choose an in-server captcha, a DM captcha, or Instant Access." disabled={locked}><ModernSelect disabled={locked} value={values.mode} onChange={value => set("mode", value as VerificationMode)} options={[{ label: "Stained Captcha · Channel", value: "captcha_channel", hint: "Private challenge inside the server" }, { label: "Stained Captcha · DMs", value: "captcha_dm", hint: "Challenge is sent directly to the member" }, { label: "Instant Access", value: "instant", hint: "No captcha; roles change immediately" }]} /></FieldCard>
+            <FieldCard title="Verification channel" detail="Where Stained posts the public Verify button." disabled={locked}><ModernSelect disabled={locked || !hasChannels} value={values.channelId} onChange={value => set("channelId", value)} options={channelOptions} placeholder={hasChannels ? "Choose a channel" : "No channels available"} /></FieldCard>
             <FieldCard title="Give role" detail="Role added after the member passes verification." disabled={locked}><ModernSelect disabled={locked || !hasRoles} value={values.giveRoleId} onChange={value => set("giveRoleId", value)} options={roleOptions} placeholder={hasRoles ? "Choose a role" : "No roles available"} /></FieldCard>
-            <FieldCard title="Remove role" detail="Usually your Unverified or Locked role. Ware removes it after success." disabled={locked}><ModernSelect disabled={locked || !hasRoles} value={values.removeRoleId} onChange={value => set("removeRoleId", value)} options={roleOptions} placeholder={hasRoles ? "Choose a role" : "No roles available"} /></FieldCard>
+            <FieldCard title="Remove role" detail="Usually your Unverified or Locked role. Stained removes it after success." disabled={locked}><ModernSelect disabled={locked || !hasRoles} value={values.removeRoleId} onChange={value => set("removeRoleId", value)} options={roleOptions} placeholder={hasRoles ? "Choose a role" : "No roles available"} /></FieldCard>
             <ToggleCard title="Give unverified role on join" detail="Automatically give the Remove Role to new members until they verify." disabled={locked} value={values.assignRemoveRoleOnJoin} onChange={value => set("assignRemoveRoleOnJoin", value)} />
           </div>
         </section>
@@ -289,16 +289,17 @@ function VerificationPage() {
               </div>
               <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
                 <div className="rounded-[15px] border border-white/[.055] bg-white/[.018] p-3.5"><div className="text-[10px] font-black text-white/65">Private per member</div><div className="mt-1 text-[9px] font-semibold leading-4 text-white/25">Each click creates a fresh code and expiration window.</div></div>
-                <div className="rounded-[15px] border border-white/[.055] bg-white/[.018] p-3.5"><div className="text-[10px] font-black text-white/65">Automatic role handoff</div><div className="mt-1 text-[9px] font-semibold leading-4 text-white/25">Ware gives the verified role and removes the locked role after success.</div></div>
+                <div className="rounded-[15px] border border-white/[.055] bg-white/[.018] p-3.5"><div className="text-[10px] font-black text-white/65">Automatic role handoff</div><div className="mt-1 text-[9px] font-semibold leading-4 text-white/25">Stained gives the verified role and removes the locked role after success.</div></div>
               </div>
             </div>
           </div>
         </section>
 
         <section className={`${panel} mt-4 p-5 md:p-6`}>
-          <div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#66d4b5]/62" /><div><div className="text-[12px] font-black text-white/76">Verification flow</div><div className="mt-2 flex flex-wrap gap-2 text-[9px] font-bold text-white/35"><span className="rounded-full border border-white/[.06] px-3 py-2">1 · Member presses Verify</span><span className="rounded-full border border-white/[.06] px-3 py-2">2 · Ware creates a private captcha</span><span className="rounded-full border border-white/[.06] px-3 py-2">3 · Member enters the code</span><span className="rounded-full border border-white/[.06] px-3 py-2">4 · Roles update instantly</span></div></div></div>
+          <div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#66d4b5]/62" /><div><div className="text-[12px] font-black text-white/76">Verification flow</div><div className="mt-2 flex flex-wrap gap-2 text-[9px] font-bold text-white/35"><span className="rounded-full border border-white/[.06] px-3 py-2">1 · Member presses Verify</span><span className="rounded-full border border-white/[.06] px-3 py-2">2 · Stained creates a private captcha</span><span className="rounded-full border border-white/[.06] px-3 py-2">3 · Member enters the code</span><span className="rounded-full border border-white/[.06] px-3 py-2">4 · Roles update instantly</span></div></div></div>
         </section>
       </div>
     </DashboardShell>
   );
 }
+

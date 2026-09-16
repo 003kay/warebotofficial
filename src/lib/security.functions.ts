@@ -18,7 +18,7 @@ async function validateChannel(guildId: string, channelId: string | null) {
   if (!channelId) return;
   const { fetchGuildChannels } = await import("@/lib/discord-bot.server");
   const channels = await fetchGuildChannels(guildId);
-  if (!channels) throw new Error("Ware cannot access this server with the configured bot token.");
+  if (!channels) throw new Error("Stained cannot access this server with the configured bot token.");
   if (!channels.some((c) => c.id === channelId && (c.type === 0 || c.type === 5))) throw new Error("Selected channel is not a text channel in this server.");
 }
 
@@ -26,7 +26,7 @@ async function validateRole(guildId: string, roleId: string | null) {
   if (!roleId) return;
   const { fetchGuildRoles } = await import("@/lib/discord-bot.server");
   const roles = await fetchGuildRoles(guildId);
-  if (!roles) throw new Error("Ware cannot access this server with the configured bot token.");
+  if (!roles) throw new Error("Stained cannot access this server with the configured bot token.");
   if (!roles.some((r) => r.id === roleId)) throw new Error("Selected role does not belong to this server.");
 }
 
@@ -108,8 +108,8 @@ export const getSecurityConfig = createServerFn({ method: "GET" })
     for (const row of listsRes.data ?? []) if ((LIST_TYPES as readonly string[]).includes(row.list_type)) lists[row.list_type as ListType].push({ id: row.id, entry_type: row.entry_type, value: row.value, note: row.note });
 
     // Discord AutoMod keyword rules are treated as a source of truth for Discord-managed filters.
-    // Ware keeps them visible alongside Ware-only filters and only inserts missing values; it never
-    // deletes the user's additional Ware filters when Discord rules change.
+    // Stained keeps them visible alongside Ware-only filters and only inserts missing values; it never
+    // deletes the user's additional Stained filters when Discord rules change.
     const automodValues = new Set<string>();
     for (const rule of automodRules ?? []) {
       if (!rule.enabled || rule.trigger_type !== 1) continue;
@@ -218,3 +218,4 @@ export const removeSecurityListEntry = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+

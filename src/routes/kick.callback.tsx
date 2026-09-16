@@ -8,8 +8,8 @@ export const Route = createFileRoute("/kick/callback")({
   }),
   head: () => ({
     meta: [
-      { title: "Kick Connection — ware" },
-      { name: "description", content: "Kick authorization callback for Ware." },
+      { title: "Kick Connection — stained" },
+      { name: "description", content: "Kick authorization callback for Stained." },
     ],
   }),
   component: KickCallback,
@@ -30,13 +30,14 @@ function KickCallback() {
           {search.error
             ? "Kick returned an authorization error. You can close this page and try connecting again."
             : success
-              ? "Ware received the Kick authorization callback. You can close this page and return to Discord."
-              : "This endpoint is reserved for Ware's Kick integration."}
+              ? "Stained received the Kick authorization callback. You can close this page and return to Discord."
+              : "This endpoint is reserved for Stained's Kick integration."}
         </p>
         <Link to="/" className="mt-6 inline-flex rounded-xl border border-white/10 bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-white/90">
-          Return to Ware
+          Return to Stained
         </Link>
       </section>
     </main>
   );
 }
+

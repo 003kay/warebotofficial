@@ -364,7 +364,7 @@ honeypot list
 honeypot remove
 howgay
 howhot
-https://warebot.xyz
+stained
 humans
 imagerestore
 imagine
@@ -1026,7 +1026,7 @@ function generatedDescription(name: string) {
     channel: `Set or view the channel used by ${subject}.`,
     role: `Set or view the role used by ${subject}.`,
   };
-  return phrases[action] ?? `Use Ware's ${titleCase(name)} command.`;
+  return phrases[action] ?? `Use Stained's ${titleCase(name)} command.`;
 }
 
 function generatedUsage(name: string) {
@@ -1050,7 +1050,7 @@ function generatedExample(name: string) {
     .replace("<@user>", "@user")
     .replace("<@member>", "@member")
     .replace("<reason>", "rule violation")
-    .replace("<message>", "hello from Ware")
+    .replace("<message>", "hello from Stained")
     .replace("<#hex>", "#7c3aed")
     .replace("<url>", "https://example.com/icon.png")
     .replace("<position>", "1");
@@ -1068,7 +1068,7 @@ for (const category of baseCategories) {
 }
 
 if (!baseCategories.some((category) => category.slug === "miscellaneous")) {
-  baseCategories.push({ slug: "miscellaneous", name: "Miscellaneous", description: "Additional Ware commands and utilities.", commands: [] });
+  baseCategories.push({ slug: "miscellaneous", name: "Miscellaneous", description: "Additional Stained commands and utilities.", commands: [] });
 }
 
 const bySlug = new Map(baseCategories.map((category) => [category.slug, category]));
@@ -1107,3 +1107,4 @@ export const canonicalCommands: WareCommandEntry[] = canonicalCommandNames.map((
   }
   return { name, description: generatedDescription(name), usage: generatedUsage(name), example: generatedExample(name) };
 });
+

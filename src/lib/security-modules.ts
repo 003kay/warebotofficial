@@ -116,7 +116,7 @@ export const SECURITY_GROUPS: SecurityGroup[] = [
       m("anti_token", "Anti token leak", "Detect and delete leaked Discord tokens.", { defaultPunishment: "warn", supportsThreshold: false }),
       m("anti_nsfw", "Anti NSFW", "Scan images for NSFW content and remove.", { defaultPunishment: "warn", supportsThreshold: false }),
       m("filter_words", "Word filter", "Syncs Discord AutoMod keyword filters and lets you add Ware-only filters too.", { defaultPunishment: "warn", supportsThreshold: false }),
-      m("anti_dm", "Anti DM abuse", "Block ware DMs from non-trusted users.", { defaultPunishment: "none", supportsThreshold: false }),
+      m("anti_dm", "Anti DM abuse", "Block stained DMs from non-trusted users.", { defaultPunishment: "none", supportsThreshold: false }),
     ],
   },
 ];
@@ -134,3 +134,4 @@ export const LIST_TYPES = [
   "scam_domain",
 ] as const;
 export type ListType = (typeof LIST_TYPES)[number];
+

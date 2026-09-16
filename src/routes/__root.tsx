@@ -57,7 +57,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     reset();
   };
 
-  return <div className="flex min-h-screen items-center justify-center bg-background px-4"><div className="max-w-md text-center"><h1 className="text-xl font-semibold tracking-tight text-foreground">{retrying ? "Reconnecting to Ware…" : "This page didn't load"}</h1><p className="mt-2 text-sm text-muted-foreground">{retrying ? "A dashboard request failed. Ware is retrying automatically." : "The automatic retries didn't recover this page."}</p><div className="mt-6 flex flex-wrap justify-center gap-2"><button onClick={manualRetry} className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Try again</button><a href="/dashboard" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">Dashboard</a></div></div></div>;
+  return <div className="flex min-h-screen items-center justify-center bg-background px-4"><div className="max-w-md text-center"><h1 className="text-xl font-semibold tracking-tight text-foreground">{retrying ? "Reconnecting to Stained…" : "This page didn't load"}</h1><p className="mt-2 text-sm text-muted-foreground">{retrying ? "A dashboard request failed. Stained is retrying automatically." : "The automatic retries didn't recover this page."}</p><div className="mt-6 flex flex-wrap justify-center gap-2"><button onClick={manualRetry} className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Try again</button><a href="/dashboard" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">Dashboard</a></div></div></div>;
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -65,14 +65,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ware" },
-      { name: "description", content: "@003kay on instagram\nhttps://discord.gg/warebot" },
+      { title: "stained" },
+      { name: "description", content: "stained — Discord moderation, security, tickets, music, and server management." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "Run your entire server from one bot." },
       { name: "twitter:title", content: "Run your entire server from one bot." },
-      { property: "og:description", content: "Protection, moderation, tickets, music, utilities and more — powered by Ware." },
-      { name: "twitter:description", content: "Protection, moderation, tickets, music, utilities and more — powered by Ware." },
+      { property: "og:description", content: "Protection, moderation, tickets, music, utilities and more — powered by Stained." },
+      { name: "twitter:description", content: "Protection, moderation, tickets, music, utilities and more — powered by Stained." },
       { property: "og:image", content: WARE_LOGO },
       { name: "twitter:image", content: WARE_LOGO },
     ],
@@ -224,3 +224,4 @@ function RootComponent() {
     <Outlet/>
   </QueryClientProvider>;
 }
+

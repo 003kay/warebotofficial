@@ -15,8 +15,8 @@ const DARK_PALETTE = [
 export const Route = createFileRoute("/embeds")({
   head: () => ({
     meta: [
-      { title: "Embed Builder — ware" },
-      { name: "description", content: "Build and preview Discord embeds for Ware." },
+      { title: "Embed Builder — stained" },
+      { name: "description", content: "Build and preview Discord embeds for Stained." },
     ],
   }),
   component: EmbedBuilderPage,
@@ -163,7 +163,7 @@ function EmbedBuilderPage() {
                   <div className="rounded-xl border border-white/[0.07] p-3.5" style={{background:`linear-gradient(135deg, ${primary}, ${secondary})`}}>
                     <div className="rounded-lg border border-white/10 bg-black/45 px-3 py-2 text-xs text-white/75">Shade preview · {primary} → {secondary}</div>
                   </div>
-                  <p className="text-[11px] leading-5 text-white/30">Discord embeds support one accent color, so the primary shade is used for the generated embed. The second shade is available for Ware&apos;s builder styling and Components V2 designs.</p>
+                  <p className="text-[11px] leading-5 text-white/30">Discord embeds support one accent color, so the primary shade is used for the generated embed. The second shade is available for Stained&apos;s builder styling and Components V2 designs.</p>
                 </div>
               </details>
 
@@ -240,9 +240,9 @@ function EmbedBuilderPage() {
               ) : (
                 <div className="mt-4 rounded-xl bg-[#313338] p-4 text-[#dbdee1] shadow-inner">
                   <div className="flex gap-3">
-                    <img src={WARE_AVATAR} alt="Ware" className="h-10 w-10 rounded-full object-cover"/>
+                    <img src={WARE_AVATAR} alt="Stained" className="h-10 w-10 rounded-full object-cover"/>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 text-sm"><span className="font-semibold text-white">ware</span><span className="inline-flex items-center gap-1 rounded-[3px] bg-[#5865f2] px-1.5 py-[1px] text-[10px] font-bold text-white"><span>✓</span> APP</span><span className="text-xs text-[#949ba4]">Today at 6:49 AM</span></div>
+                      <div className="flex items-center gap-1.5 text-sm"><span className="font-semibold text-white">stained</span><span className="inline-flex items-center gap-1 rounded-[3px] bg-[#5865f2] px-1.5 py-[1px] text-[10px] font-bold text-white"><span>✓</span> APP</span><span className="text-xs text-[#949ba4]">Today at 6:49 AM</span></div>
                       {content ? <div className="mt-1 whitespace-pre-wrap text-sm">{content}</div> : null}
                       <div className="mt-2 max-w-[560px] overflow-hidden rounded-[4px] border-l-4 p-3" style={{borderLeftColor: primary, background:`linear-gradient(135deg, #2b2d31 0%, #2b2d31 72%, ${secondary}55 140%)`}}>
                         {author ? <div className="mb-2 flex items-center gap-2 text-xs font-semibold">{authorIcon ? <img src={authorIcon} className="h-5 w-5 rounded-full"/> : null}{author}</div> : null}
@@ -271,3 +271,4 @@ function EmbedBuilderPage() {
     </div>
   );
 }
+

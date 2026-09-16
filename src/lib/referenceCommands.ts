@@ -251,7 +251,7 @@ export const referenceCommandCategories = [
       cmd("skip", "Skip to the next track"),
       cmd("pause", "Pause the current track"),
       cmd("resume", "Resume the current track"),
-      cmd("stop", "Stop playback, clear the queue, and disconnect Ware"),
+      cmd("stop", "Stop playback, clear the queue, and disconnect Stained"),
       cmd("seek", "Seek to a specific position in the current track", ["position"]),
       cmd("volume", "Change the music volume", ["percentage"]),
       cmd("repeat", "Set the repeat mode", ["off | queue | current"]),
@@ -294,3 +294,4 @@ export const referenceCommandCategories = [
     ],
   },
 ] as const;
+

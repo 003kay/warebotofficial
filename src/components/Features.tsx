@@ -63,7 +63,7 @@ export function Features() {
         </div>
         <div className="max-w-sm">
           <p className="text-sm leading-6 text-muted-foreground">
-            Ware replaces the pile of single-purpose bots with one cohesive
+            Stained replaces the pile of single-purpose bots with one cohesive
             command system. Pick a category and jump straight into the command library.
           </p>
           <a
@@ -136,3 +136,4 @@ export function Features() {
     </section>
   );
 }
+

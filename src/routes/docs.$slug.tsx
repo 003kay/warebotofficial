@@ -19,25 +19,26 @@ function CommandList({ commands }: { commands: CommandDef[] }) {
 }
 
 const pageInfo: Record<string, { title: string; section: string; description: string; commandCategory?: string }> = {
-  introduction:{title:"Introduction",section:"Overview",description:"Learn how to set up ware in your server, find commands, and configure the features you need."},
-  "donator-perks":{title:"Donator Perks",section:"Overview",description:"Supporting ware unlocks expanded limits, premium features, and additional server tools."},
-  customization:{title:"Customization",section:"Overview",description:"Customize ware's prefix, messages, embeds, permissions, and server behavior."},
+  introduction:{title:"Introduction",section:"Overview",description:"Learn how to set up stained in your server, find commands, and configure the features you need."},
+  "donator-perks":{title:"Donator Perks",section:"Overview",description:"Supporting stained unlocks expanded limits, premium features, and additional server tools."},
+  customization:{title:"Customization",section:"Overview",description:"Customize stained's prefix, messages, embeds, permissions, and server behavior."},
   "security-setup":{title:"Antinuke",section:"Security Setup",description:"Protect your server from malicious admins, compromised staff accounts, destructive bots, and mass actions.",commandCategory:"antinuke"},
   "join-gate":{title:"Join Gate",section:"Security Setup",description:"Control how new members enter your server and add verification or screening before they can chat.",commandCategory:"anti"},
-  "moderation-guide":{title:"Moderation",section:"Security Setup",description:"Ban, kick, timeout, jail, mute, warn, lock down, and manage members with Ware's moderation system.",commandCategory:"moderation"},
+  "moderation-guide":{title:"Moderation",section:"Security Setup",description:"Ban, kick, timeout, jail, mute, warn, lock down, and manage members with Stained's moderation system.",commandCategory:"moderation"},
   "fake-permissions":{title:"Fake Permissions",section:"Security Setup",description:"Give staff Ware-specific command access without granting unnecessary native Discord permissions.",commandCategory:"administration"},
   "server-configuration":{title:"Tickets",section:"Server Configuration",description:"Create and manage ticket workflows, support panels, and server support tools.",commandCategory:"tickets"},
   integrations:{title:"Roles",section:"Server Configuration",description:"Configure role utilities, role management, and server role automation.",commandCategory:"channels-roles"},
-  "embed-scripting":{title:"Messages",section:"Server Configuration",description:"Build embeds, manage messages, and use Ware's message tools for cleaner server presentation.",commandCategory:"message-tools"},
+  "embed-scripting":{title:"Messages",section:"Server Configuration",description:"Build embeds, manage messages, and use Stained's message tools for cleaner server presentation.",commandCategory:"message-tools"},
   starboard:{title:"Starboard",section:"Server Configuration",description:"Highlight popular messages automatically with a configurable starboard system.",commandCategory:"fun"},
   "level-rewards":{title:"Level Rewards",section:"Server Configuration",description:"Reward active members with progression, levels, and role rewards.",commandCategory:"leveling"},
 };
 function findCategory(slug:string){return commandCategories.find((category)=>category.slug===slug);}
-export const Route=createFileRoute("/docs/$slug")({head:()=>({meta:[{title:"ware docs"}]}),component:DocPageComponent});
+export const Route=createFileRoute("/docs/$slug")({head:()=>({meta:[{title:"stained docs"}]}),component:DocPageComponent});
 function DocPageComponent(){
-  const {slug}=Route.useParams(); const directCategorySlug=slug.startsWith("commands-")?slug.replace(/^commands-/,""):undefined; const directCategory=directCategorySlug?findCategory(directCategorySlug):undefined; const info=pageInfo[slug]; const category=directCategory??(info?.commandCategory?findCategory(info.commandCategory):undefined); const title=directCategory?`${directCategory.name} Commands`:info?.title??"Documentation"; const section=directCategory?"Commands":info?.section??"Ware Docs"; const description=directCategory?.description??info?.description??"Browse Ware documentation, commands, configuration, and server tools."; const toc=category?[{id:"commands",label:"Commands"}]:undefined;
+  const {slug}=Route.useParams(); const directCategorySlug=slug.startsWith("commands-")?slug.replace(/^commands-/,""):undefined; const directCategory=directCategorySlug?findCategory(directCategorySlug):undefined; const info=pageInfo[slug]; const category=directCategory??(info?.commandCategory?findCategory(info.commandCategory):undefined); const title=directCategory?`${directCategory.name} Commands`:info?.title??"Documentation"; const section=directCategory?"Commands":info?.section??"Stained Docs"; const description=directCategory?.description??info?.description??"Browse Stained documentation, commands, configuration, and server tools."; const toc=category?[{id:"commands",label:"Commands"}]:undefined;
   return <DocsLayout active={slug} toc={toc}>
     <div className="mb-8"><div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">{section}</div><h1 className="mt-5 text-4xl font-bold tracking-[-0.045em] text-white md:text-6xl">{title}</h1><p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">{description}</p></div>
     {category?<section id="commands" className="mt-10"><div className="border-b border-white/[0.07] pb-5"><p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Command library</p><h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">{category.name}</h2></div><CommandList commands={category.commands}/></section>:<div className="grid gap-4 md:grid-cols-2"><div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5"><p className="text-sm font-medium text-white">Fast setup</p><p className="mt-2 text-sm leading-6 text-muted-foreground">Use the navigation on the left to jump between setup guides, security tools, and command categories.</p></div><div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5"><p className="text-sm font-medium text-white">Search everything</p><p className="mt-2 text-sm leading-6 text-muted-foreground">Use search to find commands and documentation instantly.</p></div></div>}
   </DocsLayout>;
 }
+

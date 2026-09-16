@@ -5,11 +5,11 @@ import { DocsLayout } from "@/components/docs/DocsLayout";
 export const Route = createFileRoute("/docs/introduction")({
   head: () => ({
     meta: [
-      { title: "Introduction — ware docs" },
+      { title: "Introduction — stained docs" },
       {
         name: "description",
         content:
-          "Learn how to get started with ware, browse commands, configure your server, and use the documentation.",
+          "Learn how to get started with stained, browse commands, configure your server, and use the documentation.",
       },
     ],
   }),
@@ -33,7 +33,7 @@ function IntroductionPage() {
       </h1>
 
       <p className="mt-4 max-w-3xl text-lg text-muted-foreground">
-        ware is an all-in-one Discord bot built for server moderation, security,
+        stained is an all-in-one Discord bot built for server moderation, security,
         configuration, utilities, economy, VoiceMaster, tickets, giveaways,
         logging, and more. These docs show you what each command does and how to
         use it.
@@ -59,7 +59,7 @@ function IntroductionPage() {
             <BookOpen className="h-5 w-5 text-muted-foreground" />
             <h3 className="mt-3 font-semibold">Default prefix</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              ware uses a comma as the default command prefix.
+              stained uses a comma as the default command prefix.
             </p>
             <code className="mt-3 inline-block rounded bg-white/10 px-2 py-1 font-mono text-sm">
               ,help
@@ -70,7 +70,7 @@ function IntroductionPage() {
             <Settings className="h-5 w-5 text-muted-foreground" />
             <h3 className="mt-3 font-semibold">Server setup</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Use the setup command to begin configuring ware for your server.
+              Use the setup command to begin configuring stained for your server.
             </p>
             <code className="mt-3 inline-block rounded bg-white/10 px-2 py-1 font-mono text-sm">
               ,setup
@@ -143,3 +143,4 @@ function IntroductionPage() {
     </DocsLayout>
   );
 }
+

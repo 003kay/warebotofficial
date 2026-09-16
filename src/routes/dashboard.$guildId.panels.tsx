@@ -6,7 +6,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getTicketPanel } from "@/lib/dashboard.functions";
 
 export const Route = createFileRoute("/dashboard/$guildId/panels")({
-  head: () => ({ meta: [{ title: "Panels — ware dashboard" }] }),
+  head: () => ({ meta: [{ title: "Panels — stained dashboard" }] }),
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData({
       queryKey: ["ticketPanel", params.guildId],
@@ -103,7 +103,7 @@ function PanelsPage() {
                     </div>
                     <div className="min-w-0">
                       <div className="text-sm font-semibold">
-                        ware <span className="text-xs text-muted-foreground">APP</span>
+                        stained <span className="text-xs text-muted-foreground">APP</span>
                       </div>
 
                       <div className="mt-2 rounded-lg border-l-4 border-white/30 bg-white/[0.035] p-3">
@@ -131,7 +131,7 @@ function PanelsPage() {
               </div>
 
               <div className="border-t border-white/10 px-5 py-3 text-xs text-muted-foreground">
-                Ware currently supports one live ticket panel per guild. Multi-panel
+                Stained currently supports one live ticket panel per guild. Multi-panel
                 support is the next backend phase.
               </div>
             </article>
@@ -157,3 +157,4 @@ function PanelsPage() {
     </DashboardShell>
   );
 }
+
