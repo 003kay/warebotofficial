@@ -18,8 +18,8 @@ import wareV2Css from "../ware-v2.css?url";
 import refreshCss from "../ware-refresh.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
-const WARE_LOGO = "/ware-logo.svg?v=4";
-const WARE_FAVICON = "/favicon.svg?v=4";
+const WARE_LOGO = "/stained-logo.png?v=1";
+const WARE_FAVICON = "/stained-logo.png?v=1";
 
 function NotFoundComponent() {
   return <div className="flex min-h-screen items-center justify-center bg-background px-4"><div className="max-w-md text-center"><h1 className="text-7xl font-bold text-foreground">404</h1><h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2><p className="mt-2 text-sm text-muted-foreground">The page you're looking for doesn't exist or has been moved.</p><div className="mt-6"><Link to="/" className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Go home</Link></div></div></div>;
@@ -77,8 +77,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: WARE_LOGO },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: WARE_FAVICON },
-      { rel: "shortcut icon", type: "image/svg+xml", href: WARE_FAVICON },
+      { rel: "icon", type: "image/png", href: WARE_FAVICON },
+      { rel: "shortcut icon", type: "image/png", href: WARE_FAVICON },
       { rel: "apple-touch-icon", href: WARE_LOGO },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

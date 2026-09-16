@@ -21,7 +21,7 @@ export const Route = createFileRoute("/dashboard/$guildId/embeds")({
 
 type Field = { id: number; name: string; value: string; inline: boolean };
 
-const WARE_AVATAR = "/ware-logo.svg?v=4";
+const WARE_AVATAR = "/stained-logo.png?v=1";
 const PALETTE = [
   "#2d3138", "#4b161b", "#6b2415", "#704214", "#5a4b12",
   "#365314", "#14532d", "#115e59", "#155e75", "#164e63",

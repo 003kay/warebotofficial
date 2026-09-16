@@ -3,8 +3,6 @@ import {
   Bell,
   Bot,
   Check,
-  ChevronLeft,
-  ChevronRight,
   CircleEllipsis,
   Copy,
   Gamepad2,
@@ -109,7 +107,6 @@ function formatPermission(permission?: string) {
 
 function CommandsPage() {
   const search = Route.useSearch();
-  const railRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -119,8 +116,6 @@ function CommandsPage() {
       : canonicalCommandCategories[0]?.slug ?? "home",
   );
   const [copied, setCopied] = useState<string | null>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const categoryByCommand = useMemo(() => {
     const map = new Map<string, WareCommandCategory>();
@@ -156,47 +151,6 @@ function CommandsPage() {
     () => canonicalCommandCategories.find((group) => group.slug === category),
     [category],
   );
-
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-
-    const updateScrollState = () => {
-      const max = Math.max(0, rail.scrollWidth - rail.clientWidth);
-      setCanScrollLeft(rail.scrollLeft > 6);
-      setCanScrollRight(rail.scrollLeft < max - 6);
-    };
-
-    const onWheel = (event: WheelEvent) => {
-      const max = Math.max(0, rail.scrollWidth - rail.clientWidth);
-      if (max <= 0) return;
-      const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
-      if (!delta) return;
-
-      const movingRight = delta > 0;
-      const canMove = movingRight ? rail.scrollLeft < max - 1 : rail.scrollLeft > 1;
-      if (!canMove) return;
-
-      event.preventDefault();
-      rail.scrollLeft = Math.max(0, Math.min(max, rail.scrollLeft + delta));
-      updateScrollState();
-    };
-
-    updateScrollState();
-    rail.addEventListener("wheel", onWheel, { passive: false });
-    rail.addEventListener("scroll", updateScrollState, { passive: true });
-    window.addEventListener("resize", updateScrollState);
-
-    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateScrollState) : null;
-    observer?.observe(rail);
-
-    return () => {
-      rail.removeEventListener("wheel", onWheel);
-      rail.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
-      observer?.disconnect();
-    };
-  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -239,15 +193,6 @@ function CommandsPage() {
     };
   }, [searchOpen]);
 
-  const scrollRail = (direction: -1 | 1) => {
-    const rail = railRef.current;
-    if (!rail) return;
-    rail.scrollBy({
-      left: direction * Math.max(320, Math.min(620, rail.clientWidth * 0.75)),
-      behavior: "smooth",
-    });
-  };
-
   const copy = async (text: string, key: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -270,7 +215,7 @@ function CommandsPage() {
             </div>
             <div className="min-w-0">
               <h1 className="text-[38px] font-semibold tracking-[-.055em] text-white sm:text-[48px]">Commands</h1>
-              <p className="mt-1 hidden text-[12px] text-white/28 sm:block">
+              <p className="mt-1 text-[12px] text-white/45">
                 {WARE_COMMAND_COUNT.toLocaleString()} commands available
               </p>
             </div>
@@ -290,62 +235,21 @@ function CommandsPage() {
           </div>
         </header>
 
-        <section className="relative mb-10">
-          <div className="relative flex h-[72px] items-center overflow-hidden rounded-[22px] border border-white/[.08] bg-[#101212] shadow-[0_18px_60px_-50px_rgba(255,255,255,.26)]">
-            <button
-              type="button"
-              onClick={() => scrollRail(-1)}
-              disabled={!canScrollLeft}
-              aria-label="Scroll categories left"
-              className="absolute left-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.085] bg-[#0d0f0f]/95 text-white/42 shadow-[0_8px_25px_rgba(0,0,0,.35)] backdrop-blur transition hover:border-white/[.18] hover:bg-[#171919] hover:text-white disabled:cursor-default disabled:opacity-20"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-
-            <div className="pointer-events-none absolute left-0 z-10 h-full w-[68px] bg-gradient-to-r from-[#101212] via-[#101212]/95 to-transparent" />
-
-            <div
-              ref={railRef}
-              className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-[62px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              <div className="flex h-[70px] w-max items-stretch">
-                {canonicalCommandCategories.map((group) => (
-                  <button
-                    key={group.slug}
-                    type="button"
-                    onClick={() => {
-                      setCategory(group.slug);
-                      setQuery("");
-                    }}
-                    className={`group/category flex min-w-[158px] items-center gap-3 border-r border-white/[.045] px-5 text-left transition duration-200 ${
-                      category === group.slug
-                        ? "bg-[#252727] text-white"
-                        : "text-white/48 hover:bg-white/[.03] hover:text-white/82"
-                    }`}
-                  >
-                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full transition ${category === group.slug ? "bg-white/[.08] text-white" : "text-[#bcd3df]/80 group-hover/category:text-white"}`}>
-                      <CategoryIcon group={group} />
-                    </span>
-                    <span className="max-w-[120px] truncate whitespace-nowrap text-[14px] font-medium">{group.name}</span>
-                    <span className="ml-auto rounded-[9px] bg-white/[.06] px-2.5 py-1 font-mono text-[10px] text-white/45">
-                      {group.commands.length}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="pointer-events-none absolute right-0 z-10 h-full w-[68px] bg-gradient-to-l from-[#101212] via-[#101212]/95 to-transparent" />
-
-            <button
-              type="button"
-              onClick={() => scrollRail(1)}
-              disabled={!canScrollRight}
-              aria-label="Scroll categories right"
-              className="absolute right-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.085] bg-[#0d0f0f]/95 text-white/42 shadow-[0_8px_25px_rgba(0,0,0,.35)] backdrop-blur transition hover:border-white/[.18] hover:bg-[#171919] hover:text-white disabled:cursor-default disabled:opacity-20"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
+        <section className="mb-10 rounded-3xl border border-white/10 bg-white/[.025] p-4 sm:p-6" aria-label="Command categories">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[.16em] text-white/50">Browse by category</h2>
+            <span className="text-xs text-white/40">{canonicalCommandCategories.length} categories</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+            {canonicalCommandCategories.map((group) => (
+              <button key={group.slug} type="button" aria-pressed={category === group.slug}
+                onClick={() => { setCategory(group.slug); setQuery(""); }}
+                className={`flex min-h-14 items-center gap-3 rounded-xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 ${category === group.slug ? "border-violet-300/40 bg-violet-300/10 text-white" : "border-transparent bg-white/[.025] text-white/60 hover:border-white/10 hover:bg-white/[.06] hover:text-white"}`}>
+                <span className={category === group.slug ? "text-violet-200" : "text-white/40"}><CategoryIcon group={group} /></span>
+                <span className="min-w-0 flex-1 text-xs font-medium sm:text-sm">{group.name}</span>
+                <span className="rounded-md bg-black/20 px-2 py-1 font-mono text-[10px] tabular-nums text-white/50">{group.commands.length}</span>
+              </button>
+            ))}
           </div>
         </section>
 

@@ -1,7 +1,7 @@
 import { ArrowUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-const WARE_AVATAR = "/ware-logo.svg";
+const WARE_AVATAR = "/stained-logo.png?v=1";
 const DISCORD_URL = "https://discord.gg/warebot";
 
 export function Footer() {

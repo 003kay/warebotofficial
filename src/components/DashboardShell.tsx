@@ -26,7 +26,7 @@ type DashboardShellProps = {
   children: ReactNode;
 };
 
-const WARE_LOGO = "/ware-logo.svg";
+const WARE_LOGO = "/stained-logo.png?v=1";
 
 const futureItems = [
   { label: "Templates", icon: FileText },

@@ -6,8 +6,8 @@ import { Stats } from "@/components/Stats";
 import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
 
-const WARE_LOGO = "/ware-logo.svg?v=4";
-const WARE_FAVICON = "/favicon.svg?v=4";
+const WARE_LOGO = "/stained-logo.png?v=1";
+const WARE_FAVICON = "/stained-logo.png?v=1";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,8 +19,8 @@ export const Route = createFileRoute("/")({
       { property: "og:image", content: WARE_LOGO },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: WARE_FAVICON },
-      { rel: "shortcut icon", type: "image/svg+xml", href: WARE_FAVICON },
+      { rel: "icon", type: "image/png", href: WARE_FAVICON },
+      { rel: "shortcut icon", type: "image/png", href: WARE_FAVICON },
       { rel: "apple-touch-icon", href: WARE_LOGO },
     ],
   }),

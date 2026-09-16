@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { ArrowRight, Gavel, MessageSquare, ShieldCheck, Terminal, Users, Wrench } from "lucide-react";
 import { INVITE_URL } from "@/lib/links";
 
-const WARE_AVATAR = "/ware-logo.svg?v=4";
+const WARE_AVATAR = "/stained-logo.png?v=1";
 const COMMAND_COUNT = 929;
 
 function DiscordLogo() {

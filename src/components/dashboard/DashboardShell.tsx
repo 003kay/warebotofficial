@@ -250,7 +250,7 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
           >
             <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-[11px] border border-[#6677ca]/14 bg-black">
               <img
-                src="/ware-logo.svg?v=4"
+                src="/stained-logo.png?v=1"
                 alt="Stained"
                 className="h-full w-full object-contain p-1"
               />
