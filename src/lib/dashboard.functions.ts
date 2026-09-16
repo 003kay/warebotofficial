@@ -58,6 +58,14 @@ export const getManagedGuildsFn = createServerFn({ method: "GET" }).handler(asyn
 
   try {
     const guilds = await getManagedGuilds(session.accessToken);
+    const { getBotGuildStatus } = await import("@/lib/discord-bot.server");
+    const statuses = new Map<string, Awaited<ReturnType<typeof getBotGuildStatus>>>();
+    for (let offset = 0; offset < guilds.length; offset += 4) {
+      await Promise.all(guilds.slice(offset, offset + 4).map(async (guild) => {
+        const status = await getBotGuildStatus(guild.id).catch(() => ({ connected: false as const, reason: "discord_error" as const }));
+        statuses.set(guild.id, status);
+      }));
+    }
     return {
       authenticated: true as const,
       guilds: guilds.map((g) => ({
@@ -65,6 +73,8 @@ export const getManagedGuildsFn = createServerFn({ method: "GET" }).handler(asyn
         name: g.name,
         iconUrl: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=128` : null,
         owner: g.owner,
+        botInGuild: statuses.get(g.id)?.connected === true,
+        botStatusReason: statuses.get(g.id)?.reason ?? null,
       })),
     };
   } catch (error) {
@@ -306,4 +316,3 @@ export const publishTicketPanel = createServerFn({ method: "POST" })
 
     return { ok: true, messageId };
   });
-
