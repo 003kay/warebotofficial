@@ -1,3 +1,4 @@
+import { commandCategoryDefinitions, legacyCommandCategories } from "./commandCategoryMap";
 import { botCommandRegistry } from "./botCommandRegistry";
 import { commandCategories } from "@/lib/commands";
 import { lastFmCategory } from "@/lib/lastfmCommands";
@@ -86,9 +87,21 @@ function generatedDescription(name: string) {
 function generatedUsage(name: string) {
   const action = name.split(" ").at(-1) ?? name;
   const argByAction: Record<string, string> = {
-    add: "<value>", remove: "<value>", set: "<value>", create: "<name>", delete: "<name>",
-    channel: "<#channel>", role: "<@role>", user: "<@user>", member: "<@member>", rename: "<name>",
-    reason: "<reason>", message: "<message>", color: "<#hex>", icon: "<url>", position: "<position>",
+    add: "<value>",
+    remove: "<value>",
+    set: "<value>",
+    create: "<name>",
+    delete: "<name>",
+    channel: "<#channel>",
+    role: "<@role>",
+    user: "<@user>",
+    member: "<@member>",
+    rename: "<name>",
+    reason: "<reason>",
+    message: "<message>",
+    color: "<#hex>",
+    icon: "<url>",
+    position: "<position>",
   };
   const arg = argByAction[action];
   return arg ? `${name} ${arg}` : name;
@@ -122,7 +135,12 @@ for (const category of baseCategories) {
 }
 
 if (!baseCategories.some((category) => category.slug === "miscellaneous")) {
-  baseCategories.push({ slug: "miscellaneous", name: "Miscellaneous", description: "Additional Stained commands and utilities.", commands: [] });
+  baseCategories.push({
+    slug: "miscellaneous",
+    name: "Miscellaneous",
+    description: "Additional Stained commands and utilities.",
+    commands: [],
+  });
 }
 
 const bySlug = new Map(baseCategories.map((category) => [category.slug, category]));
@@ -143,28 +161,79 @@ for (const name of canonicalCommandNames) {
 
 const registry = new Map(botCommandRegistry.map((command) => [command.name, command]));
 
-export const canonicalCommandCategories: WareCommandCategory[] = baseCategories
+const enrichedCategories: WareCommandCategory[] = baseCategories
   .map((category) => ({
     ...category,
     commands: category.commands
       .map((command) => {
         const live = registry.get(command.name)!;
-        return { ...command, usage: live.usage, aliases: live.aliases, description: live.description || command.description };
+        return {
+          ...command,
+          usage: live.usage,
+          aliases: live.aliases,
+          description: live.description || command.description,
+        };
       })
-      .filter((command, index, all) => all.findIndex((item) => item.name.toLowerCase() === command.name.toLowerCase()) === index)
+      .filter(
+        (command, index, all) =>
+          all.findIndex((item) => item.name.toLowerCase() === command.name.toLowerCase()) === index,
+      )
       .sort((a, b) => {
         if (category.slug !== "logs") return a.name.localeCompare(b.name);
-        const order = ["log", "log remove", "log ignore", "log ignore list", "log color", "log color list", "log add"];
+        const order = [
+          "log",
+          "log remove",
+          "log ignore",
+          "log ignore list",
+          "log color",
+          "log color list",
+          "log add",
+        ];
         return order.indexOf(a.name.toLowerCase()) - order.indexOf(b.name.toLowerCase());
       }),
   }))
   .filter((category) => category.commands.length > 0);
 
-export const canonicalCommands: WareCommandEntry[] = canonicalCommandNames.map((name) => {
-  for (const category of canonicalCommandCategories) {
-    const found = category.commands.find((command) => command.name.toLowerCase() === name.toLowerCase());
-    if (found) return found;
-  }
-  return { name, description: generatedDescription(name), usage: generatedUsage(name), example: generatedExample(name) };
-});
+// Preserve existing documentation while assigning every registered command once.
+const documentedCommands = new Map(
+  enrichedCategories.flatMap((group) =>
+    group.commands.map((command) => [command.name, command] as const),
+  ),
+);
+const rootCategories = new Map<string, string>(
+  commandCategoryDefinitions.flatMap((group) =>
+    group.roots.map((root) => [root, group.slug] as const),
+  ),
+);
 
+export function commandCategorySlug(name: string) {
+  // The bot uses kick for moderation, and kick subcommands for stream alerts.
+  if (name.startsWith("kick ")) return "social";
+  return rootCategories.get(name.split(" ")[0]) ?? "utility";
+}
+
+export const canonicalCommands: WareCommandEntry[] = botCommandRegistry.map(
+  (command) =>
+    documentedCommands.get(command.name) ?? {
+      ...command,
+      description: command.description || generatedDescription(command.name),
+    },
+);
+
+export const canonicalCommandCategories: WareCommandCategory[] = commandCategoryDefinitions
+  .map((group) => ({
+    slug: group.slug,
+    name: group.name,
+    description: group.description,
+    commands: canonicalCommands
+      .filter((command) => commandCategorySlug(command.name) === group.slug)
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  }))
+  .filter((group) => group.commands.length > 0);
+
+export function resolveCommandCategory(slug?: string) {
+  const candidate = slug ? (legacyCommandCategories[slug] ?? slug) : "information";
+  return canonicalCommandCategories.some((group) => group.slug === candidate)
+    ? candidate
+    : "information";
+}

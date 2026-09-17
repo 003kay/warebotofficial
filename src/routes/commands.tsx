@@ -1,29 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Bell,
-  Bot,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  CircleEllipsis,
-  Copy,
-  Gamepad2,
-  Gavel,
-  Hash,
-  Heart,
-  Info,
-  Mic2,
-  Music2,
-  Search,
-  Server,
-  Settings2,
-  ShieldCheck,
-  Sparkles,
-  Terminal,
-  TicketCheck,
-  WalletCards,
-  Wrench,
-} from "lucide-react";
+import { Check, CircleEllipsis, Copy, Search, Terminal } from "lucide-react";
+import { CommandCategories } from "@/components/CommandCategories";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -32,10 +9,11 @@ import {
   canonicalCommands,
   WARE_COMMAND_COUNT,
   type WareCommandCategory,
+  resolveCommandCategory,
 } from "@/lib/canonicalCommands";
 
 export const Route = createFileRoute("/commands")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { category?: string } => ({
     category: typeof search.category === "string" ? search.category : undefined,
   }),
   head: () => ({
@@ -49,29 +27,6 @@ export const Route = createFileRoute("/commands")({
   }),
   component: CommandsPage,
 });
-
-function CategoryIcon({ group }: { group: WareCommandCategory }) {
-  const name = group.name.toLowerCase();
-  const className = "h-[19px] w-[19px]";
-
-  if (name.includes("moder")) return <Gavel className={className} />;
-  if (name.includes("channel") || name.includes("role")) return <Hash className={className} />;
-  if (name.includes("voice")) return <Mic2 className={className} />;
-  if (name.includes("config") || name.includes("log")) return <Settings2 className={className} />;
-  if (name.includes("nuke") || name.includes("security") || name.includes("anti")) return <ShieldCheck className={className} />;
-  if (name.includes("econom")) return <WalletCards className={className} />;
-  if (name.includes("fun")) return <Sparkles className={className} />;
-  if (name.includes("game")) return <Gamepad2 className={className} />;
-  if (name.includes("util")) return <Wrench className={className} />;
-  if (name.includes("music") || name.includes("last")) return <Music2 className={className} />;
-  if (name.includes("ticket")) return <TicketCheck className={className} />;
-  if (name.includes("notify") || name.includes("social")) return <Bell className={className} />;
-  if (name.includes("info")) return <Info className={className} />;
-  if (name.includes("roleplay")) return <Heart className={className} />;
-  if (name.includes("server") || name.includes("home")) return <Server className={className} />;
-  if (name.includes("bot") || name.includes("ai")) return <Bot className={className} />;
-  return <Terminal className={className} />;
-}
 
 function commandArguments(command: (typeof canonicalCommands)[number]) {
   const usage = command.usage.trim();
@@ -89,7 +44,12 @@ function commandArguments(command: (typeof canonicalCommands)[number]) {
   const grouped = value.match(/<[^>]+>|\[[^\]]+\]|\([^)]+\)|\{[^}]+\}/g);
   if (grouped?.length) {
     return grouped
-      .map((token) => token.replace(/^[<([{]\s*/, "").replace(/\s*[>\])}]$/, "").trim())
+      .map((token) =>
+        token
+          .replace(/^[<([{]\s*/, "")
+          .replace(/\s*[>\])}]$/, "")
+          .trim(),
+      )
       .filter(Boolean);
   }
 
@@ -102,25 +62,21 @@ function commandArguments(command: (typeof canonicalCommands)[number]) {
 function formatPermission(permission?: string) {
   const value = permission?.trim();
   if (!value || value.toLowerCase() === "none") return "none";
-  return value
-    .replace(/[_-]+/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return value.replace(/[_-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function CommandsPage() {
   const search = Route.useSearch();
-  const railRef = useRef<HTMLDivElement>(null);
+  const navigate = Route.useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [category, setCategory] = useState(() =>
-    canonicalCommandCategories.some((group) => group.slug === search.category)
-      ? search.category!
-      : canonicalCommandCategories[0]?.slug ?? "home",
-  );
+  const category = resolveCommandCategory(search.category);
+  const selectCategory = (slug: string) => {
+    setQuery("");
+    void navigate({ search: { category: slug }, resetScroll: false });
+  };
   const [copied, setCopied] = useState<string | null>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const categoryByCommand = useMemo(() => {
     const map = new Map<string, WareCommandCategory>();
@@ -156,47 +112,6 @@ function CommandsPage() {
     () => canonicalCommandCategories.find((group) => group.slug === category),
     [category],
   );
-
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-
-    const updateScrollState = () => {
-      const max = Math.max(0, rail.scrollWidth - rail.clientWidth);
-      setCanScrollLeft(rail.scrollLeft > 6);
-      setCanScrollRight(rail.scrollLeft < max - 6);
-    };
-
-    const onWheel = (event: WheelEvent) => {
-      const max = Math.max(0, rail.scrollWidth - rail.clientWidth);
-      if (max <= 0) return;
-      const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
-      if (!delta) return;
-
-      const movingRight = delta > 0;
-      const canMove = movingRight ? rail.scrollLeft < max - 1 : rail.scrollLeft > 1;
-      if (!canMove) return;
-
-      event.preventDefault();
-      rail.scrollLeft = Math.max(0, Math.min(max, rail.scrollLeft + delta));
-      updateScrollState();
-    };
-
-    updateScrollState();
-    rail.addEventListener("wheel", onWheel, { passive: false });
-    rail.addEventListener("scroll", updateScrollState, { passive: true });
-    window.addEventListener("resize", updateScrollState);
-
-    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateScrollState) : null;
-    observer?.observe(rail);
-
-    return () => {
-      rail.removeEventListener("wheel", onWheel);
-      rail.removeEventListener("scroll", updateScrollState);
-      window.removeEventListener("resize", updateScrollState);
-      observer?.disconnect();
-    };
-  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -239,15 +154,6 @@ function CommandsPage() {
     };
   }, [searchOpen]);
 
-  const scrollRail = (direction: -1 | 1) => {
-    const rail = railRef.current;
-    if (!rail) return;
-    rail.scrollBy({
-      left: direction * Math.max(320, Math.min(620, rail.clientWidth * 0.75)),
-      behavior: "smooth",
-    });
-  };
-
   const copy = async (text: string, key: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -269,7 +175,9 @@ function CommandsPage() {
               <Terminal className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-[38px] font-semibold tracking-[-.055em] text-white sm:text-[48px]">Commands</h1>
+              <h1 className="text-[38px] font-semibold tracking-[-.055em] text-white sm:text-[48px]">
+                Commands
+              </h1>
               <p className="mt-1 text-[12px] text-white/45">
                 {WARE_COMMAND_COUNT.toLocaleString()} commands available
               </p>
@@ -277,7 +185,9 @@ function CommandsPage() {
           </div>
 
           <div className="flex flex-col items-center gap-2">
-            <span className="text-[11px] font-medium lowercase tracking-wide text-white/38">search</span>
+            <span className="text-[11px] font-medium lowercase tracking-wide text-white/38">
+              search
+            </span>
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
@@ -290,74 +200,25 @@ function CommandsPage() {
           </div>
         </header>
 
-        <section className="relative mb-10">
-          <div className="relative flex h-[72px] items-center overflow-hidden rounded-[22px] border border-white/[.08] bg-[#101212] shadow-[0_18px_60px_-50px_rgba(255,255,255,.26)]">
-            <button
-              type="button"
-              onClick={() => scrollRail(-1)}
-              disabled={!canScrollLeft}
-              aria-label="Scroll categories left"
-              className="absolute left-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.085] bg-[#0d0f0f]/95 text-white/42 shadow-[0_8px_25px_rgba(0,0,0,.35)] backdrop-blur transition hover:border-white/[.18] hover:bg-[#171919] hover:text-white disabled:cursor-default disabled:opacity-20"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-
-            <div className="pointer-events-none absolute left-0 z-10 h-full w-[68px] bg-gradient-to-r from-[#101212] via-[#101212]/95 to-transparent" />
-
-            <div
-              ref={railRef}
-              className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-[62px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              <div className="flex h-[56px] w-max items-stretch gap-2">
-                {canonicalCommandCategories.map((group) => (
-                  <button
-                    key={group.slug}
-                    type="button"
-                    onClick={() => {
-                      setCategory(group.slug);
-                      setQuery("");
-                    }}
-                    className={`group/category flex min-w-[158px] items-center gap-3 rounded-xl border border-transparent px-4 text-left transition duration-200 ${
-                      category === group.slug
-                        ? "border-white/15 bg-white/[.08] text-white"
-                        : "text-white/48 hover:bg-white/[.03] hover:text-white/82"
-                    }`}
-                  >
-                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full transition ${category === group.slug ? "bg-white/[.08] text-white" : "text-[#bcd3df]/80 group-hover/category:text-white"}`}>
-                      <CategoryIcon group={group} />
-                    </span>
-                    <span className="max-w-[120px] truncate whitespace-nowrap text-[14px] font-medium">{group.name}</span>
-                    <span className="ml-auto rounded-[9px] bg-white/[.06] px-2.5 py-1 font-mono text-[10px] text-white/45">
-                      {group.commands.length}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="pointer-events-none absolute right-0 z-10 h-full w-[68px] bg-gradient-to-l from-[#101212] via-[#101212]/95 to-transparent" />
-
-            <button
-              type="button"
-              onClick={() => scrollRail(1)}
-              disabled={!canScrollRight}
-              aria-label="Scroll categories right"
-              className="absolute right-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[.085] bg-[#0d0f0f]/95 text-white/42 shadow-[0_8px_25px_rgba(0,0,0,.35)] backdrop-blur transition hover:border-white/[.18] hover:bg-[#171919] hover:text-white disabled:cursor-default disabled:opacity-20"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </section>
+        <CommandCategories
+          categories={canonicalCommandCategories}
+          value={category}
+          onChange={selectCategory}
+        />
 
         <section id="command-results" className="scroll-mt-28">
           <div className="mb-6 flex items-end justify-between gap-4 border-b border-white/[.06] pb-5">
             <div>
               <h2 className="text-[17px] font-semibold tracking-[-.025em] text-white/90">
-                {query ? "Search results" : activeCategory?.name ?? "Commands"}
+                {query ? "Search results" : (activeCategory?.name ?? "Commands")}
               </h2>
-              <p className="mt-1.5 text-[11px] text-white/28">
+              <p className="mt-1.5 text-[12px] text-white/45">
                 {shown.length.toLocaleString()} {shown.length === 1 ? "command" : "commands"}
-                {query ? <span> matching “{query}”</span> : null}
+                {query ? (
+                  <span> matching “{query}”</span>
+                ) : (
+                  <span className="hidden sm:inline"> · {activeCategory?.description}</span>
+                )}
               </p>
             </div>
             {query ? (
@@ -401,7 +262,11 @@ function CommandsPage() {
                       title={copied === key ? "Copied" : "Copy usage"}
                       aria-label={copied === key ? "Copied" : `Copy ${command.name} usage`}
                     >
-                      {copied === key ? <Check className="h-[18px] w-[18px]" /> : <Copy className="h-[18px] w-[18px]" />}
+                      {copied === key ? (
+                        <Check className="h-[18px] w-[18px]" />
+                      ) : (
+                        <Copy className="h-[18px] w-[18px]" />
+                      )}
                     </button>
                   </div>
 
@@ -446,7 +311,9 @@ function CommandsPage() {
             <div className="mt-5 rounded-[24px] border border-white/[.08] bg-[#101212] px-6 py-20 text-center">
               <CircleEllipsis className="mx-auto h-6 w-6 text-white/20" />
               <div className="mt-4 text-[13px] font-medium text-white/60">No commands found</div>
-              <div className="mt-2 text-[11px] text-white/28">Try another command, alias, syntax, or category.</div>
+              <div className="mt-2 text-[11px] text-white/28">
+                Try another command, alias, syntax, or category.
+              </div>
             </div>
           ) : null}
         </section>
@@ -474,7 +341,13 @@ function CommandsPage() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     setSearchOpen(false);
-                    window.setTimeout(() => document.getElementById("command-results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+                    window.setTimeout(
+                      () =>
+                        document
+                          .getElementById("command-results")
+                          ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+                      50,
+                    );
                   }
                 }}
                 placeholder="Search commands or categories..."
