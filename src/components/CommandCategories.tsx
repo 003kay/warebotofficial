@@ -78,11 +78,27 @@ export function CommandCategories({ categories, value, onChange }: Props) {
         previous.left === left && previous.right === right ? previous : { left, right },
       );
     };
+    const onWheel = (event: WheelEvent) => {
+      // Keep trackpad horizontal gestures and browser zoom native.
+      if (event.ctrlKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+      const maximum = Math.max(0, rail.scrollWidth - rail.clientWidth);
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? rail.clientWidth : 1;
+      const delta = event.deltaY * unit;
+      if (!maximum || !delta) return;
+      if ((delta < 0 && rail.scrollLeft <= 1) || (delta > 0 && rail.scrollLeft >= maximum - 1))
+        return;
+      event.preventDefault();
+      rail.scrollLeft = Math.max(0, Math.min(maximum, rail.scrollLeft + delta));
+      update();
+    };
+    const wheelTarget = rail.parentElement ?? rail;
     update();
+    wheelTarget.addEventListener("wheel", onWheel, { passive: false });
     rail.addEventListener("scroll", update, { passive: true });
     const observer = new ResizeObserver(update);
     observer.observe(rail);
     return () => {
+      wheelTarget.removeEventListener("wheel", onWheel);
       rail.removeEventListener("scroll", update);
       observer.disconnect();
     };
@@ -150,7 +166,7 @@ export function CommandCategories({ categories, value, onChange }: Props) {
         </button>
         <div
           ref={railRef}
-          className="relative min-w-0 flex-1 snap-x snap-proximity overflow-x-auto overscroll-x-contain px-1 [scroll-padding-inline:4px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="relative min-w-0 flex-1 overflow-x-auto overscroll-x-contain px-1 [scroll-padding-inline:4px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <div className="flex w-max items-center gap-1.5 py-2">
             {categories.map((group) => {
@@ -164,7 +180,7 @@ export function CommandCategories({ categories, value, onChange }: Props) {
                   aria-pressed={active}
                   aria-controls="command-results"
                   onClick={() => onChange(group.slug)}
-                  className={`group/category relative flex h-12 shrink-0 snap-start items-center gap-2.5 whitespace-nowrap rounded-xl border px-3.5 text-[13px] font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bdd8ef]/50 sm:gap-3 sm:px-4 ${active ? "border-[#bdd8ef]/20 bg-[linear-gradient(135deg,rgba(189,216,239,.12),rgba(255,255,255,.04))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)]" : "border-transparent text-white/55 hover:border-white/[.06] hover:bg-white/[.035] hover:text-white/90"}`}
+                  className={`group/category relative flex h-12 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-xl border px-3.5 text-[13px] font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bdd8ef]/50 sm:gap-3 sm:px-4 ${active ? "border-[#bdd8ef]/20 bg-[linear-gradient(135deg,rgba(189,216,239,.12),rgba(255,255,255,.04))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)]" : "border-transparent text-white/55 hover:border-white/[.06] hover:bg-white/[.035] hover:text-white/90"}`}
                 >
                   <span
                     className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg transition ${active ? "bg-white/[.06] text-[#d7e7ee]" : "text-[#a8bac2] group-hover/category:text-white"}`}
@@ -211,3 +227,4 @@ export function CommandCategories({ categories, value, onChange }: Props) {
     </section>
   );
 }
+
