@@ -1,9 +1,10 @@
+import { SUPPORT_URL as DISCORD_URL } from "@/lib/links";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { WARE_COMMAND_COUNT } from "@/lib/canonicalCommands";
 
-const DISCORD_URL = "https://discord.gg/warebot";
+
 const DASHBOARD_LOGIN = "/auth/discord/login";
 const DASHBOARD_LOGOUT = "/auth/discord/logout";
 

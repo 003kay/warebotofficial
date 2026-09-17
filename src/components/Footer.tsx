@@ -1,9 +1,9 @@
-import { INVITE_URL } from "@/lib/links";
+import { INVITE_URL, SUPPORT_URL as DISCORD_URL } from "@/lib/links";
 import { ArrowUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 const WARE_AVATAR = "/stained-logo.png?v=1";
-const DISCORD_URL = "https://discord.gg/warebot";
+
 
 export function Footer() {
   return (

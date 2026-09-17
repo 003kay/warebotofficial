@@ -1,10 +1,11 @@
+import { SUPPORT_URL as DISCORD_URL } from "@/lib/links";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
-const DISCORD_URL = "https://discord.gg/warebot";
+
 
 const Code = ({ children }: { children: ReactNode }) => (
   <code className="rounded-md bg-white/[.07] px-1.5 py-0.5 font-mono text-[13px] text-white/78">{children}</code>
