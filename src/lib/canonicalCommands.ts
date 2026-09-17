@@ -208,7 +208,7 @@ const rootCategories = new Map<string, string>(
 
 export function commandCategorySlug(name: string) {
   // The bot uses kick for moderation, and kick subcommands for stream alerts.
-  if (name.startsWith("kick ")) return "social";
+  if (name.startsWith("kick ")) return "kick";
   return rootCategories.get(name.split(" ")[0]) ?? "utility";
 }
 

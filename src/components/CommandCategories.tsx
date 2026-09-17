@@ -28,6 +28,7 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
+import { platformLogos } from "@/lib/platformLogos";
 import type { WareCommandCategory } from "@/lib/canonicalCommands";
 
 const icons: Record<string, LucideIcon> = {
@@ -95,7 +96,7 @@ export function CommandCategories({ categories, value, onChange }: Props) {
     const left = selected.offsetLeft;
     const right = left + selected.offsetWidth;
     if (left < rail.scrollLeft || right > rail.scrollLeft + rail.clientWidth) {
-      rail.scrollTo({ left: left - (rail.clientWidth - selected.offsetWidth) / 2 });
+      rail.scrollTo({ left: Math.max(0, left - 8) });
     }
   }, [value]);
 
@@ -136,25 +137,26 @@ export function CommandCategories({ categories, value, onChange }: Props) {
       </div>
       <nav
         aria-label="Browse command categories"
-        className="flex overflow-hidden rounded-2xl border border-white/[.09] bg-[#101212]"
+        className="flex h-16 items-center overflow-hidden rounded-2xl border border-white/[.10] bg-[linear-gradient(180deg,#141717_0%,#0d1010_100%)] px-1 shadow-[inset_0_1px_0_rgba(255,255,255,.035),0_8px_28px_rgba(0,0,0,.12)]"
       >
         <button
           type="button"
           aria-label="Scroll categories left"
           disabled={!edges.left}
           onClick={() => scroll(-1)}
-          className="grid w-10 shrink-0 place-items-center border-r border-white/[.06] text-white/60 transition hover:bg-white/[.04] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bdd8ef]/50 disabled:cursor-default disabled:text-white/15 sm:w-12"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white/55 transition hover:bg-white/[.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bdd8ef]/50 disabled:cursor-default disabled:text-white/15 sm:w-10"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
         <div
           ref={railRef}
-          className="relative min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="relative min-w-0 flex-1 snap-x snap-proximity overflow-x-auto overscroll-x-contain px-1 [scroll-padding-inline:4px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <div className="flex w-max">
+          <div className="flex w-max items-center gap-1.5 py-2">
             {categories.map((group) => {
               const Icon = icons[group.slug] ?? Wrench;
               const active = value === group.slug;
+              const logo = platformLogos[group.slug];
               return (
                 <button
                   key={group.slug}
@@ -162,20 +164,34 @@ export function CommandCategories({ categories, value, onChange }: Props) {
                   aria-pressed={active}
                   aria-controls="command-results"
                   onClick={() => onChange(group.slug)}
-                  className={`relative flex h-16 shrink-0 items-center gap-2.5 whitespace-nowrap border-r border-white/[.045] px-4 text-[13px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bdd8ef]/50 sm:gap-3 sm:px-5 ${active ? "bg-white/[.065] text-white" : "text-white/50 hover:bg-white/[.035] hover:text-white/85"}`}
+                  className={`group/category relative flex h-12 shrink-0 snap-start items-center gap-2.5 whitespace-nowrap rounded-xl border px-3.5 text-[13px] font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bdd8ef]/50 sm:gap-3 sm:px-4 ${active ? "border-[#bdd8ef]/20 bg-[linear-gradient(135deg,rgba(189,216,239,.12),rgba(255,255,255,.04))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)]" : "border-transparent text-white/55 hover:border-white/[.06] hover:bg-white/[.035] hover:text-white/90"}`}
                 >
-                  <Icon
-                    className={`h-[18px] w-[18px] shrink-0 ${active ? "text-[#bdd8ef]" : "text-[#9eb2bc]/75"}`}
-                    aria-hidden="true"
-                  />
+                  <span
+                    className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg transition ${active ? "bg-white/[.06] text-[#d7e7ee]" : "text-[#a8bac2] group-hover/category:text-white"}`}
+                  >
+                    {logo ? (
+                      <svg
+                        data-platform={group.slug}
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="h-[19px] w-[19px]"
+                        aria-hidden="true"
+                        focusable="false"
+                      >
+                        <path d={logo} />
+                      </svg>
+                    ) : (
+                      <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+                    )}
+                  </span>
                   <span>{group.name}</span>
                   <span
-                    className={`min-w-6 rounded-md px-1.5 py-0.5 text-center font-mono text-[10px] tabular-nums ${active ? "bg-white/[.09] text-white/75" : "bg-white/[.035] text-white/35"}`}
+                    className={`ml-0.5 min-w-6 rounded-md border px-1.5 py-0.5 text-center font-mono text-[10px] tabular-nums transition ${active ? "border-white/[.08] bg-white/[.08] text-white/80" : "border-white/[.035] bg-black/15 text-white/40 group-hover/category:text-white/65"}`}
                   >
                     {group.commands.length}
                   </span>
                   {active && (
-                    <span className="absolute inset-x-5 bottom-0 h-0.5 rounded-t bg-[#bdd8ef]/80" />
+                    <span className="absolute inset-x-4 bottom-0 h-px bg-gradient-to-r from-transparent via-[#bdd8ef]/70 to-transparent" />
                   )}
                 </button>
               );
@@ -187,7 +203,7 @@ export function CommandCategories({ categories, value, onChange }: Props) {
           aria-label="Scroll categories right"
           disabled={!edges.right}
           onClick={() => scroll(1)}
-          className="grid w-10 shrink-0 place-items-center border-l border-white/[.06] text-white/60 transition hover:bg-white/[.04] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bdd8ef]/50 disabled:cursor-default disabled:text-white/15 sm:w-12"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white/55 transition hover:bg-white/[.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#bdd8ef]/50 disabled:cursor-default disabled:text-white/15 sm:w-10"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
