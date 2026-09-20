@@ -1,0 +1,6 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { FeatureSettingsPage } from "@/components/dashboard/FeatureSettingsPage";
+import { getDashboardSettings } from "@/lib/dashboard-settings.functions";
+export const Route=createFileRoute("/dashboard/$guildId/filters")({component:Page});
+function Page(){const {guildId}=Route.useParams();const {data}=useSuspenseQuery({queryKey:["dashboardSettings",guildId],queryFn:()=>getDashboardSettings({data:{guildId}})});return <FeatureSettingsPage guild={data.guild} guildId={guildId} active="filters" section="filters" title="Message filters" eyebrow="Security" description="Control Stained’s message filters. Configure custom words, regular expressions and exemptions with the filter commands in Discord." initial={{enabled:true,...(data.settings.filters as Record<string,unknown> ?? {})}} fields={[{key:"enabled",label:"Enable message filtering",type:"toggle"},...[["caps","Excessive capitals"],["spam","Repeated messages"],["spoiler","Spoiler markup"],["massmention","Mass mentions"],["musicfiles","Audio attachments"],["emoji","Emoji spam"],["invites","Discord invites"],["links","Website links"],["snipe","Exclude filtered messages from snipes"]].map(([key,label])=>({key,label,type:"toggle" as const}))]}/>}

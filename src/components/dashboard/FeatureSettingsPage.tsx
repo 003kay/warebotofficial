@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { dashboardFields } from "@/lib/dashboard-contract";
 import { Save, CheckCircle2 } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { ModernSelect } from "@/components/dashboard/ModernSelect";
@@ -23,14 +25,18 @@ function Toggle({ checked, disabled, onChange }: { checked:boolean; disabled?:bo
 }
 
 export function FeatureSettingsPage({ guild, guildId, active, title, eyebrow, description, section, fields, initial }: { guild: GuildInfo; guildId: string; active: string; title: string; eyebrow: string; description: string; section: string; fields: Field[]; initial: Record<string, unknown>; }) {
+  fields = fields.filter(field => dashboardFields[section]?.includes(field.key));
+  const queryClient = useQueryClient();
+  const [dirty, setDirty] = useState(false);
   const [values, setValues] = useState<Record<string, unknown>>(initial);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  useEffect(() => { if (!dirty) setValues(initial); }, [initial, dirty]);
   const masterField = fields.find((field) => field.key === "enabled" && field.type === "toggle");
   const masterEnabled = masterField ? Boolean(values.enabled) : true;
-  const set = (key:string,value:unknown)=>{setValues(current=>({...current,[key]:value}));setSaved(false)};
+  const set = (key:string,value:unknown)=>{setValues(current=>({...current,[key]:value}));setSaved(false);setDirty(true)};
 
-  async function onSave(){setSaving(true);try{await saveDashboardSettings({data:{guildId,section,values}});setSaved(true)}catch(error){alert((error as Error).message)}finally{setSaving(false)}}
+  async function onSave(){setSaving(true);try{await saveDashboardSettings({data:{guildId,section,values:Object.fromEntries(Object.entries(values).filter(([key])=>dashboardFields[section]?.includes(key)))}});setSaved(true);setDirty(false);await queryClient.invalidateQueries({queryKey:["dashboardSettings",guildId]})}catch(error){alert((error as Error).message)}finally{setSaving(false)}}
 
   return <DashboardShell guild={guild} guildId={guildId} active={active}>
     <div className="mx-auto max-w-[1260px] pb-16">

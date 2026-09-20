@@ -1,23 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { FeatureSettingsPage } from "@/components/dashboard/FeatureSettingsPage";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getDashboardSettings } from "@/lib/dashboard-settings.functions";
-
-export const Route = createFileRoute("/dashboard/$guildId/webhooks")({
-  head: () => ({ meta: [{ title: "Webhooks — Stained Dashboard" }] }),
-  loader: async ({ context, params }) => { await context.queryClient.ensureQueryData({ queryKey: ["dashboardSettings", params.guildId], queryFn: () => getDashboardSettings({ data: { guildId: params.guildId } }) }); return null; },
-  component: Page,
-});
-function Page() {
-  const { guildId } = Route.useParams();
-  const { data } = useSuspenseQuery({ queryKey: ["dashboardSettings", guildId], queryFn: () => getDashboardSettings({ data: { guildId } }) });
-  const initial = ((data.settings.webhooks as Record<string, unknown>) ?? { enabled: false, auditWebhookUrl: "", ticketWebhookUrl: "", username: "Stained", retryFailures: true });
-  return <FeatureSettingsPage guild={data.guild} guildId={guildId} active="webhooks" eyebrow="Integrations" title="Webhooks" description="Configure optional outgoing webhook destinations for Stained events. Keep webhook URLs private." section="webhooks" initial={initial} fields={[
-    { key: "enabled", label: "Enable outgoing webhooks", description: "Allow Stained to deliver configured events to external webhook URLs.", type: "toggle" },
-    { key: "auditWebhookUrl", label: "Audit webhook URL", description: "Receives moderation and audit events.", type: "text", placeholder: "https://discord.com/api/webhooks/…" },
-    { key: "ticketWebhookUrl", label: "Ticket webhook URL", description: "Receives ticket open/close events and transcript metadata.", type: "text", placeholder: "https://…" },
-    { key: "username", label: "Webhook display name", type: "text", placeholder: "Stained" },
-    { key: "retryFailures", label: "Retry failed deliveries", description: "Allow the bot runtime to retry temporary webhook errors.", type: "toggle" },
-  ]} />;
-}
-
+export const Route=createFileRoute("/dashboard/$guildId/webhooks")({component:Page});
+function Page(){const {guildId}=Route.useParams();const {data}=useSuspenseQuery({queryKey:["dashboardSettings",guildId],queryFn:()=>getDashboardSettings({data:{guildId}})});return <DashboardShell guild={data.guild} guildId={guildId} active="webhooks"><h1 className="text-3xl font-bold">Webhooks</h1><p className="mt-4 max-w-2xl text-sm leading-7 text-white/55">Create and manage webhooks in Discord. Identifiers stay on the bot host; webhook tokens are never exposed in the dashboard.</p><div className="mt-6 flex flex-wrap gap-3">{["webhook create", "webhook list", "webhook send", "webhook edit", "webhook delete"].map(command=><a key={command} href={`/commands?search=${encodeURIComponent(command)}`} className="rounded-xl border border-white/10 px-4 py-3 font-mono text-sm">,{command}</a>)}</div></DashboardShell>}

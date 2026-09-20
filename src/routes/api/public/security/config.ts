@@ -7,15 +7,17 @@ function safeEqual(a: string, b: string) {
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
-function derivedBotSecret(value: string | undefined) {
+function derivedBotSecret(value: string | undefined, prefix = "stained") {
   const token = (value || "").trim().replace(/^Bot\s+/i, "");
   if (!token) return "";
-  return createHash("sha256").update(`ware-analytics-v1:${token}`).digest("hex");
+  return createHash("sha256").update(`${prefix}-analytics-v1:${token}`).digest("hex");
 }
 
 function sharedSecrets() {
   const values = [
     (process.env.WARE_ANALYTICS_SECRET || "").trim(),
+    (process.env.STAINED_ANALYTICS_SECRET || "").trim(),
+    ...[process.env.DISCORD_BOT_TOKEN, process.env.BOT_TOKEN, process.env.DISCORD_TOKEN].map(token => derivedBotSecret(token, "ware")),
     derivedBotSecret(process.env.DISCORD_BOT_TOKEN),
     derivedBotSecret(process.env.BOT_TOKEN),
     derivedBotSecret(process.env.DISCORD_TOKEN),
@@ -27,8 +29,8 @@ function sharedSecrets() {
 function verifyRequest(request: Request, body: string) {
   const secrets = sharedSecrets();
   if (!secrets.length) return false;
-  const timestampText = request.headers.get("x-ware-timestamp") || "";
-  const signature = request.headers.get("x-ware-signature") || "";
+  const timestampText = (request.headers.get("x-stained-timestamp") || request.headers.get("x-ware-timestamp")) || "";
+  const signature = (request.headers.get("x-stained-signature") || request.headers.get("x-ware-signature")) || "";
   if (!/^\d+$/.test(timestampText) || !signature) return false;
   const timestamp = Number(timestampText);
   const now = Math.floor(Date.now() / 1000);
@@ -118,7 +120,7 @@ export const Route = createFileRoute("/api/public/security/config")({
             .in("guild_id", guildIds),
         ]);
 
-        if (modulesResult.error) {
+        if (modulesResult.error || dashboardResult.error) {
           console.error("Security config sync read failed", modulesResult.error);
           return Response.json({ error: "Database error" }, { status: 500 });
         }
@@ -129,7 +131,7 @@ export const Route = createFileRoute("/api/public/security/config")({
         for (const guildId of guildIds) {
           guilds[guildId] = [];
           verification[guildId] = {};
-          leveling[guildId] = { enabled: false };
+          leveling[guildId] = {};
         }
         for (const row of modulesResult.data ?? []) {
           const guildId = String(row.guild_id);
@@ -147,7 +149,32 @@ export const Route = createFileRoute("/api/public/security/config")({
             leveling[guildId] = levelingValue as Record<string, unknown>;
         }
 
+        const dashboard: Record<string, unknown> = {};
+        for (const row of dashboardResult.data ?? []) dashboard[String(row.guild_id)] = row.settings ?? {};
+        const tickets: Record<string, unknown> = {};
+        if (parsed.protocol === 2) {
+          const panels = await supabaseAdmin.from("ticket_panels").select("*").in("guild_id", guildIds);
+          if (panels.error) return Response.json({ error: "Ticket configuration read failed" }, { status: 500 });
+          const ids = (panels.data ?? []).map((panel: any) => panel.id);
+          const options = ids.length ? await supabaseAdmin.from("ticket_panel_options").select("*").in("panel_id", ids) : { data: [], error: null };
+          if (options.error) return Response.json({ error: "Ticket option read failed" }, { status: 500 });
+          for (const panel of panels.data ?? []) tickets[String(panel.guild_id)] = { ...panel, options: (options.data ?? []).filter((option: any) => option.panel_id === panel.id) };
+        }
+        if (parsed.protocol === 2 && Array.isArray(parsed.runtime)) {
+          const runtimeRows = parsed.runtime.slice(0, 500).filter((row: any) => guildIds.includes(String(row?.guild_id)))
+            .map((row: any) => ({ guild_id: String(row.guild_id), snapshot: row.snapshot ?? {},
+              applied: row.applied ?? {}, errors: row.errors ?? {},
+              command_count: Math.max(0, Math.min(100000, Number(row.command_count) || 0)),
+              version: String(row.version ?? "").slice(0, 64), updated_at: new Date().toISOString() }));
+          if (runtimeRows.length) {
+            const write = await (supabaseAdmin as any).from("guild_bot_runtime").upsert(runtimeRows, { onConflict: "guild_id" });
+            if (write.error) return Response.json({ error: "Runtime status write failed" }, { status: 500 });
+          }
+        }
         return Response.json({
+          protocol: 2,
+          dashboard,
+          tickets,
           guilds,
           verification,
           leveling,

@@ -24,6 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getManagedGuildsFn } from "@/lib/dashboard.functions";
+import { BotSyncStatus } from "./BotSyncStatus";
 import { SUPPORT_URL } from "@/lib/links";
 import "@/dashboard-extra.css";
 
@@ -46,6 +47,7 @@ const ACTIVE_LABELS: Record<string, string> = {
   home: "Overview",
   settings: "Settings",
   security: "Antinuke",
+  filters: "Message filters",
   joinGate: "Join Gate",
   verification: "Verification",
   permissions: "Permissions",
@@ -298,6 +300,7 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
             >
               Antinuke
             </NavItem>
+            <NavItem icon={ShieldCheck} active={active === "filters"} href={`/dashboard/${guildId}/filters`}>Message filters</NavItem>
             <NavItem
               icon={LockKeyhole}
               active={active === "joinGate"}
@@ -436,9 +439,8 @@ export function DashboardShell({ guild, guildId, active, children }: DashboardSh
             </a>
           </div>
         </header>
-        <main className="relative px-4 py-5 md:px-7 md:py-7 xl:px-9">{children}</main>
+        <main className="relative px-4 py-5 md:px-7 md:py-7 xl:px-9"><BotSyncStatus guildId={guildId} />{children}</main>
       </div>
     </div>
   );
 }
-

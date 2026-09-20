@@ -22,10 +22,10 @@ export const lastFmCategory = {
   name: "Last.fm",
   description: "Connect Last.fm, view scrobbles, compare music taste, and explore listening statistics.",
   commands: [
-    lfm("lastfm", "Integrate your Last.fm account with bleed and view your scrobble stats", ",lastfm", "None"),
+    lfm("lastfm", "Integrate your Last.fm account with Stained and view your scrobble stats", ",lastfm", "None"),
     lfm("lastfm mode", "Use a different embed for NP or create your own", ",lastfm mode (type)", "Tier 1 Only"),
     lfm("lastfm color", "Set embed color for Last.fm commands", ",lastfm color (hexc)", "None"),
-    lfm("lastfm logout", "Remove your Last.fm account with bleed's internal system", ",lastfm logout", "None"),
+    lfm("lastfm logout", "Remove your Last.fm account with Stained's internal system", ",lastfm logout", "None"),
     lfm("lastfm taste", "Compare your music taste between you and someone else", ",lastfm taste (member) (period)", "None"),
     lfm("lastfm playsall", "Check how many plays you have for every song on an album", ",lastfm playsall (member) (artist and album)", "None"),
     lfm("lastfm update", "Update your Last.fm library", ",lastfm update (parameters)", "None"),
@@ -79,7 +79,7 @@ export const lastFmCategory = {
     lfm("lastfm wkalbum", "View the top listeners for an album by an artist", ",lastfm wkalbum (album)", "None"),
     lfm("lastfm recentfor", "View your recent tracks for an artist", ",lastfm recentfor (artist)", "None"),
     lfm("lastfm plays", "Check how many plays you have for an artist", ",lastfm plays (member) (artist)", "None"),
-    lfm("lastfm login", "Login and authenticate bleed to use your account", ",lastfm login", "None"),
+    lfm("lastfm login", "Login and authenticate Stained to use your account", ",lastfm login", "None"),
     lfm("nowplaying", "Shows your current song playing from Last.fm", ",nowplaying (member)", "None", ["np"]),
     lfm("itunes", "Finds a song from the iTunes API", ",itunes (song)", "None"),
     lfm("spotifyalbum", "Finds album results from the Spotify API", ",spotifyalbum (album)", "None"),
@@ -116,4 +116,3 @@ const spotifyCategory = {
 };
 
 (referenceCommandCategories as unknown as Array<unknown>).push(spotifyCategory);
-

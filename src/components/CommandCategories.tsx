@@ -227,4 +227,3 @@ export function CommandCategories({ categories, value, onChange }: Props) {
     </section>
   );
 }
-

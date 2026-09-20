@@ -1,4 +1,4 @@
-// Generated from stained-steal-help-update.py registered commands; aliases are not counted separately.
+// Generated from the current registered Stained commands. Aliases are not counted separately.
 export const botCommandRegistry = [
   {
     "name": "2048",
@@ -153,6 +153,12 @@ export const botCommandRegistry = [
   {
     "name": "alias view",
     "usage": "alias view [shortcut]",
+    "aliases": [],
+    "description": ""
+  },
+  {
+    "name": "anconfig",
+    "usage": "anconfig",
     "aliases": [],
     "description": ""
   },
@@ -361,13 +367,13 @@ export const botCommandRegistry = [
   },
   {
     "name": "antinuke permissions grant",
-    "usage": "antinuke permissions grant [member] [permissions]",
+    "usage": "antinuke permissions grant [permission] [flags]",
     "aliases": [],
     "description": ""
   },
   {
     "name": "antinuke permissions remove",
-    "usage": "antinuke permissions remove [member] [permissions]",
+    "usage": "antinuke permissions remove [permission] [flags]",
     "aliases": [],
     "description": ""
   },
@@ -583,7 +589,11 @@ export const botCommandRegistry = [
   {
     "name": "autoresponder",
     "usage": "autoresponder",
-    "aliases": [],
+    "aliases": [
+      "aur",
+      "autoresponse",
+      "autoreponder"
+    ],
     "description": ""
   },
   {
@@ -608,6 +618,12 @@ export const botCommandRegistry = [
     "aliases": [
       "scope"
     ],
+    "description": ""
+  },
+  {
+    "name": "autoresponder flags",
+    "usage": "autoresponder flags",
+    "aliases": [],
     "description": ""
   },
   {
@@ -644,7 +660,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "autoresponder variables",
-    "usage": "autoresponder variables [args]",
+    "usage": "autoresponder variables",
     "aliases": [],
     "description": "View a list of available variables"
   },
@@ -988,6 +1004,14 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "boost variables",
+    "usage": "boost variables",
+    "aliases": [
+      "vars"
+    ],
+    "description": ""
+  },
+  {
     "name": "boost view",
     "usage": "boost view [channel]",
     "aliases": [],
@@ -1049,7 +1073,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "boosterrole create",
-    "usage": "boosterrole create",
+    "usage": "boosterrole create [color=000000] [name]",
     "aliases": [],
     "description": "Create at most one personal booster role per member."
   },
@@ -1255,6 +1279,15 @@ export const botCommandRegistry = [
     "usage": "bot reply remove [message]",
     "aliases": [
       "delete"
+    ],
+    "description": ""
+  },
+  {
+    "name": "botevents",
+    "usage": "botevents",
+    "aliases": [
+      "events",
+      "eventlist"
     ],
     "description": ""
   },
@@ -1672,6 +1705,14 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "cleverbot",
+    "usage": "cleverbot [message]",
+    "aliases": [
+      "cb"
+    ],
+    "description": ""
+  },
+  {
     "name": "clih",
     "usage": "clih",
     "aliases": [],
@@ -1713,6 +1754,14 @@ export const botCommandRegistry = [
     "name": "clownboard color",
     "usage": "clownboard color [value]",
     "aliases": [],
+    "description": ""
+  },
+  {
+    "name": "clownboard config",
+    "usage": "clownboard config",
+    "aliases": [
+      "settings"
+    ],
     "description": ""
   },
   {
@@ -1813,6 +1862,12 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "commonissues",
+    "usage": "commonissues",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "compress",
     "usage": "compress [args]",
     "aliases": [],
@@ -1905,6 +1960,14 @@ export const botCommandRegistry = [
     "usage": "crash [amount]",
     "aliases": [],
     "description": ""
+  },
+  {
+    "name": "create",
+    "usage": "create [first] [rest]",
+    "aliases": [
+      "ec"
+    ],
+    "description": "Create a quick embed with `,create embed <text>` or `,ec <text>`."
   },
   {
     "name": "createembed",
@@ -2044,8 +2107,10 @@ export const botCommandRegistry = [
   },
   {
     "name": "disableevent",
-    "usage": "disableevent [args]",
-    "aliases": [],
+    "usage": "disableevent [event]",
+    "aliases": [
+      "de"
+    ],
     "description": "Disable a bot event in a channel"
   },
   {
@@ -2062,21 +2127,11 @@ export const botCommandRegistry = [
   },
   {
     "name": "disablemodule",
-    "usage": "disablemodule [args]",
-    "aliases": [],
-    "description": "Disable a module in a channel"
-  },
-  {
-    "name": "disablemodule all",
-    "usage": "disablemodule all [args]",
-    "aliases": [],
-    "description": "Disable a module in every channel"
-  },
-  {
-    "name": "disablemodule list",
-    "usage": "disablemodule list [args]",
-    "aliases": [],
-    "description": "View a list of disabled modules in guild"
+    "usage": "disablemodule [target] [module]",
+    "aliases": [
+      "dm"
+    ],
+    "description": ""
   },
   {
     "name": "discog",
@@ -2251,6 +2306,14 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "embed script",
+    "usage": "embed script [code]",
+    "aliases": [
+      "code"
+    ],
+    "description": ""
+  },
+  {
     "name": "embedcode",
     "usage": "embedcode [message_link]",
     "aliases": [],
@@ -2339,8 +2402,10 @@ export const botCommandRegistry = [
   },
   {
     "name": "enableevent",
-    "usage": "enableevent [args]",
-    "aliases": [],
+    "usage": "enableevent [event]",
+    "aliases": [
+      "ee"
+    ],
     "description": "Enable a bot event in a channel"
   },
   {
@@ -2351,15 +2416,11 @@ export const botCommandRegistry = [
   },
   {
     "name": "enablemodule",
-    "usage": "enablemodule [args]",
-    "aliases": [],
-    "description": "Enable a module in a channel"
-  },
-  {
-    "name": "enablemodule all",
-    "usage": "enablemodule all [args]",
-    "aliases": [],
-    "description": "Enables a module in every channel"
+    "usage": "enablemodule [target] [module]",
+    "aliases": [
+      "em"
+    ],
+    "description": ""
   },
   {
     "name": "end",
@@ -2424,12 +2485,15 @@ export const botCommandRegistry = [
   {
     "name": "fakepermissions",
     "usage": "fakepermissions [args]",
-    "aliases": [],
+    "aliases": [
+      "fp",
+      "fakeperms"
+    ],
     "description": "Set up fake permissions for role through the bot!"
   },
   {
     "name": "fakepermissions add",
-    "usage": "fakepermissions add [args]",
+    "usage": "fakepermissions add [role] [permission]",
     "aliases": [],
     "description": "Grant a fake permission to a role"
   },
@@ -2441,19 +2505,27 @@ export const botCommandRegistry = [
   },
   {
     "name": "fakepermissions list",
-    "usage": "fakepermissions list [args]",
+    "usage": "fakepermissions list [role]",
     "aliases": [],
     "description": "List all fake permissions"
   },
   {
+    "name": "fakepermissions permissions",
+    "usage": "fakepermissions permissions",
+    "aliases": [
+      "perms"
+    ],
+    "description": ""
+  },
+  {
     "name": "fakepermissions remove",
-    "usage": "fakepermissions remove [args]",
+    "usage": "fakepermissions remove [role] [permission]",
     "aliases": [],
     "description": "Remove a fake permission from a role"
   },
   {
     "name": "fakepermissions reset",
-    "usage": "fakepermissions reset [args]",
+    "usage": "fakepermissions reset",
     "aliases": [],
     "description": "Resets all fake permissions"
   },
@@ -2481,7 +2553,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "filter caps",
-    "usage": "filter caps [args]",
+    "usage": "filter caps [state]",
     "aliases": [],
     "description": "Delete messages that contain too many uppercase characters"
   },
@@ -2499,7 +2571,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "filter emoji",
-    "usage": "filter emoji [args]",
+    "usage": "filter emoji [state]",
     "aliases": [],
     "description": "Delete any message exceeding the threshold for emojis"
   },
@@ -2529,7 +2601,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "filter invites",
-    "usage": "filter invites [args]",
+    "usage": "filter invites [state]",
     "aliases": [],
     "description": "Delete any message that contains a server link"
   },
@@ -2551,7 +2623,7 @@ export const botCommandRegistry = [
     "aliases": [
       "link"
     ],
-    "description": "Enable Ware's two-strike link filter with `filter links on`."
+    "description": "Enable Stained's two-strike link filter with `filter links on`."
   },
   {
     "name": "filter list",
@@ -2562,8 +2634,14 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "filter massfiles",
+    "usage": "filter massfiles [state]",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "filter massmention",
-    "usage": "filter massmention [args]",
+    "usage": "filter massmention [state]",
     "aliases": [],
     "description": "Delete any message exceeding the threshold for user mentions"
   },
@@ -2580,8 +2658,22 @@ export const botCommandRegistry = [
     "description": "View list of roles exempted from massmention filter"
   },
   {
+    "name": "filter module",
+    "usage": "filter module [module] [state]",
+    "aliases": [],
+    "description": ""
+  },
+  {
+    "name": "filter modules",
+    "usage": "filter modules",
+    "aliases": [
+      "types"
+    ],
+    "description": ""
+  },
+  {
     "name": "filter musicfiles",
-    "usage": "filter musicfiles [args]",
+    "usage": "filter musicfiles [state]",
     "aliases": [],
     "description": "Delete any message that contains a music file"
   },
@@ -2599,7 +2691,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "filter regex",
-    "usage": "filter regex [args]",
+    "usage": "filter regex",
     "aliases": [],
     "description": "Add or remove a regex pattern"
   },
@@ -2620,14 +2712,20 @@ export const botCommandRegistry = [
     "description": "Reset all legacy filtered words"
   },
   {
+    "name": "filter setup",
+    "usage": "filter setup",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "filter snipe",
-    "usage": "filter snipe [args]",
+    "usage": "filter snipe [state]",
     "aliases": [],
     "description": "Filter snipe command from allowing certain content"
   },
   {
     "name": "filter spam",
-    "usage": "filter spam [args]",
+    "usage": "filter spam [state]",
     "aliases": [],
     "description": "Delete messages from users that send messages too fast"
   },
@@ -2644,8 +2742,14 @@ export const botCommandRegistry = [
     "description": "View list of roles exempted from spam filter"
   },
   {
+    "name": "filter spoiler",
+    "usage": "filter spoiler [state]",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "filter spoilers",
-    "usage": "filter spoilers [args]",
+    "usage": "filter spoilers [state]",
     "aliases": [],
     "description": "Delete any message exceeding the threshold for spoilers"
   },
@@ -2866,6 +2970,12 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "gfk",
+    "usage": "gfk [member] [response]",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "giphy",
     "usage": "giphy [keyword]",
     "aliases": [],
@@ -3069,31 +3179,31 @@ export const botCommandRegistry = [
   },
   {
     "name": "goodbye add",
-    "usage": "goodbye add [args]",
+    "usage": "goodbye add [channel] [message]",
     "aliases": [],
     "description": "Add a goodbye message for a channel"
   },
   {
     "name": "goodbye list",
-    "usage": "goodbye list [args]",
+    "usage": "goodbye list",
     "aliases": [],
     "description": "View all goodbye messages"
   },
   {
     "name": "goodbye remove",
-    "usage": "goodbye remove [args]",
+    "usage": "goodbye remove [channel]",
     "aliases": [],
     "description": "Remove a goodbye message from a channel"
   },
   {
     "name": "goodbye variables",
-    "usage": "goodbye variables [args]",
+    "usage": "goodbye variables",
     "aliases": [],
     "description": "View all available variables for goodbye messages"
   },
   {
     "name": "goodbye view",
-    "usage": "goodbye view [args]",
+    "usage": "goodbye view [channel]",
     "aliases": [],
     "description": "View goodbye message for a channel"
   },
@@ -3268,8 +3378,8 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
-    "name": "https://warebot.xyz",
-    "usage": "https://warebot.xyz [user]",
+    "name": "https://stainedbot.xyz",
+    "usage": "https://stainedbot.xyz [user]",
     "aliases": [],
     "description": ""
   },
@@ -3368,6 +3478,12 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "initialsetup",
+    "usage": "initialsetup",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "inrole",
     "usage": "inrole [role_query]",
     "aliases": [],
@@ -3442,7 +3558,7 @@ export const botCommandRegistry = [
     "aliases": [
       "serverinvites"
     ],
-    "description": "Show every active server invite in a paginated Ware-style list."
+    "description": "Show every active server invite in a paginated Stained-style list."
   },
   {
     "name": "invoke",
@@ -4180,13 +4296,13 @@ export const botCommandRegistry = [
     "name": "lastfm login",
     "usage": "lastfm login [args]",
     "aliases": [],
-    "description": "Login and authenticate Ware to use your account"
+    "description": "Login and authenticate Stained to use your account"
   },
   {
     "name": "lastfm logout",
     "usage": "lastfm logout [args]",
     "aliases": [],
-    "description": "Remove your Last.fm account with Ware's internal system"
+    "description": "Remove your Last.fm account with Stained's internal system"
   },
   {
     "name": "lastfm lyrics",
@@ -4485,6 +4601,12 @@ export const botCommandRegistry = [
   {
     "name": "levels leaderboard",
     "usage": "levels leaderboard",
+    "aliases": [],
+    "description": ""
+  },
+  {
+    "name": "levels list",
+    "usage": "levels list",
     "aliases": [],
     "description": ""
   },
@@ -5408,57 +5530,49 @@ export const botCommandRegistry = [
   },
   {
     "name": "pagination",
-    "usage": "pagination [args]",
-    "aliases": [],
-    "description": "Set up multiple embeds on one message"
+    "usage": "pagination",
+    "aliases": [
+      "pages"
+    ],
+    "description": ""
   },
   {
     "name": "pagination add",
-    "usage": "pagination add [args]",
+    "usage": "pagination add [message_link] [embed_code]",
     "aliases": [],
-    "description": "Add a page to a pagination embed"
+    "description": ""
   },
   {
     "name": "pagination delete",
-    "usage": "pagination delete [args]",
+    "usage": "pagination delete [message_link]",
     "aliases": [],
-    "description": "Delete a pagination embed entirely"
+    "description": ""
   },
   {
     "name": "pagination list",
-    "usage": "pagination list [args]",
+    "usage": "pagination list",
     "aliases": [],
-    "description": "View all existing pagination embeds"
-  },
-  {
-    "name": "pagination remove",
-    "usage": "pagination remove [args]",
-    "aliases": [],
-    "description": "Remove a page from a pagination embed"
-  },
-  {
-    "name": "pagination reset",
-    "usage": "pagination reset [args]",
-    "aliases": [],
-    "description": "Remove every existing pagination in guild"
+    "description": ""
   },
   {
     "name": "pagination restorereactions",
-    "usage": "pagination restorereactions [args]",
+    "usage": "pagination restorereactions [message_link]",
     "aliases": [],
-    "description": "Restore reactions to an existing pagination"
+    "description": ""
   },
   {
     "name": "pagination set",
-    "usage": "pagination set [args]",
+    "usage": "pagination set [message_link]",
     "aliases": [],
-    "description": "Set up an existing embed to be paginated"
+    "description": ""
   },
   {
     "name": "pagination update",
-    "usage": "pagination update [args]",
-    "aliases": [],
-    "description": "Update an existing page on pagination embed"
+    "usage": "pagination update [message_link] [page_number] [embed_code]",
+    "aliases": [
+      "edit"
+    ],
+    "description": ""
   },
   {
     "name": "pat",
@@ -6063,10 +6177,15 @@ export const botCommandRegistry = [
     "description": "Create a quote image from supplied text or the message being replied to."
   },
   {
+    "name": "raid",
+    "usage": "raid [duration] [action] [reason=Raid cleanup]",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "raidmode",
     "usage": "raidmode",
     "aliases": [
-      "raid",
       "rm"
     ],
     "description": ""
@@ -6125,7 +6244,8 @@ export const botCommandRegistry = [
     "name": "reaction",
     "usage": "reaction [message_link] [emoji]",
     "aliases": [
-      "reactions"
+      "reactions",
+      "reactiontrigger"
     ],
     "description": ""
   },
@@ -6176,6 +6296,14 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "reactionrole clear",
+    "usage": "reactionrole clear",
+    "aliases": [
+      "reset"
+    ],
+    "description": ""
+  },
+  {
     "name": "reactionrole list",
     "usage": "reactionrole list",
     "aliases": [],
@@ -6194,12 +6322,6 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
-    "name": "reactionrole reset",
-    "usage": "reactionrole reset",
-    "aliases": [],
-    "description": ""
-  },
-  {
     "name": "reactionrole restore",
     "usage": "reactionrole restore [option]",
     "aliases": [],
@@ -6209,7 +6331,8 @@ export const botCommandRegistry = [
     "name": "reactionsnipe",
     "usage": "reactionsnipe [index=1]",
     "aliases": [
-      "rs"
+      "rs",
+      "previousreaction"
     ],
     "description": "Show a recently removed reaction in the current channel."
   },
@@ -6301,7 +6424,7 @@ export const botCommandRegistry = [
     "name": "reposter prefix",
     "usage": "reposter prefix [args]",
     "aliases": [],
-    "description": "Enable or disable Ware prefix for reposting"
+    "description": "Enable or disable Stained prefix for reposting"
   },
   {
     "name": "reposter strict",
@@ -6333,7 +6456,7 @@ export const botCommandRegistry = [
     "aliases": [
       "rc"
     ],
-    "description": ""
+    "description": "Toggle a command restriction for a role.\n\nUsage: ,rc <command> <role>\nRunning the exact same command + role a second time removes the restriction."
   },
   {
     "name": "resume",
@@ -6881,7 +7004,7 @@ export const botCommandRegistry = [
     "name": "security setup",
     "usage": "security setup",
     "aliases": [],
-    "description": "Install and repair the complete Ware security configuration in one command."
+    "description": "Install and repair the complete Stained security configuration in one command."
   },
   {
     "name": "security status",
@@ -7060,7 +7183,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "settings",
-    "usage": "settings [args]",
+    "usage": "settings",
     "aliases": [],
     "description": "Server configuration"
   },
@@ -7078,7 +7201,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "settings baserole",
-    "usage": "settings baserole [args]",
+    "usage": "settings baserole [role]",
     "aliases": [],
     "description": "Set the base role for where boost roles will go under"
   },
@@ -7132,7 +7255,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "settings jailroles",
-    "usage": "settings jailroles [args]",
+    "usage": "settings jailroles [state]",
     "aliases": [],
     "description": "Enable or disable removal of roles for jail"
   },
@@ -7180,20 +7303,22 @@ export const botCommandRegistry = [
   },
   {
     "name": "settings staff",
-    "usage": "settings staff [args]",
+    "usage": "settings staff [role]",
     "aliases": [],
     "description": "Set staff role(s)"
   },
   {
     "name": "settings staff list",
-    "usage": "settings staff list [args]",
+    "usage": "settings staff list",
     "aliases": [],
     "description": "View a list of all staff roles"
   },
   {
     "name": "setup",
     "usage": "setup",
-    "aliases": [],
+    "aliases": [
+      "setme"
+    ],
     "description": ""
   },
   {
@@ -7206,7 +7331,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "setupmute",
-    "usage": "setupmute [args]",
+    "usage": "setupmute",
     "aliases": [],
     "description": "Sets up muted roles and channel permissions"
   },
@@ -7560,6 +7685,14 @@ export const botCommandRegistry = [
     "name": "starboard color",
     "usage": "starboard color [value]",
     "aliases": [],
+    "description": ""
+  },
+  {
+    "name": "starboard config",
+    "usage": "starboard config",
+    "aliases": [
+      "settings"
+    ],
     "description": ""
   },
   {
@@ -8681,6 +8814,28 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "v/a",
+    "usage": "v/a",
+    "aliases": [
+      "va"
+    ],
+    "description": ""
+  },
+  {
+    "name": "v/r",
+    "usage": "v/r",
+    "aliases": [
+      "vr"
+    ],
+    "description": ""
+  },
+  {
+    "name": "v/s",
+    "usage": "v/s",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "valorant",
     "usage": "valorant [args]",
     "aliases": [],
@@ -8870,7 +9025,7 @@ export const botCommandRegistry = [
       "setup",
       "s"
     ],
-    "description": "Create the VoiceMaster category, join channel, and Ware Interface."
+    "description": "Create the VoiceMaster category, join channel, and Stained Interface."
   },
   {
     "name": "voicemaster default",
@@ -9074,6 +9229,12 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "voicemaster sendinterface",
+    "usage": "voicemaster sendinterface",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "voicemaster status",
     "usage": "voicemaster status [status]",
     "aliases": [
@@ -9171,51 +9332,51 @@ export const botCommandRegistry = [
   },
   {
     "name": "webhook",
-    "usage": "webhook [args]",
+    "usage": "webhook",
     "aliases": [],
     "description": "Set up webhooks in your server"
   },
   {
     "name": "webhook create",
-    "usage": "webhook create [args]",
+    "usage": "webhook create [name]",
     "aliases": [],
     "description": "Create webhook to forward messages to"
   },
   {
     "name": "webhook delete",
-    "usage": "webhook delete [args]",
+    "usage": "webhook delete [ident]",
     "aliases": [],
-    "description": "Delete webhook for a channel"
+    "description": ""
   },
   {
     "name": "webhook edit",
-    "usage": "webhook edit [args]",
+    "usage": "webhook edit [message_link] [message]",
     "aliases": [],
     "description": "Send message to existing channel webhook"
   },
   {
     "name": "webhook list",
-    "usage": "webhook list [args]",
+    "usage": "webhook list",
     "aliases": [],
     "description": "List all available webhooks in the server"
   },
   {
     "name": "webhook lock",
-    "usage": "webhook lock [args]",
+    "usage": "webhook lock [ident]",
     "aliases": [],
-    "description": "Lock your webhook from being accessed by others"
+    "description": ""
   },
   {
     "name": "webhook send",
-    "usage": "webhook send [args]",
+    "usage": "webhook send [ident] [message]",
     "aliases": [],
-    "description": "Send message to existing channel webhook"
+    "description": ""
   },
   {
     "name": "webhook unlock",
-    "usage": "webhook unlock [args]",
+    "usage": "webhook unlock [ident]",
     "aliases": [],
-    "description": "Unlock your webhook from being accessed by others"
+    "description": ""
   },
   {
     "name": "weekly",
@@ -9233,7 +9394,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "welcome add",
-    "usage": "welcome add [args]",
+    "usage": "welcome add [channel] [message]",
     "aliases": [],
     "description": "Add a welcome message for a channel"
   },
@@ -9275,7 +9436,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "welcome list",
-    "usage": "welcome list [args]",
+    "usage": "welcome list",
     "aliases": [],
     "description": "View all welcome messages"
   },
@@ -9291,14 +9452,12 @@ export const botCommandRegistry = [
     "name": "welcome remove",
     "usage": "welcome remove [channel]",
     "aliases": [],
-    "description": ""
+    "description": "Remove a welcome message from a channel"
   },
   {
     "name": "welcome reset",
     "usage": "welcome reset",
-    "aliases": [
-      "delete"
-    ],
+    "aliases": [],
     "description": ""
   },
   {
@@ -9317,7 +9476,7 @@ export const botCommandRegistry = [
   },
   {
     "name": "welcome test",
-    "usage": "welcome test",
+    "usage": "welcome test [user]",
     "aliases": [
       "preview",
       "t"
@@ -9326,15 +9485,15 @@ export const botCommandRegistry = [
   },
   {
     "name": "welcome variables",
-    "usage": "welcome variables [args]",
+    "usage": "welcome variables",
     "aliases": [],
     "description": "View all available variables for welcome messages"
   },
   {
     "name": "welcome view",
-    "usage": "welcome view",
+    "usage": "welcome view [channel]",
     "aliases": [
-      "v"
+      "show"
     ],
     "description": ""
   },
@@ -9447,9 +9606,17 @@ export const botCommandRegistry = [
     "description": ""
   },
   {
+    "name": "y/n",
+    "usage": "y/n",
+    "aliases": [],
+    "description": ""
+  },
+  {
     "name": "youtube",
     "usage": "youtube [query]",
-    "aliases": [],
+    "aliases": [
+      "shorts"
+    ],
     "description": ""
   },
   {

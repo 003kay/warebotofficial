@@ -9,95 +9,61 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthorizedRouteImport } from './routes/authorized'
-import { Route as CommandsRouteImport } from './routes/commands'
-import { Route as DocumentationRouteImport } from './routes/documentation'
-import { Route as EmbedsRouteImport } from './routes/embeds'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as HelpRouteImport } from './routes/help'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as RefundsRouteImport } from './routes/refunds'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EmbedsRouteImport } from './routes/embeds'
+import { Route as DocumentationRouteImport } from './routes/documentation'
+import { Route as CommandsRouteImport } from './routes/commands'
+import { Route as AuthorizedRouteImport } from './routes/authorized'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
-import { Route as DocsSlugRouteImport } from './routes/docs.$slug'
-import { Route as DocsCommandsRouteImport } from './routes/docs.commands'
-import { Route as DocsIntroductionRouteImport } from './routes/docs.introduction'
-import { Route as KickCallbackRouteImport } from './routes/kick.callback'
-import { Route as LastfmCallbackRouteImport } from './routes/lastfm.callback'
-import { Route as TranscriptsTranscriptIdRouteImport } from './routes/transcripts.$transcriptId'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as TranscriptsIngestRouteImport } from './routes/transcripts.ingest'
-import { Route as AuthDiscordCallbackRouteImport } from './routes/auth.discord.callback'
-import { Route as AuthDiscordLoginRouteImport } from './routes/auth.discord.login'
-import { Route as AuthDiscordLogoutRouteImport } from './routes/auth.discord.logout'
+import { Route as TranscriptsTranscriptIdRouteImport } from './routes/transcripts.$transcriptId'
+import { Route as LastfmCallbackRouteImport } from './routes/lastfm.callback'
+import { Route as KickCallbackRouteImport } from './routes/kick.callback'
+import { Route as DocsIntroductionRouteImport } from './routes/docs.introduction'
+import { Route as DocsCommandsRouteImport } from './routes/docs.commands'
+import { Route as DocsSlugRouteImport } from './routes/docs.$slug'
 import { Route as DashboardGuildIdIndexRouteImport } from './routes/dashboard.$guildId.index'
-import { Route as DashboardGuildIdAutomationsRouteImport } from './routes/dashboard.$guildId.automations'
-import { Route as DashboardGuildIdCustomCommandsRouteImport } from './routes/dashboard.$guildId.custom-commands'
-import { Route as DashboardGuildIdDiscordAppsRouteImport } from './routes/dashboard.$guildId.discord-apps'
-import { Route as DashboardGuildIdEmbedsRouteImport } from './routes/dashboard.$guildId.embeds'
-import { Route as DashboardGuildIdHistoryRouteImport } from './routes/dashboard.$guildId.history'
-import { Route as DashboardGuildIdJoinGateRouteImport } from './routes/dashboard.$guildId.join-gate'
-import { Route as DashboardGuildIdLastfmRouteImport } from './routes/dashboard.$guildId.lastfm'
-import { Route as DashboardGuildIdLeaderboardRouteImport } from './routes/dashboard.$guildId.leaderboard'
-import { Route as DashboardGuildIdLevelingRouteImport } from './routes/dashboard.$guildId.leveling'
-import { Route as DashboardGuildIdLoggingRouteImport } from './routes/dashboard.$guildId.logging'
-import { Route as DashboardGuildIdMessagesRouteImport } from './routes/dashboard.$guildId.messages'
-import { Route as DashboardGuildIdPanelsRouteImport } from './routes/dashboard.$guildId.panels'
-import { Route as DashboardGuildIdPermissionsRouteImport } from './routes/dashboard.$guildId.permissions'
-import { Route as DashboardGuildIdSecurityRouteImport } from './routes/dashboard.$guildId.security'
-import { Route as DashboardGuildIdSettingsRouteImport } from './routes/dashboard.$guildId.settings'
-import { Route as DashboardGuildIdTicketsRouteImport } from './routes/dashboard.$guildId.tickets'
-import { Route as DashboardGuildIdVerificationRouteImport } from './routes/dashboard.$guildId.verification'
-import { Route as DashboardGuildIdVoicemasterRouteImport } from './routes/dashboard.$guildId.voicemaster'
 import { Route as DashboardGuildIdWebhooksRouteImport } from './routes/dashboard.$guildId.webhooks'
-import { Route as ApiPublicAnalyticsSnapshotRouteImport } from './routes/api/public/analytics/snapshot'
-import { Route as ApiPublicLastfmAccountRouteImport } from './routes/api/public/lastfm/account'
-import { Route as ApiPublicSecurityConfigRouteImport } from './routes/api/public/security/config'
-import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
+import { Route as DashboardGuildIdVoicemasterRouteImport } from './routes/dashboard.$guildId.voicemaster'
+import { Route as DashboardGuildIdVerificationRouteImport } from './routes/dashboard.$guildId.verification'
+import { Route as DashboardGuildIdTicketsRouteImport } from './routes/dashboard.$guildId.tickets'
+import { Route as DashboardGuildIdSettingsRouteImport } from './routes/dashboard.$guildId.settings'
+import { Route as DashboardGuildIdSecurityRouteImport } from './routes/dashboard.$guildId.security'
+import { Route as DashboardGuildIdPermissionsRouteImport } from './routes/dashboard.$guildId.permissions'
+import { Route as DashboardGuildIdPanelsRouteImport } from './routes/dashboard.$guildId.panels'
+import { Route as DashboardGuildIdMessagesRouteImport } from './routes/dashboard.$guildId.messages'
+import { Route as DashboardGuildIdLoggingRouteImport } from './routes/dashboard.$guildId.logging'
+import { Route as DashboardGuildIdLevelingRouteImport } from './routes/dashboard.$guildId.leveling'
+import { Route as DashboardGuildIdLeaderboardRouteImport } from './routes/dashboard.$guildId.leaderboard'
+import { Route as DashboardGuildIdLastfmRouteImport } from './routes/dashboard.$guildId.lastfm'
+import { Route as DashboardGuildIdJoinGateRouteImport } from './routes/dashboard.$guildId.join-gate'
+import { Route as DashboardGuildIdHistoryRouteImport } from './routes/dashboard.$guildId.history'
+import { Route as DashboardGuildIdFiltersRouteImport } from './routes/dashboard.$guildId.filters'
+import { Route as DashboardGuildIdEmbedsRouteImport } from './routes/dashboard.$guildId.embeds'
+import { Route as DashboardGuildIdDiscordAppsRouteImport } from './routes/dashboard.$guildId.discord-apps'
+import { Route as DashboardGuildIdCustomCommandsRouteImport } from './routes/dashboard.$guildId.custom-commands'
+import { Route as DashboardGuildIdAutomationsRouteImport } from './routes/dashboard.$guildId.automations'
+import { Route as AuthDiscordLogoutRouteImport } from './routes/auth.discord.logout'
+import { Route as AuthDiscordLoginRouteImport } from './routes/auth.discord.login'
+import { Route as AuthDiscordCallbackRouteImport } from './routes/auth.discord.callback'
 import { Route as ApiPublicTicketsTranscriptRouteImport } from './routes/api/public/tickets/transcript'
-import { Route as ApiPublicAuthDiscordCallbackRouteImport } from './routes/api/public/auth/discord/callback'
-import { Route as ApiPublicAuthDiscordLoginRouteImport } from './routes/api/public/auth/discord/login'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
+import { Route as ApiPublicSecurityConfigRouteImport } from './routes/api/public/security/config'
+import { Route as ApiPublicLastfmAccountRouteImport } from './routes/api/public/lastfm/account'
+import { Route as ApiPublicAnalyticsSnapshotRouteImport } from './routes/api/public/analytics/snapshot'
 import { Route as ApiPublicAuthDiscordLogoutRouteImport } from './routes/api/public/auth/discord/logout'
+import { Route as ApiPublicAuthDiscordLoginRouteImport } from './routes/api/public/auth/discord/login'
+import { Route as ApiPublicAuthDiscordCallbackRouteImport } from './routes/api/public/auth/discord/callback'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthorizedRoute = AuthorizedRouteImport.update({
-  id: '/authorized',
-  path: '/authorized',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CommandsRoute = CommandsRouteImport.update({
-  id: '/commands',
-  path: '/commands',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocumentationRoute = DocumentationRouteImport.update({
-  id: '/documentation',
-  path: '/documentation',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmbedsRoute = EmbedsRouteImport.update({
-  id: '/embeds',
-  path: '/embeds',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RefundsRoute = RefundsRouteImport.update({
@@ -105,14 +71,44 @@ const RefundsRoute = RefundsRouteImport.update({
   path: '/refunds',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmbedsRoute = EmbedsRouteImport.update({
+  id: '/embeds',
+  path: '/embeds',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentationRoute = DocumentationRouteImport.update({
+  id: '/documentation',
+  path: '/documentation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommandsRoute = CommandsRouteImport.update({
+  id: '/commands',
+  path: '/commands',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthorizedRoute = AuthorizedRouteImport.update({
+  id: '/authorized',
+  path: '/authorized',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsIndexRoute = DocsIndexRouteImport.update({
@@ -120,34 +116,9 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   path: '/docs/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsSlugRoute = DocsSlugRouteImport.update({
-  id: '/docs/$slug',
-  path: '/docs/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsCommandsRoute = DocsCommandsRouteImport.update({
-  id: '/docs/commands',
-  path: '/docs/commands',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsIntroductionRoute = DocsIntroductionRouteImport.update({
-  id: '/docs/introduction',
-  path: '/docs/introduction',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KickCallbackRoute = KickCallbackRouteImport.update({
-  id: '/kick/callback',
-  path: '/kick/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LastfmCallbackRoute = LastfmCallbackRouteImport.update({
-  id: '/lastfm/callback',
-  path: '/lastfm/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TranscriptsTranscriptIdRoute = TranscriptsTranscriptIdRouteImport.update({
-  id: '/transcripts/$transcriptId',
-  path: '/transcripts/$transcriptId',
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TranscriptsIngestRoute = TranscriptsIngestRouteImport.update({
@@ -155,19 +126,34 @@ const TranscriptsIngestRoute = TranscriptsIngestRouteImport.update({
   path: '/transcripts/ingest',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthDiscordCallbackRoute = AuthDiscordCallbackRouteImport.update({
-  id: '/auth/discord/callback',
-  path: '/auth/discord/callback',
+const TranscriptsTranscriptIdRoute = TranscriptsTranscriptIdRouteImport.update({
+  id: '/transcripts/$transcriptId',
+  path: '/transcripts/$transcriptId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthDiscordLoginRoute = AuthDiscordLoginRouteImport.update({
-  id: '/auth/discord/login',
-  path: '/auth/discord/login',
+const LastfmCallbackRoute = LastfmCallbackRouteImport.update({
+  id: '/lastfm/callback',
+  path: '/lastfm/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthDiscordLogoutRoute = AuthDiscordLogoutRouteImport.update({
-  id: '/auth/discord/logout',
-  path: '/auth/discord/logout',
+const KickCallbackRoute = KickCallbackRouteImport.update({
+  id: '/kick/callback',
+  path: '/kick/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsIntroductionRoute = DocsIntroductionRouteImport.update({
+  id: '/docs/introduction',
+  path: '/docs/introduction',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsCommandsRoute = DocsCommandsRouteImport.update({
+  id: '/docs/commands',
+  path: '/docs/commands',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsSlugRoute = DocsSlugRouteImport.update({
+  id: '/docs/$slug',
+  path: '/docs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardGuildIdIndexRoute = DashboardGuildIdIndexRouteImport.update({
@@ -175,100 +161,10 @@ const DashboardGuildIdIndexRoute = DashboardGuildIdIndexRouteImport.update({
   path: '/dashboard/$guildId/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardGuildIdAutomationsRoute =
-  DashboardGuildIdAutomationsRouteImport.update({
-    id: '/dashboard/$guildId/automations',
-    path: '/dashboard/$guildId/automations',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdCustomCommandsRoute =
-  DashboardGuildIdCustomCommandsRouteImport.update({
-    id: '/dashboard/$guildId/custom-commands',
-    path: '/dashboard/$guildId/custom-commands',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdDiscordAppsRoute =
-  DashboardGuildIdDiscordAppsRouteImport.update({
-    id: '/dashboard/$guildId/discord-apps',
-    path: '/dashboard/$guildId/discord-apps',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdEmbedsRoute = DashboardGuildIdEmbedsRouteImport.update({
-  id: '/dashboard/$guildId/embeds',
-  path: '/dashboard/$guildId/embeds',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardGuildIdHistoryRoute = DashboardGuildIdHistoryRouteImport.update({
-  id: '/dashboard/$guildId/history',
-  path: '/dashboard/$guildId/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardGuildIdJoinGateRoute =
-  DashboardGuildIdJoinGateRouteImport.update({
-    id: '/dashboard/$guildId/join-gate',
-    path: '/dashboard/$guildId/join-gate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdLastfmRoute = DashboardGuildIdLastfmRouteImport.update({
-  id: '/dashboard/$guildId/lastfm',
-  path: '/dashboard/$guildId/lastfm',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardGuildIdLeaderboardRoute =
-  DashboardGuildIdLeaderboardRouteImport.update({
-    id: '/dashboard/$guildId/leaderboard',
-    path: '/dashboard/$guildId/leaderboard',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdLevelingRoute =
-  DashboardGuildIdLevelingRouteImport.update({
-    id: '/dashboard/$guildId/leveling',
-    path: '/dashboard/$guildId/leveling',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdLoggingRoute = DashboardGuildIdLoggingRouteImport.update({
-  id: '/dashboard/$guildId/logging',
-  path: '/dashboard/$guildId/logging',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardGuildIdMessagesRoute =
-  DashboardGuildIdMessagesRouteImport.update({
-    id: '/dashboard/$guildId/messages',
-    path: '/dashboard/$guildId/messages',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdPanelsRoute = DashboardGuildIdPanelsRouteImport.update({
-  id: '/dashboard/$guildId/panels',
-  path: '/dashboard/$guildId/panels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardGuildIdPermissionsRoute =
-  DashboardGuildIdPermissionsRouteImport.update({
-    id: '/dashboard/$guildId/permissions',
-    path: '/dashboard/$guildId/permissions',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdSecurityRoute =
-  DashboardGuildIdSecurityRouteImport.update({
-    id: '/dashboard/$guildId/security',
-    path: '/dashboard/$guildId/security',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdSettingsRoute =
-  DashboardGuildIdSettingsRouteImport.update({
-    id: '/dashboard/$guildId/settings',
-    path: '/dashboard/$guildId/settings',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const DashboardGuildIdTicketsRoute = DashboardGuildIdTicketsRouteImport.update({
-  id: '/dashboard/$guildId/tickets',
-  path: '/dashboard/$guildId/tickets',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardGuildIdVerificationRoute =
-  DashboardGuildIdVerificationRouteImport.update({
-    id: '/dashboard/$guildId/verification',
-    path: '/dashboard/$guildId/verification',
+const DashboardGuildIdWebhooksRoute =
+  DashboardGuildIdWebhooksRouteImport.update({
+    id: '/dashboard/$guildId/webhooks',
+    path: '/dashboard/$guildId/webhooks',
     getParentRoute: () => rootRouteImport,
   } as any)
 const DashboardGuildIdVoicemasterRoute =
@@ -277,31 +173,120 @@ const DashboardGuildIdVoicemasterRoute =
     path: '/dashboard/$guildId/voicemaster',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardGuildIdWebhooksRoute =
-  DashboardGuildIdWebhooksRouteImport.update({
-    id: '/dashboard/$guildId/webhooks',
-    path: '/dashboard/$guildId/webhooks',
+const DashboardGuildIdVerificationRoute =
+  DashboardGuildIdVerificationRouteImport.update({
+    id: '/dashboard/$guildId/verification',
+    path: '/dashboard/$guildId/verification',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAnalyticsSnapshotRoute =
-  ApiPublicAnalyticsSnapshotRouteImport.update({
-    id: '/api/public/analytics/snapshot',
-    path: '/api/public/analytics/snapshot',
+const DashboardGuildIdTicketsRoute = DashboardGuildIdTicketsRouteImport.update({
+  id: '/dashboard/$guildId/tickets',
+  path: '/dashboard/$guildId/tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardGuildIdSettingsRoute =
+  DashboardGuildIdSettingsRouteImport.update({
+    id: '/dashboard/$guildId/settings',
+    path: '/dashboard/$guildId/settings',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicLastfmAccountRoute = ApiPublicLastfmAccountRouteImport.update({
-  id: '/api/public/lastfm/account',
-  path: '/api/public/lastfm/account',
+const DashboardGuildIdSecurityRoute =
+  DashboardGuildIdSecurityRouteImport.update({
+    id: '/dashboard/$guildId/security',
+    path: '/dashboard/$guildId/security',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardGuildIdPermissionsRoute =
+  DashboardGuildIdPermissionsRouteImport.update({
+    id: '/dashboard/$guildId/permissions',
+    path: '/dashboard/$guildId/permissions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardGuildIdPanelsRoute = DashboardGuildIdPanelsRouteImport.update({
+  id: '/dashboard/$guildId/panels',
+  path: '/dashboard/$guildId/panels',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicSecurityConfigRoute = ApiPublicSecurityConfigRouteImport.update({
-  id: '/api/public/security/config',
-  path: '/api/public/security/config',
+const DashboardGuildIdMessagesRoute =
+  DashboardGuildIdMessagesRouteImport.update({
+    id: '/dashboard/$guildId/messages',
+    path: '/dashboard/$guildId/messages',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardGuildIdLoggingRoute = DashboardGuildIdLoggingRouteImport.update({
+  id: '/dashboard/$guildId/logging',
+  path: '/dashboard/$guildId/logging',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
-  id: '/api/public/stripe/webhook',
-  path: '/api/public/stripe/webhook',
+const DashboardGuildIdLevelingRoute =
+  DashboardGuildIdLevelingRouteImport.update({
+    id: '/dashboard/$guildId/leveling',
+    path: '/dashboard/$guildId/leveling',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardGuildIdLeaderboardRoute =
+  DashboardGuildIdLeaderboardRouteImport.update({
+    id: '/dashboard/$guildId/leaderboard',
+    path: '/dashboard/$guildId/leaderboard',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardGuildIdLastfmRoute = DashboardGuildIdLastfmRouteImport.update({
+  id: '/dashboard/$guildId/lastfm',
+  path: '/dashboard/$guildId/lastfm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardGuildIdJoinGateRoute =
+  DashboardGuildIdJoinGateRouteImport.update({
+    id: '/dashboard/$guildId/join-gate',
+    path: '/dashboard/$guildId/join-gate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardGuildIdHistoryRoute = DashboardGuildIdHistoryRouteImport.update({
+  id: '/dashboard/$guildId/history',
+  path: '/dashboard/$guildId/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardGuildIdFiltersRoute = DashboardGuildIdFiltersRouteImport.update({
+  id: '/dashboard/$guildId/filters',
+  path: '/dashboard/$guildId/filters',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardGuildIdEmbedsRoute = DashboardGuildIdEmbedsRouteImport.update({
+  id: '/dashboard/$guildId/embeds',
+  path: '/dashboard/$guildId/embeds',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardGuildIdDiscordAppsRoute =
+  DashboardGuildIdDiscordAppsRouteImport.update({
+    id: '/dashboard/$guildId/discord-apps',
+    path: '/dashboard/$guildId/discord-apps',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardGuildIdCustomCommandsRoute =
+  DashboardGuildIdCustomCommandsRouteImport.update({
+    id: '/dashboard/$guildId/custom-commands',
+    path: '/dashboard/$guildId/custom-commands',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardGuildIdAutomationsRoute =
+  DashboardGuildIdAutomationsRouteImport.update({
+    id: '/dashboard/$guildId/automations',
+    path: '/dashboard/$guildId/automations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthDiscordLogoutRoute = AuthDiscordLogoutRouteImport.update({
+  id: '/auth/discord/logout',
+  path: '/auth/discord/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthDiscordLoginRoute = AuthDiscordLoginRouteImport.update({
+  id: '/auth/discord/login',
+  path: '/auth/discord/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthDiscordCallbackRoute = AuthDiscordCallbackRouteImport.update({
+  id: '/auth/discord/callback',
+  path: '/auth/discord/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTicketsTranscriptRoute =
@@ -310,10 +295,31 @@ const ApiPublicTicketsTranscriptRoute =
     path: '/api/public/tickets/transcript',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAuthDiscordCallbackRoute =
-  ApiPublicAuthDiscordCallbackRouteImport.update({
-    id: '/api/public/auth/discord/callback',
-    path: '/api/public/auth/discord/callback',
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe/webhook',
+  path: '/api/public/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSecurityConfigRoute = ApiPublicSecurityConfigRouteImport.update({
+  id: '/api/public/security/config',
+  path: '/api/public/security/config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicLastfmAccountRoute = ApiPublicLastfmAccountRouteImport.update({
+  id: '/api/public/lastfm/account',
+  path: '/api/public/lastfm/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAnalyticsSnapshotRoute =
+  ApiPublicAnalyticsSnapshotRouteImport.update({
+    id: '/api/public/analytics/snapshot',
+    path: '/api/public/analytics/snapshot',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAuthDiscordLogoutRoute =
+  ApiPublicAuthDiscordLogoutRouteImport.update({
+    id: '/api/public/auth/discord/logout',
+    path: '/api/public/auth/discord/logout',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicAuthDiscordLoginRoute =
@@ -322,10 +328,10 @@ const ApiPublicAuthDiscordLoginRoute =
     path: '/api/public/auth/discord/login',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAuthDiscordLogoutRoute =
-  ApiPublicAuthDiscordLogoutRouteImport.update({
-    id: '/api/public/auth/discord/logout',
-    path: '/api/public/auth/discord/logout',
+const ApiPublicAuthDiscordCallbackRoute =
+  ApiPublicAuthDiscordCallbackRouteImport.update({
+    id: '/api/public/auth/discord/callback',
+    path: '/api/public/auth/discord/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -356,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/$guildId/custom-commands': typeof DashboardGuildIdCustomCommandsRoute
   '/dashboard/$guildId/discord-apps': typeof DashboardGuildIdDiscordAppsRoute
   '/dashboard/$guildId/embeds': typeof DashboardGuildIdEmbedsRoute
+  '/dashboard/$guildId/filters': typeof DashboardGuildIdFiltersRoute
   '/dashboard/$guildId/history': typeof DashboardGuildIdHistoryRoute
   '/dashboard/$guildId/join-gate': typeof DashboardGuildIdJoinGateRoute
   '/dashboard/$guildId/lastfm': typeof DashboardGuildIdLastfmRoute
@@ -408,6 +415,7 @@ export interface FileRoutesByTo {
   '/dashboard/$guildId/custom-commands': typeof DashboardGuildIdCustomCommandsRoute
   '/dashboard/$guildId/discord-apps': typeof DashboardGuildIdDiscordAppsRoute
   '/dashboard/$guildId/embeds': typeof DashboardGuildIdEmbedsRoute
+  '/dashboard/$guildId/filters': typeof DashboardGuildIdFiltersRoute
   '/dashboard/$guildId/history': typeof DashboardGuildIdHistoryRoute
   '/dashboard/$guildId/join-gate': typeof DashboardGuildIdJoinGateRoute
   '/dashboard/$guildId/lastfm': typeof DashboardGuildIdLastfmRoute
@@ -461,6 +469,7 @@ export interface FileRoutesById {
   '/dashboard/$guildId/custom-commands': typeof DashboardGuildIdCustomCommandsRoute
   '/dashboard/$guildId/discord-apps': typeof DashboardGuildIdDiscordAppsRoute
   '/dashboard/$guildId/embeds': typeof DashboardGuildIdEmbedsRoute
+  '/dashboard/$guildId/filters': typeof DashboardGuildIdFiltersRoute
   '/dashboard/$guildId/history': typeof DashboardGuildIdHistoryRoute
   '/dashboard/$guildId/join-gate': typeof DashboardGuildIdJoinGateRoute
   '/dashboard/$guildId/lastfm': typeof DashboardGuildIdLastfmRoute
@@ -515,6 +524,7 @@ export interface FileRouteTypes {
     | '/dashboard/$guildId/custom-commands'
     | '/dashboard/$guildId/discord-apps'
     | '/dashboard/$guildId/embeds'
+    | '/dashboard/$guildId/filters'
     | '/dashboard/$guildId/history'
     | '/dashboard/$guildId/join-gate'
     | '/dashboard/$guildId/lastfm'
@@ -567,6 +577,7 @@ export interface FileRouteTypes {
     | '/dashboard/$guildId/custom-commands'
     | '/dashboard/$guildId/discord-apps'
     | '/dashboard/$guildId/embeds'
+    | '/dashboard/$guildId/filters'
     | '/dashboard/$guildId/history'
     | '/dashboard/$guildId/join-gate'
     | '/dashboard/$guildId/lastfm'
@@ -619,6 +630,7 @@ export interface FileRouteTypes {
     | '/dashboard/$guildId/custom-commands'
     | '/dashboard/$guildId/discord-apps'
     | '/dashboard/$guildId/embeds'
+    | '/dashboard/$guildId/filters'
     | '/dashboard/$guildId/history'
     | '/dashboard/$guildId/join-gate'
     | '/dashboard/$guildId/lastfm'
@@ -672,6 +684,7 @@ export interface RootRouteChildren {
   DashboardGuildIdCustomCommandsRoute: typeof DashboardGuildIdCustomCommandsRoute
   DashboardGuildIdDiscordAppsRoute: typeof DashboardGuildIdDiscordAppsRoute
   DashboardGuildIdEmbedsRoute: typeof DashboardGuildIdEmbedsRoute
+  DashboardGuildIdFiltersRoute: typeof DashboardGuildIdFiltersRoute
   DashboardGuildIdHistoryRoute: typeof DashboardGuildIdHistoryRoute
   DashboardGuildIdJoinGateRoute: typeof DashboardGuildIdJoinGateRoute
   DashboardGuildIdLastfmRoute: typeof DashboardGuildIdLastfmRoute
@@ -700,60 +713,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/authorized': {
-      id: '/authorized'
-      path: '/authorized'
-      fullPath: '/authorized'
-      preLoaderRoute: typeof AuthorizedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/commands': {
-      id: '/commands'
-      path: '/commands'
-      fullPath: '/commands'
-      preLoaderRoute: typeof CommandsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/documentation': {
-      id: '/documentation'
-      path: '/documentation'
-      fullPath: '/documentation'
-      preLoaderRoute: typeof DocumentationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/embeds': {
-      id: '/embeds'
-      path: '/embeds'
-      fullPath: '/embeds'
-      preLoaderRoute: typeof EmbedsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refunds': {
@@ -763,18 +727,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embeds': {
+      id: '/embeds'
+      path: '/embeds'
+      fullPath: '/embeds'
+      preLoaderRoute: typeof EmbedsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documentation': {
+      id: '/documentation'
+      path: '/documentation'
+      fullPath: '/documentation'
+      preLoaderRoute: typeof DocumentationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/commands': {
+      id: '/commands'
+      path: '/commands'
+      fullPath: '/commands'
+      preLoaderRoute: typeof CommandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/authorized': {
+      id: '/authorized'
+      path: '/authorized'
+      fullPath: '/authorized'
+      preLoaderRoute: typeof AuthorizedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs/': {
@@ -784,46 +790,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/docs/$slug': {
-      id: '/docs/$slug'
-      path: '/docs/$slug'
-      fullPath: '/docs/$slug'
-      preLoaderRoute: typeof DocsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs/commands': {
-      id: '/docs/commands'
-      path: '/docs/commands'
-      fullPath: '/docs/commands'
-      preLoaderRoute: typeof DocsCommandsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs/introduction': {
-      id: '/docs/introduction'
-      path: '/docs/introduction'
-      fullPath: '/docs/introduction'
-      preLoaderRoute: typeof DocsIntroductionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kick/callback': {
-      id: '/kick/callback'
-      path: '/kick/callback'
-      fullPath: '/kick/callback'
-      preLoaderRoute: typeof KickCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lastfm/callback': {
-      id: '/lastfm/callback'
-      path: '/lastfm/callback'
-      fullPath: '/lastfm/callback'
-      preLoaderRoute: typeof LastfmCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/transcripts/$transcriptId': {
-      id: '/transcripts/$transcriptId'
-      path: '/transcripts/$transcriptId'
-      fullPath: '/transcripts/$transcriptId'
-      preLoaderRoute: typeof TranscriptsTranscriptIdRouteImport
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/transcripts/ingest': {
@@ -833,25 +804,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TranscriptsIngestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/discord/callback': {
-      id: '/auth/discord/callback'
-      path: '/auth/discord/callback'
-      fullPath: '/auth/discord/callback'
-      preLoaderRoute: typeof AuthDiscordCallbackRouteImport
+    '/transcripts/$transcriptId': {
+      id: '/transcripts/$transcriptId'
+      path: '/transcripts/$transcriptId'
+      fullPath: '/transcripts/$transcriptId'
+      preLoaderRoute: typeof TranscriptsTranscriptIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/discord/login': {
-      id: '/auth/discord/login'
-      path: '/auth/discord/login'
-      fullPath: '/auth/discord/login'
-      preLoaderRoute: typeof AuthDiscordLoginRouteImport
+    '/lastfm/callback': {
+      id: '/lastfm/callback'
+      path: '/lastfm/callback'
+      fullPath: '/lastfm/callback'
+      preLoaderRoute: typeof LastfmCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/discord/logout': {
-      id: '/auth/discord/logout'
-      path: '/auth/discord/logout'
-      fullPath: '/auth/discord/logout'
-      preLoaderRoute: typeof AuthDiscordLogoutRouteImport
+    '/kick/callback': {
+      id: '/kick/callback'
+      path: '/kick/callback'
+      fullPath: '/kick/callback'
+      preLoaderRoute: typeof KickCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/introduction': {
+      id: '/docs/introduction'
+      path: '/docs/introduction'
+      fullPath: '/docs/introduction'
+      preLoaderRoute: typeof DocsIntroductionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/commands': {
+      id: '/docs/commands'
+      path: '/docs/commands'
+      fullPath: '/docs/commands'
+      preLoaderRoute: typeof DocsCommandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/$slug': {
+      id: '/docs/$slug'
+      path: '/docs/$slug'
+      fullPath: '/docs/$slug'
+      preLoaderRoute: typeof DocsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/$guildId/': {
@@ -861,123 +853,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardGuildIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/$guildId/automations': {
-      id: '/dashboard/$guildId/automations'
-      path: '/dashboard/$guildId/automations'
-      fullPath: '/dashboard/$guildId/automations'
-      preLoaderRoute: typeof DashboardGuildIdAutomationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/custom-commands': {
-      id: '/dashboard/$guildId/custom-commands'
-      path: '/dashboard/$guildId/custom-commands'
-      fullPath: '/dashboard/$guildId/custom-commands'
-      preLoaderRoute: typeof DashboardGuildIdCustomCommandsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/discord-apps': {
-      id: '/dashboard/$guildId/discord-apps'
-      path: '/dashboard/$guildId/discord-apps'
-      fullPath: '/dashboard/$guildId/discord-apps'
-      preLoaderRoute: typeof DashboardGuildIdDiscordAppsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/embeds': {
-      id: '/dashboard/$guildId/embeds'
-      path: '/dashboard/$guildId/embeds'
-      fullPath: '/dashboard/$guildId/embeds'
-      preLoaderRoute: typeof DashboardGuildIdEmbedsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/history': {
-      id: '/dashboard/$guildId/history'
-      path: '/dashboard/$guildId/history'
-      fullPath: '/dashboard/$guildId/history'
-      preLoaderRoute: typeof DashboardGuildIdHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/join-gate': {
-      id: '/dashboard/$guildId/join-gate'
-      path: '/dashboard/$guildId/join-gate'
-      fullPath: '/dashboard/$guildId/join-gate'
-      preLoaderRoute: typeof DashboardGuildIdJoinGateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/lastfm': {
-      id: '/dashboard/$guildId/lastfm'
-      path: '/dashboard/$guildId/lastfm'
-      fullPath: '/dashboard/$guildId/lastfm'
-      preLoaderRoute: typeof DashboardGuildIdLastfmRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/leaderboard': {
-      id: '/dashboard/$guildId/leaderboard'
-      path: '/dashboard/$guildId/leaderboard'
-      fullPath: '/dashboard/$guildId/leaderboard'
-      preLoaderRoute: typeof DashboardGuildIdLeaderboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/leveling': {
-      id: '/dashboard/$guildId/leveling'
-      path: '/dashboard/$guildId/leveling'
-      fullPath: '/dashboard/$guildId/leveling'
-      preLoaderRoute: typeof DashboardGuildIdLevelingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/logging': {
-      id: '/dashboard/$guildId/logging'
-      path: '/dashboard/$guildId/logging'
-      fullPath: '/dashboard/$guildId/logging'
-      preLoaderRoute: typeof DashboardGuildIdLoggingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/messages': {
-      id: '/dashboard/$guildId/messages'
-      path: '/dashboard/$guildId/messages'
-      fullPath: '/dashboard/$guildId/messages'
-      preLoaderRoute: typeof DashboardGuildIdMessagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/panels': {
-      id: '/dashboard/$guildId/panels'
-      path: '/dashboard/$guildId/panels'
-      fullPath: '/dashboard/$guildId/panels'
-      preLoaderRoute: typeof DashboardGuildIdPanelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/permissions': {
-      id: '/dashboard/$guildId/permissions'
-      path: '/dashboard/$guildId/permissions'
-      fullPath: '/dashboard/$guildId/permissions'
-      preLoaderRoute: typeof DashboardGuildIdPermissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/security': {
-      id: '/dashboard/$guildId/security'
-      path: '/dashboard/$guildId/security'
-      fullPath: '/dashboard/$guildId/security'
-      preLoaderRoute: typeof DashboardGuildIdSecurityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/settings': {
-      id: '/dashboard/$guildId/settings'
-      path: '/dashboard/$guildId/settings'
-      fullPath: '/dashboard/$guildId/settings'
-      preLoaderRoute: typeof DashboardGuildIdSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/tickets': {
-      id: '/dashboard/$guildId/tickets'
-      path: '/dashboard/$guildId/tickets'
-      fullPath: '/dashboard/$guildId/tickets'
-      preLoaderRoute: typeof DashboardGuildIdTicketsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/$guildId/verification': {
-      id: '/dashboard/$guildId/verification'
-      path: '/dashboard/$guildId/verification'
-      fullPath: '/dashboard/$guildId/verification'
-      preLoaderRoute: typeof DashboardGuildIdVerificationRouteImport
+    '/dashboard/$guildId/webhooks': {
+      id: '/dashboard/$guildId/webhooks'
+      path: '/dashboard/$guildId/webhooks'
+      fullPath: '/dashboard/$guildId/webhooks'
+      preLoaderRoute: typeof DashboardGuildIdWebhooksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/$guildId/voicemaster': {
@@ -987,39 +867,151 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardGuildIdVoicemasterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/$guildId/webhooks': {
-      id: '/dashboard/$guildId/webhooks'
-      path: '/dashboard/$guildId/webhooks'
-      fullPath: '/dashboard/$guildId/webhooks'
-      preLoaderRoute: typeof DashboardGuildIdWebhooksRouteImport
+    '/dashboard/$guildId/verification': {
+      id: '/dashboard/$guildId/verification'
+      path: '/dashboard/$guildId/verification'
+      fullPath: '/dashboard/$guildId/verification'
+      preLoaderRoute: typeof DashboardGuildIdVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/analytics/snapshot': {
-      id: '/api/public/analytics/snapshot'
-      path: '/api/public/analytics/snapshot'
-      fullPath: '/api/public/analytics/snapshot'
-      preLoaderRoute: typeof ApiPublicAnalyticsSnapshotRouteImport
+    '/dashboard/$guildId/tickets': {
+      id: '/dashboard/$guildId/tickets'
+      path: '/dashboard/$guildId/tickets'
+      fullPath: '/dashboard/$guildId/tickets'
+      preLoaderRoute: typeof DashboardGuildIdTicketsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/lastfm/account': {
-      id: '/api/public/lastfm/account'
-      path: '/api/public/lastfm/account'
-      fullPath: '/api/public/lastfm/account'
-      preLoaderRoute: typeof ApiPublicLastfmAccountRouteImport
+    '/dashboard/$guildId/settings': {
+      id: '/dashboard/$guildId/settings'
+      path: '/dashboard/$guildId/settings'
+      fullPath: '/dashboard/$guildId/settings'
+      preLoaderRoute: typeof DashboardGuildIdSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/security/config': {
-      id: '/api/public/security/config'
-      path: '/api/public/security/config'
-      fullPath: '/api/public/security/config'
-      preLoaderRoute: typeof ApiPublicSecurityConfigRouteImport
+    '/dashboard/$guildId/security': {
+      id: '/dashboard/$guildId/security'
+      path: '/dashboard/$guildId/security'
+      fullPath: '/dashboard/$guildId/security'
+      preLoaderRoute: typeof DashboardGuildIdSecurityRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/stripe/webhook': {
-      id: '/api/public/stripe/webhook'
-      path: '/api/public/stripe/webhook'
-      fullPath: '/api/public/stripe/webhook'
-      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+    '/dashboard/$guildId/permissions': {
+      id: '/dashboard/$guildId/permissions'
+      path: '/dashboard/$guildId/permissions'
+      fullPath: '/dashboard/$guildId/permissions'
+      preLoaderRoute: typeof DashboardGuildIdPermissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/panels': {
+      id: '/dashboard/$guildId/panels'
+      path: '/dashboard/$guildId/panels'
+      fullPath: '/dashboard/$guildId/panels'
+      preLoaderRoute: typeof DashboardGuildIdPanelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/messages': {
+      id: '/dashboard/$guildId/messages'
+      path: '/dashboard/$guildId/messages'
+      fullPath: '/dashboard/$guildId/messages'
+      preLoaderRoute: typeof DashboardGuildIdMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/logging': {
+      id: '/dashboard/$guildId/logging'
+      path: '/dashboard/$guildId/logging'
+      fullPath: '/dashboard/$guildId/logging'
+      preLoaderRoute: typeof DashboardGuildIdLoggingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/leveling': {
+      id: '/dashboard/$guildId/leveling'
+      path: '/dashboard/$guildId/leveling'
+      fullPath: '/dashboard/$guildId/leveling'
+      preLoaderRoute: typeof DashboardGuildIdLevelingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/leaderboard': {
+      id: '/dashboard/$guildId/leaderboard'
+      path: '/dashboard/$guildId/leaderboard'
+      fullPath: '/dashboard/$guildId/leaderboard'
+      preLoaderRoute: typeof DashboardGuildIdLeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/lastfm': {
+      id: '/dashboard/$guildId/lastfm'
+      path: '/dashboard/$guildId/lastfm'
+      fullPath: '/dashboard/$guildId/lastfm'
+      preLoaderRoute: typeof DashboardGuildIdLastfmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/join-gate': {
+      id: '/dashboard/$guildId/join-gate'
+      path: '/dashboard/$guildId/join-gate'
+      fullPath: '/dashboard/$guildId/join-gate'
+      preLoaderRoute: typeof DashboardGuildIdJoinGateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/history': {
+      id: '/dashboard/$guildId/history'
+      path: '/dashboard/$guildId/history'
+      fullPath: '/dashboard/$guildId/history'
+      preLoaderRoute: typeof DashboardGuildIdHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/filters': {
+      id: '/dashboard/$guildId/filters'
+      path: '/dashboard/$guildId/filters'
+      fullPath: '/dashboard/$guildId/filters'
+      preLoaderRoute: typeof DashboardGuildIdFiltersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/embeds': {
+      id: '/dashboard/$guildId/embeds'
+      path: '/dashboard/$guildId/embeds'
+      fullPath: '/dashboard/$guildId/embeds'
+      preLoaderRoute: typeof DashboardGuildIdEmbedsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/discord-apps': {
+      id: '/dashboard/$guildId/discord-apps'
+      path: '/dashboard/$guildId/discord-apps'
+      fullPath: '/dashboard/$guildId/discord-apps'
+      preLoaderRoute: typeof DashboardGuildIdDiscordAppsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/custom-commands': {
+      id: '/dashboard/$guildId/custom-commands'
+      path: '/dashboard/$guildId/custom-commands'
+      fullPath: '/dashboard/$guildId/custom-commands'
+      preLoaderRoute: typeof DashboardGuildIdCustomCommandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$guildId/automations': {
+      id: '/dashboard/$guildId/automations'
+      path: '/dashboard/$guildId/automations'
+      fullPath: '/dashboard/$guildId/automations'
+      preLoaderRoute: typeof DashboardGuildIdAutomationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/discord/logout': {
+      id: '/auth/discord/logout'
+      path: '/auth/discord/logout'
+      fullPath: '/auth/discord/logout'
+      preLoaderRoute: typeof AuthDiscordLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/discord/login': {
+      id: '/auth/discord/login'
+      path: '/auth/discord/login'
+      fullPath: '/auth/discord/login'
+      preLoaderRoute: typeof AuthDiscordLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/discord/callback': {
+      id: '/auth/discord/callback'
+      path: '/auth/discord/callback'
+      fullPath: '/auth/discord/callback'
+      preLoaderRoute: typeof AuthDiscordCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/tickets/transcript': {
@@ -1029,11 +1021,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTicketsTranscriptRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/auth/discord/callback': {
-      id: '/api/public/auth/discord/callback'
-      path: '/api/public/auth/discord/callback'
-      fullPath: '/api/public/auth/discord/callback'
-      preLoaderRoute: typeof ApiPublicAuthDiscordCallbackRouteImport
+    '/api/public/stripe/webhook': {
+      id: '/api/public/stripe/webhook'
+      path: '/api/public/stripe/webhook'
+      fullPath: '/api/public/stripe/webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/security/config': {
+      id: '/api/public/security/config'
+      path: '/api/public/security/config'
+      fullPath: '/api/public/security/config'
+      preLoaderRoute: typeof ApiPublicSecurityConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/lastfm/account': {
+      id: '/api/public/lastfm/account'
+      path: '/api/public/lastfm/account'
+      fullPath: '/api/public/lastfm/account'
+      preLoaderRoute: typeof ApiPublicLastfmAccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/analytics/snapshot': {
+      id: '/api/public/analytics/snapshot'
+      path: '/api/public/analytics/snapshot'
+      fullPath: '/api/public/analytics/snapshot'
+      preLoaderRoute: typeof ApiPublicAnalyticsSnapshotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/auth/discord/logout': {
+      id: '/api/public/auth/discord/logout'
+      path: '/api/public/auth/discord/logout'
+      fullPath: '/api/public/auth/discord/logout'
+      preLoaderRoute: typeof ApiPublicAuthDiscordLogoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/auth/discord/login': {
@@ -1043,11 +1063,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAuthDiscordLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/auth/discord/logout': {
-      id: '/api/public/auth/discord/logout'
-      path: '/api/public/auth/discord/logout'
-      fullPath: '/api/public/auth/discord/logout'
-      preLoaderRoute: typeof ApiPublicAuthDiscordLogoutRouteImport
+    '/api/public/auth/discord/callback': {
+      id: '/api/public/auth/discord/callback'
+      path: '/api/public/auth/discord/callback'
+      fullPath: '/api/public/auth/discord/callback'
+      preLoaderRoute: typeof ApiPublicAuthDiscordCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -1080,6 +1100,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardGuildIdCustomCommandsRoute: DashboardGuildIdCustomCommandsRoute,
   DashboardGuildIdDiscordAppsRoute: DashboardGuildIdDiscordAppsRoute,
   DashboardGuildIdEmbedsRoute: DashboardGuildIdEmbedsRoute,
+  DashboardGuildIdFiltersRoute: DashboardGuildIdFiltersRoute,
   DashboardGuildIdHistoryRoute: DashboardGuildIdHistoryRoute,
   DashboardGuildIdJoinGateRoute: DashboardGuildIdJoinGateRoute,
   DashboardGuildIdLastfmRoute: DashboardGuildIdLastfmRoute,

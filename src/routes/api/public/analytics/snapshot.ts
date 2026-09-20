@@ -7,17 +7,19 @@ function safeEqual(a: string, b: string) {
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
-function derivedBotSecret(value: string | undefined) {
+function derivedBotSecret(value: string | undefined, prefix = "stained") {
   const token = (value || "").trim().replace(/^Bot\s+/i, "");
   if (!token) return "";
   return createHash("sha256")
-    .update(`ware-analytics-v1:${token}`)
+    .update(`${prefix}-analytics-v1:${token}`)
     .digest("hex");
 }
 
 function analyticsSecrets() {
   const values = [
     (process.env.WARE_ANALYTICS_SECRET || "").trim(),
+    (process.env.STAINED_ANALYTICS_SECRET || "").trim(),
+    ...[process.env.DISCORD_BOT_TOKEN, process.env.BOT_TOKEN, process.env.DISCORD_TOKEN].map(token => derivedBotSecret(token, "ware")),
     derivedBotSecret(process.env.DISCORD_BOT_TOKEN),
     derivedBotSecret(process.env.BOT_TOKEN),
     derivedBotSecret(process.env.DISCORD_TOKEN),
@@ -30,8 +32,8 @@ function verifyRequest(request: Request, body: string) {
   const secrets = analyticsSecrets();
   if (!secrets.length) return false;
 
-  const timestampText = request.headers.get("x-ware-timestamp") || "";
-  const signature = request.headers.get("x-ware-signature") || "";
+  const timestampText = (request.headers.get("x-stained-timestamp") || request.headers.get("x-ware-timestamp")) || "";
+  const signature = (request.headers.get("x-stained-signature") || request.headers.get("x-ware-signature")) || "";
   if (!/^\d+$/.test(timestampText) || !signature) return false;
 
   const timestamp = Number(timestampText);

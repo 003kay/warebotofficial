@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowUpRight, Command, FileText, Search } from "lucide-react";
-import { commandCategories } from "@/lib/commands";
+import { canonicalCommandCategories as commandCategories } from "@/lib/canonicalCommands";
 import { docSections } from "./doc-sections";
 
 type Result =

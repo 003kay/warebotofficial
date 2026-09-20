@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { ALL_MODULES, LIST_TYPES, MODULE_KEYS, type ListType } from "@/lib/security-modules";
 import type { Json } from "@/integrations/supabase/types";
+import { runtimeSecurityKeys, runtimePunishments } from "@/lib/runtime-security";
 
 async function requireGuildManager(guildId: string) {
   const { readSessionDataFromCookie } = await import("@/lib/session.server");
@@ -180,8 +181,11 @@ export const saveSecuritySettings = createServerFn({ method: "POST" })
 export const saveSecurityModule = createServerFn({ method: "POST" })
   .inputValidator((d: { guildId: string; module_key: string; enabled: boolean; dry_run: boolean; punishment: string; threshold_count: number; threshold_seconds: number; extra: Json }) => d)
   .handler(async ({ data }) => {
-    await requireGuildManager(data.guildId);
-    if (!MODULE_KEYS.has(data.module_key)) throw new Error("Unknown security module");
+    const { guild, userId } = await requireGuildManager(data.guildId);
+    if (!guild.owner) throw new Error("Only the server owner can change antinuke from the dashboard.");
+    if (!runtimeSecurityKeys.has(data.module_key)) throw new Error("Configure this feature using its dedicated page or Discord command.");
+    if (!runtimePunishments.some(item => item.value === data.punishment)) throw new Error("Unsupported antinuke action.");
+    if (!Number.isFinite(data.threshold_count) || !Number.isFinite(data.threshold_seconds)) throw new Error("Enter valid threshold values.");
     const count = Math.max(1, Math.min(1000, Number(data.threshold_count || 1)));
     const seconds = Math.max(1, Math.min(86400, Number(data.threshold_seconds || 1)));
     const incomingExtra = (data.extra && typeof data.extra === "object" && !Array.isArray(data.extra) ? data.extra : {}) as Record<string, Json>;
@@ -189,6 +193,8 @@ export const saveSecurityModule = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("security_modules").upsert({ guild_id: data.guildId, module_key: data.module_key, enabled: data.enabled, dry_run: data.dry_run, punishment: data.punishment, threshold_count: count, threshold_seconds: seconds, extra }, { onConflict: "guild_id,module_key" });
     if (error) throw new Error(error.message);
+    const ack = await (supabaseAdmin as any).rpc("save_stained_dashboard_section", {p_guild_id:data.guildId,p_section:"security",p_values:{updatedAt:new Date().toISOString()},p_user_id:userId});
+    if (ack.error) throw new Error("Module saved, but sync tracking failed. Please save again.");
     return { ok: true };
   });
 
@@ -218,4 +224,3 @@ export const removeSecurityListEntry = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
-
